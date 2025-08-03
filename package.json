@@ -1,0 +1,15 @@
+{
+  "name": "@payzeno/contracts",
+  "version": "3.4.0",
+  "description": "Shared request/response types, event envelopes and money helpers for every Payzeno service. Zero runtime dependencies.",
+  "license": "UNLICENSED",
+  "private": false,
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://npm.payzeno.internal/"
+  },
+  "repository": {
+    "vitest": "1.6.0"
+  }
+}
