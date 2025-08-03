@@ -1,0 +1,17 @@
+import { describe, expect, it } from 'vitest';
+
+import { CURRENCIES, CURRENCY_EXPONENT } from './scalars';
+
+describe('CURRENCIES', () => {
+  it('is the five supported currencies, uppercase ISO-4217', () => {
+    expect([...CURRENCIES]).toEqual(['USD', 'EUR', 'GBP', 'ILS', 'JPY']);
+    for (const currency of CURRENCIES) {
+      expect(currency).toMatch(/^[A-Z]{3}$/);
+    }
+  });
+
+  it('is JPY = 0 — anything that hardcodes 100 is a bug', () => {
+    expect(CURRENCY_EXPONENT.JPY).toBe(0);
+  });
+
+});
