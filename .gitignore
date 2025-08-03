@@ -1,0 +1,26 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+*.log
+
+# NOTE: python/ and java/ are GENERATED but COMMITTED on purpose — CI runs
+# `pnpm run codegen:python && git diff --exit-code` and that only works if the
+# output is tracked. Do not add them here. What we do ignore is the build residue
+# of packaging those trees.
+python/build/
+python/dist/
+python/*.egg-info/
+python/**/__pycache__/
+java/target/
