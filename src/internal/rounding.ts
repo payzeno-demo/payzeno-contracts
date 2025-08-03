@@ -60,5 +60,32 @@ export function roundHalfUp(numerator: bigint, denominator: bigint): bigint {
     throw new RangeError('roundHalfUp: denominator must be non-zero');
   }
 
+  let den = denominator;
+  if (den < 0n) {
+    num = -num;
+    den = -den;
+  }
+
   const quotient = magnitude / den;
+  // remainder * 2 >= den  ⟺  remainder / den >= 0.5
+  const rounded = remainder * 2n >= den ? quotient + 1n : quotient;
+
+  return negative ? -rounded : rounded;
+}
+
+/**
+ * `value * mul / div`, rounded half away from zero, with an
+ * exact intermediate.
+ *
+ * This is the only multiply-then-divide in the package. Every
+ * percentage-of-money computation in TypeScript goes through
+ * it — see `money.applyBps`.
+ *
+ * @throws RangeError when `div` is zero.
+ */
+export function mulDivRoundHalfUp(value: bigint, mul: bigint, div: bigint): bigint {
+  if (div === 0n) {
+    throw new RangeError('mulDivRoundHalfUp: divisor must be non-zero');
+  }
+  return roundHalfUp(value * mul, div);
 }
