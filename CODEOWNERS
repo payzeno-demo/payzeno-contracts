@@ -1,0 +1,11 @@
+# payzeno-contracts is owned by Platform, but the files that four repos inherit from
+# are pinned to the CTO. Changing errors.ts or version.ts changes every service at once.
+# Review policy: 1 approval (world default). Two if you touch src/events/**, because
+# Core consumes it — ask nmigration.
+
+*                                   @payzeno/platform @osquash
+
+# --- CTO-pinned. Do not merge without dhotfix. ------------------------------
+src/errors.ts                       @dhotfix
+src/version.ts                      @dhotfix
+src/internal/                       @dhotfix
