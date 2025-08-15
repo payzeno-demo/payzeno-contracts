@@ -11,3 +11,9 @@
  */
 
 import type { EventType } from './envelope';
+
+export const EVENT_TOPICS = {
+  'payzeno-payments-events': [
+    'payment.authorized',
+    'payment.captured',
+    'payment.failed',

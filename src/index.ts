@@ -5,3 +5,4 @@
  * consumer sees as `@payzeno/contracts`.
  *
  * RULE: adding an exported symbol to a `src/types/**` module without
+ * re-exporting it here is a contract break, not a style problem. The symbol
