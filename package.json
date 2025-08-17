@@ -10,6 +10,16 @@
     "registry": "https://npm.payzeno.internal/"
   },
   "repository": {
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js",
+      "require": "./dist/errors.cjs"
+    },
+    "./guards": {
+      "types": "./dist/guards.d.ts",
+      "import": "./dist/guards.js",
+      "require": "./dist/guards.cjs"
+    },
     "vitest": "1.6.0"
   }
 }
