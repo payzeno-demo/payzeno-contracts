@@ -14,3 +14,11 @@ Consumers: `payzeno-api`, `payzeno-console` (workspace deps), `payzeno-ledger`
 1. **Money is always a pair.** `{ amount_minor: number, currency: CurrencyCode }`. Minor units,
    integers, no floats, no `Decimal` on the wire. A field that holds money ends in `_minor` —
    if it doesn't, it isn't money. JPY has exponent 0; see `CURRENCY_EXPONENT`. Use `src/money.ts`
+   rather than doing the arithmetic yourself, because it is the one implementation the whole org
+   agrees with (the ledger mirrors it in `app/domain/money.py`).
+2. **Timestamps are RFC 3339 strings**, typed `IsoTimestamp`. There is no `Date` in this package
+   and there will not be one — `Date` does not survive the Python emitter and does not survive
+   JSON.
+3. **Enums are `as const` tuples**, never the `enum` keyword. `export const FOO = [...] as const;
+   export type Foo = (typeof FOO)[number];` The tuples are what back the Postgres enums and what
+   the codegen turns into `Literal[...]`.
