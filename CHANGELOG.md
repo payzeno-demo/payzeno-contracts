@@ -8,3 +8,7 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 ## [Unreleased]
 
 - Nothing yet.
+
+## [3.4.0] — 2026-07-16
+
+### Added

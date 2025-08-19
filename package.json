@@ -31,6 +31,8 @@
       "import": "./dist/guards.js",
       "require": "./dist/guards.cjs"
     },
+    "clean": "rm -rf dist .tsbuildinfo",
+    "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
     "vitest": "1.6.0"
   }
