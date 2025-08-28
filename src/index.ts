@@ -8,3 +8,5 @@
  * re-exporting it here is a contract break, not a style problem. The symbol
  * exists in the repo, typechecks locally, and is invisible to all four
  * consumers. `src/index.test.ts` fails on it.
+ *
+ * RULE: nothing in `src/types/**` may import from here, from `src/events/**`,
