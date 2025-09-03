@@ -1,0 +1,123 @@
+/**
+ * `SourceModule` → `IrModule`.
+ *
+ * Where the TypeScript-shaped facts become language-neutral ones. Four rules do
+ * most of the work:
+ *
+ *   1. `export const FOO = [...] as const` becomes an `IrEnum`. That idiom is
+ *      the org's only enum, so anything else that looks like an enum isn't one.
+ *   2. `foo?: T` is OPTIONAL. `foo: T | null` is NULLABLE. They are different
+ *      facts and Pydantic spells them differently; collapsing them is how a
+ *      required-but-nullable field turns into one the ledger can silently omit.
+ *   3. `Paginated<T>` and `Record<K, V>` are the only generics.
+ *   4. Anything else throws rather than guessing.
+ */
+
+import { UnsupportedTypeError } from './errors';
+import type {
+  IrConstMap,
+  IrDeclaration,
+  IrEnum,
+  IrField,
+  IrModel,
+  IrModule,
+  IrScalarName,
+  IrType,
+  SourceDeclaration,
+  SourceMember,
+  SourceModule,
+  SourceTypeNode,
+} from './ir';
+
+/** Type aliases that are really scalars wearing a name. */
+const SCALAR_ALIASES: Record<string, IrScalarName> = {
+  IsoTimestamp: 'timestamp',
+  IsoDate: 'date',
+  MinorUnits: 'integer',
+  BasisPoints: 'integer',
+  string: 'string',
+  number: 'number',
+  boolean: 'boolean',
+  unknown: 'unknown',
+  // `EventEnvelope<TType, TPayload>`'s parameters. The loader does not model
+  // type parameters, and erasing them here is what stops every generated
+  // `*Event` alias referencing a name the target module never defines.
+  TType: 'string',
+  TPayload: 'unknown',
+};
+
+export class TypeNormalizer {
+  private currentModule = '<unknown>';
+
+  normalizeTypeNode(node: SourceTypeNode): IrType {
+    switch (node.kind) {
+      case 'keyword': {
+        const scalar = SCALAR_ALIASES[node.text.trim()];
+        if (scalar === undefined) {
+          throw new UnsupportedTypeError(node.text, this.currentModule);
+        }
+        return { kind: 'scalar', name: scalar };
+      }
+
+      case 'literal':
+        return { kind: 'literal', value: node.literal ?? node.text };
+
+      case 'array': {
+        const element = node.args?.[0];
+        if (element === undefined) {
+          throw new UnsupportedTypeError(node.text, this.currentModule);
+        }
+        return { kind: 'generic', name: 'Array', args: [this.normalizeTypeNode(element)] };
+      }
+
+      case 'union': {
+        const members = (node.args ?? []).map((arg) => this.normalizeTypeNode(arg));
+        if (members.length === 0) {
+          throw new UnsupportedTypeError(node.text, this.currentModule);
+        }
+        return { kind: 'union', members };
+      }
+
+      case 'reference': {
+        const name = node.typeName ?? node.text;
+        const scalar = SCALAR_ALIASES[name];
+        if (scalar !== undefined) {
+          return { kind: 'scalar', name: scalar };
+        }
+        // Every `*Id` alias is a prefixed ULID string. Emitting a distinct
+        // NewType per id in Python was tried and rejected: it made every
+        // ledger call site cast.
+        if (/Id$/.test(name)) {
+          return { kind: 'scalar', name: 'string' };
+        }
+        return { kind: 'ref', name };
+      }
+
+      case 'generic':
+        return this.normalizeGeneric(node);
+
+      case 'object': {
+        // Inline object types (ApiError.error) are flattened to an opaque
+        // mapping. Naming them would invent a symbol that has no TypeScript
+        // counterpart and the parity check would then fail on it.
+        return {
+          kind: 'generic',
+          name: 'Record',
+          args: [
+            { kind: 'scalar', name: 'string' },
+            { kind: 'scalar', name: 'unknown' },
+          ],
+        };
+      }
+
+      case 'indexed':
+        // `(typeof FOO)[number]` — the derived-union idiom. The tuple it
+        // derives from is already an IrEnum, so point at that.
+        return this.normalizeIndexed(node);
+
+      default:
+        throw new UnsupportedTypeError(node.text, this.currentModule);
+    }
+  }
+
+}
