@@ -1,0 +1,126 @@
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { parseArgs } from './cli';
+import { EmitDriftError, UnsupportedTypeError } from './errors';
+import { PythonEmitter } from './emitters/python.emitter';
+import { JavaEmitter } from './emitters/java.emitter';
+import type { IrModule } from './ir';
+import { TypeNormalizer } from './normalizer';
+import type { SourceModule } from './ir';
+import { DeterministicWriter } from './writer';
+
+const tempDirs: string[] = [];
+
+function tempDir(): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'payzeno-codegen-'));
+  tempDirs.push(dir);
+  return dir;
+}
+
+afterEach(() => {
+  while (tempDirs.length > 0) {
+    const dir = tempDirs.pop();
+    if (dir !== undefined) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+const sourceModule: SourceModule = {
+  moduleName: 'types/sample',
+  filePath: 'src/types/sample.ts',
+  declarations: [
+    {
+      name: 'CHARGE_STATUSES',
+      kind: 'const-tuple',
+      exported: true,
+      doc: null,
+      values: ['pending', 'authorized', 'captured'],
+    },
+    {
+      name: 'SampleCharge',
+      kind: 'interface',
+      exported: true,
+      doc: 'A charge, trimmed to what the emitter needs to prove.',
+      heritage: [],
+      members: [
+        {
+          name: 'id',
+          optional: false,
+          doc: null,
+          type: { kind: 'reference', text: 'ChargeId', typeName: 'ChargeId' },
+        },
+        {
+          name: 'object',
+          optional: false,
+          doc: null,
+          type: { kind: 'literal', text: "'charge'", literal: 'charge' },
+        },
+        {
+          name: 'amount_minor',
+          optional: false,
+          doc: null,
+          type: { kind: 'reference', text: 'MinorUnits', typeName: 'MinorUnits' },
+        },
+        {
+          name: 'settled_at',
+          optional: false,
+          doc: null,
+          type: {
+            kind: 'union',
+            text: 'IsoTimestamp | null',
+            args: [
+              { kind: 'reference', text: 'IsoTimestamp', typeName: 'IsoTimestamp' },
+              { kind: 'keyword', text: 'null' },
+            ],
+          },
+        },
+        {
+          name: 'metadata',
+          optional: true,
+          doc: null,
+          type: {
+            kind: 'generic',
+            text: 'Record<string, string>',
+            typeName: 'Record',
+            args: [
+              { kind: 'keyword', text: 'string' },
+              { kind: 'keyword', text: 'string' },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+};
+
+function normalize(): IrModule {
+  return new TypeNormalizer().normalizeModule(sourceModule);
+}
+
+describe('TypeNormalizer', () => {
+  it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
+    expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
+  });
+
+  it('exports every symbol in __all__', () => {
+    expect(emitted.contents).toContain('__all__ = [');
+    expect(emitted.symbols.sort()).toEqual(['CHARGE_STATUSES', 'SampleCharge']);
+  });
+});
+
+describe('JavaEmitter', () => {
+  const module = normalize();
+  // The derived-union alias is what names the Java enum. The TS half of that
+  // pair lives in a different declaration, so hand it to the emitter here.
+  module.declarations.push({
+    kind: 'alias',
+    name: 'ChargeStatus',
+    target: { kind: 'ref', name: 'CHARGE_STATUSES' },
+    doc: null,
+  });
+});
