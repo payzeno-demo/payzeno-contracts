@@ -21,6 +21,11 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "./errors": {
       "types": "./dist/errors.d.ts",
       "import": "./dist/errors.js",
@@ -33,6 +38,7 @@
     },
     "build": "tsup",
     "clean": "rm -rf dist .tsbuildinfo",
+    "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "@vitest/coverage-v8": "1.6.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
