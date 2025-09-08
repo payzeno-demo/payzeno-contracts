@@ -40,6 +40,11 @@ export interface CodegenReport {
 export class CodegenPipeline {
   constructor(
     private readonly loader: SourceLoader,
+    private readonly normalizer: TypeNormalizer,
+    private readonly writer: DeterministicWriter,
+  ) {}
+
+  async run(opts: CodegenOptions): Promise<CodegenReport> {
     const buckets = new Map<string, IrModule>();
 
     for (const module of modules) {

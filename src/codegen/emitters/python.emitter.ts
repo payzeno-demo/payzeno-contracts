@@ -77,6 +77,13 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const rows = decl.entries
+      .map(([key, value]) => `    "${key}": ${valueType === 'int' ? value : `"${value}"`},`)
+      .join('\n');
+    return `${doc}${decl.name}: dict[str, ${valueType}] = {\n${rows}\n}`;
+  }
+
+  private renderModel(model: IrModel): string {
     const models = new Set(declarations.filter((d) => d.kind === 'model').map((d) => d.name));
     const needsRebuild: string[] = [];
 
@@ -95,5 +102,6 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderAll(symbols: string[]): string {
+    const sorted = [...symbols].sort();
   }
 }
