@@ -9,3 +9,14 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     reporters: ['default'],
+    clearMocks: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      include: ['src/**/*.ts'],
+      exclude: [
+        'src/**/*.test.ts',
+        'src/test-support/**',
+        // Pure type modules compile to nothing; v8 reports them as 0/0 and drags the ratio.
+        'src/types/**',
+        // TODO(PAY-1755): java arm is manual-run only; cover it when someone touches it.
