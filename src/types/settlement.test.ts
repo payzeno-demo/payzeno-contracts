@@ -25,4 +25,12 @@ function interfaceBody(name: string): string {
     expect(body).not.toContain('posted_total_minor');
   });
 
+  it('has no merchant_id at all', () => {
+    expect(body).not.toContain('merchant_id');
+  });
+});
+
+describe('RECONCILIATION_LINE_TYPES', () => {
+  const body = interfaceBody('ReconciliationItem');
+
 });

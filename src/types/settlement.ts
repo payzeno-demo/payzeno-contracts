@@ -29,5 +29,21 @@ export const SETTLEMENT_BATCH_STATUSES = [
   'funded',
   'failed',
 ] as const;
+export type Acquirer = (typeof ACQUIRERS)[number];
+
+export interface MerchantSettlementBatch {
+  id: SettlementBatchId;
+  object: 'merchant_settlement_batch';
+  merchant_id: MerchantId;
+  currency: CurrencyCode;
+  processing_date: IsoDate;
+  acquirer: Acquirer;
+  status: SettlementBatchStatus;
+  /** This merchant's items in the batch, and their net. Nothing else. */
+  item_count: number;
+  net_minor: MinorUnits;
+  funded_at: IsoTimestamp | null;
+}
+
 export type ReconciliationLineType = (typeof RECONCILIATION_LINE_TYPES)[number];
 
