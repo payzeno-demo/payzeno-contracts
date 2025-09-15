@@ -24,3 +24,9 @@ export const EVENT_TOPICS = {
     'dispute.opened',
     'dispute.evidence_submitted',
     'dispute.closed',
+  ],
+  'payzeno-ledger-events': [
+    'settlement.batch_closed',
+    'settlement.item_settled',
+    'settlement.completed',
+    'settlement.reconciliation_failed',
