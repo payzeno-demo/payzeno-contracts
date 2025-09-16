@@ -11,3 +11,16 @@ import type {
   BankAccountId,
   CurrencyCode,
   IsoDate,
+  IsoTimestamp,
+  LedgerTransactionId,
+  MerchantId,
+  MinorUnits,
+  PayoutFailureCode,
+  PayoutId,
+  PayoutMethod,
+} from '../index';
+import type { EventEnvelope } from './envelope';
+
+export interface PayoutScheduledPayload {
+  payout_id: PayoutId;
+  merchant_id: MerchantId;

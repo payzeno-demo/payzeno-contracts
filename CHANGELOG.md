@@ -12,3 +12,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 ## [3.4.0] — 2026-07-16
 
 ### Added
+
+- `LEDGER_PURPOSES` gains `settlement_funding` (PAY-2088). Arc MIG step 5 — the ledger needs a
+  purpose for the funding leg now that it owns it.
+- `FundingEvent` on `types/settlement.ts` (PAY-2088).
+

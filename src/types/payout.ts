@@ -20,4 +20,33 @@ export const PAYOUT_STATUSES = [
   'returned',
   'canceled',
 ] as const;
+export type PayoutMethod = (typeof PAYOUT_METHODS)[number];
+
+export interface Payout {
+  id: PayoutId;
+  object: 'payout';
+  merchant_id: MerchantId;
+  bank_account_id: BankAccountId;
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  status: PayoutStatus;
+  method: PayoutMethod;
+  available_on: IsoDate;
+  arrival_estimate: IsoDate | null;
+  statement_descriptor: string;
+  failure_code: PayoutFailureCode | null;
+  ledger_transaction_id: LedgerTransactionId | null;
+  /**
+   * The `payout_reversal` transaction. Required on `failed` and `returned` — without it an
+   * ACH failure permanently destroys the merchant's money (domain-model.md §7, §9).
+   */
+  reversal_transaction_id: LedgerTransactionId | null;
+  livemode: boolean;
+  initiated_at: IsoTimestamp | null;
+  paid_at: IsoTimestamp | null;
+  failed_at: IsoTimestamp | null;
+  returned_at: IsoTimestamp | null;
+  created_at: IsoTimestamp;
+}
+
 export type PayoutResponse = Payout;

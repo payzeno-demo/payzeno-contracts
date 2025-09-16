@@ -10,3 +10,4 @@
  * consumers. `src/index.test.ts` fails on it.
  *
  * RULE: nothing in `src/types/**` may import from here, from `src/events/**`,
+ * from `src/internal/**` or from `src/codegen/**`. The dependency arrow runs
