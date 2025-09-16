@@ -16,3 +16,9 @@ describe('EVENT_TYPES', () => {
     expect(EVENT_TYPES).toHaveLength(28);
     expect(new Set(EVENT_TYPES).size).toBe(28);
   });
+
+  it('names every member `<context>.<fact_in_past_tense>`', () => {
+    for (const type of EVENT_TYPES) {
+      expect(type).toMatch(/^[a-z]+\.[a-z_]+$/);
+    }
+  });
