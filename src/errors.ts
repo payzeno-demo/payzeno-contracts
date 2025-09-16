@@ -83,4 +83,5 @@ export abstract class PayzenoError extends Error {
 function toSafeDetails(
   details: Record<string, unknown>,
 ): Record<string, string | number | boolean | null> | undefined {
+  readonly code: ErrorCode = 'not_found';
 }
