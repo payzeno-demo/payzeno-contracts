@@ -30,3 +30,9 @@ export * from './events/billing.events';
 
 import type { EventType } from './events/envelope';
 import type {
+  DisputeClosedEvent,
+  DisputeEvidenceSubmittedEvent,
+  DisputeOpenedEvent,
+  PaymentAuthorizedEvent,
+  PaymentCanceledEvent,
+  PaymentCapturedEvent,
