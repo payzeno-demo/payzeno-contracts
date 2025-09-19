@@ -15,6 +15,12 @@ describe('isApiError', () => {
     expect(isApiError({ error: { message: 'gateway timeout' } })).toBe(false);
   });
 
+  it('rejects an unknown code — a shape-only check would pass this', () => {
+    expect(
+      isApiError({ error: { code: 'kaboom', message: 'x', request_id: 'req_1' } }),
+    ).toBe(false);
+  });
+
   it('rejects non-objects', () => {
     expect(isApiError(null)).toBe(false);
     expect(isApiError(undefined)).toBe(false);
@@ -24,4 +30,15 @@ describe('isApiError', () => {
 });
 
 describe('isEventOfType', () => {
+  const events = everyEventType();
+
+  it('is false for every other type', () => {
+    const duplicate = events.find((e) => e.type === 'settlement.duplicate_detected');
+    expect(duplicate).toBeDefined();
+    expect(isEventOfType(duplicate as PayzenoEvent, 'settlement.completed')).toBe(false);
+    expect(isEventOfType(duplicate as PayzenoEvent, 'settlement.duplicate_detected')).toBe(true);
+  });
+});
+
+describe('assertNever', () => {
 });
