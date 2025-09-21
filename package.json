@@ -26,6 +26,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./events": {
+      "types": "./dist/events.d.ts",
+      "import": "./dist/events.js",
+      "require": "./dist/events.cjs"
+    },
     "./errors": {
       "types": "./dist/errors.d.ts",
       "import": "./dist/errors.js",
@@ -36,6 +41,9 @@
       "import": "./dist/guards.js",
       "require": "./dist/guards.cjs"
     },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist .tsbuildinfo",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
