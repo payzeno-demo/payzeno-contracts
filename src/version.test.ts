@@ -16,6 +16,11 @@ describe('CONTRACTS_VERSION', () => {
     expect(CONTRACTS_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
+  it('matches python/pyproject.toml', () => {
+    const match = /^version = "(.+)"$/m.exec(read('python/pyproject.toml'));
+    expect(match?.[1]).toBe(CONTRACTS_VERSION);
+  });
+
   it('is a calendar date, not a semver', () => {
     expect(API_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });

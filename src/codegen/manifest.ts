@@ -17,6 +17,21 @@ const PYPI_DESCRIPTION =
   'Generated Pydantic models for the Payzeno shared contracts. ' +
   'Source of truth is @payzeno/contracts (TypeScript).';
 
+/** Write `python/pyproject.toml`. */
+export function writePythonManifest(
+  outDir: string,
+  writer: DeterministicWriter = new DeterministicWriter(),
+  mode: WriteMode = 'write',
+): WriteReport {
+  return writer.writeAll([pythonManifest(writer)], outDir, mode);
+}
+
+/**
+ * Write `java/pom.xml`.
+ *
+ * Only ever called by `pnpm run codegen:java`, which only ever runs when a
+ * human remembers. See PAY-1996.
+ */
 export function writeJavaManifest(
   outDir: string,
   writer: DeterministicWriter = new DeterministicWriter(),
