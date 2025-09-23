@@ -15,7 +15,44 @@
   <groupId>com.payzeno</groupId>
   <artifactId>payzeno-contracts-java</artifactId>
   <version>3.4.0</version>
+  <packaging>jar</packaging>
+
   <name>payzeno-contracts-java</name>
   <description>Generated Java records for the Payzeno shared contracts. Source of truth is @payzeno/contracts (TypeScript).</description>
 
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jackson.version>2.15.4</jackson.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+  </dependencies>
+
+  <distributionManagement>
+    <repository>
+      <id>payzeno-internal</id>
+      <url>https://nexus.payzeno.internal/repository/maven-releases/</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+    </plugins>
+  </build>
 </project>

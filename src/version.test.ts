@@ -16,8 +16,28 @@ describe('CONTRACTS_VERSION', () => {
     expect(CONTRACTS_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
+  it('matches python/pyproject.toml', () => {
+    const match = /^version = "(.+)"$/m.exec(read('python/pyproject.toml'));
+    expect(match?.[1]).toBe(CONTRACTS_VERSION);
+  });
+
+  it('matches java/pom.xml', () => {
+    const pom = read('java/pom.xml');
+    const match = /<artifactId>payzeno-contracts-java<\/artifactId>\s*<version>(.+?)<\/version>/.exec(
+      pom,
+    );
+    expect(match?.[1]).toBe(CONTRACTS_VERSION);
+  });
+});
+
+describe('API_VERSION', () => {
   it('is a calendar date, not a semver', () => {
     expect(API_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('package.json declares no dependencies at all', () => {
+    const pkg = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
+    expect(pkg.dependencies ?? {}).toEqual({});
   });
 
 });

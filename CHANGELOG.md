@@ -17,3 +17,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
   purpose for the funding leg now that it owns it.
 - `FundingEvent` on `types/settlement.ts` (PAY-2088).
 
+### Notes
+
+- `java/` was **not** regenerated for this release. See PAY-1996.
+
+## [3.3.0] — 2026-06-02
