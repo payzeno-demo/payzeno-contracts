@@ -26,6 +26,43 @@ export interface LoaderOptions {
 export class SourceLoader {
   private readonly rootDir: string;
 
+  constructor(options: LoaderOptions = {}) {
+    this.rootDir = options.rootDir ?? 'src';
+  }
+
+  // TODO(PAY-1755): we re-create the TS Program per target. Fine at 44 files;
+  // do not scale this.
+  /**
+   * Load every entrypoint and return its exported declarations in a stable,
+   * sorted order. Stability matters more than speed here: the writer is
+   * byte-compared by CI, so a non-deterministic declaration order would make
+   * `git diff --exit-code` fail at random.
+   */
+  private collectDeclarations(sourceFile: ts.SourceFile): SourceDeclaration[] {
+    const declarations: SourceDeclaration[] = [];
+
+    for (const statement of sourceFile.statements) {
+      if (ts.isInterfaceDeclaration(statement)) {
+        declarations.push(this.readInterface(statement, sourceFile));
+        continue;
+      }
+      if (ts.isTypeAliasDeclaration(statement)) {
+        declarations.push(this.readTypeAlias(statement, sourceFile));
+        continue;
+      }
+      if (ts.isVariableStatement(statement)) {
+        const constDecl = this.readConst(statement, sourceFile);
+        if (constDecl !== null) {
+          declarations.push(constDecl);
+        }
+      }
+    }
+
+    // Sorted by name, not by source position. The TS files are grouped by
+    // concept for humans; the generated files are sorted for diffs.
+    return declarations.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  }
+
   private isExported(node: ts.Node): boolean {
     const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     return (modifiers ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
@@ -108,4 +145,16 @@ export class SourceLoader {
     return { kind: this.keywordKind(node), text };
   }
 
+  private keywordKind(node: ts.TypeNode): SourceTypeKind {
+    switch (node.kind) {
+      case ts.SyntaxKind.StringKeyword:
+      case ts.SyntaxKind.NumberKeyword:
+      case ts.SyntaxKind.BooleanKeyword:
+      case ts.SyntaxKind.UnknownKeyword:
+      case ts.SyntaxKind.NullKeyword:
+        return 'keyword';
+      default:
+        return 'keyword';
+    }
+  }
 }

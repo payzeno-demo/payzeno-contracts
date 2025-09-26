@@ -24,6 +24,8 @@ export { isEventOfType };
  *
  * No new entrypoint: `tsup.config.ts` says seven and nothing else, and this is not an eighth.
  */
+export { canonicalJson, stableKeys } from './internal/canonical-json';
+
 export function isApiError(u: unknown): u is ApiError {
   if (typeof u !== 'object' || u === null) {
     return false;
