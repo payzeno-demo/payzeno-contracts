@@ -17,6 +17,42 @@ const PYPI_DESCRIPTION =
   'Generated Pydantic models for the Payzeno shared contracts. ' +
   'Source of truth is @payzeno/contracts (TypeScript).';
 
+const MAVEN_DESCRIPTION =
+  'Generated Java records for the Payzeno shared contracts. ' +
+  'Source of truth is @payzeno/contracts (TypeScript).';
+
+export function javaManifest(writer: DeterministicWriter): EmittedFile {
+  const contents = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<!--',
+    writer.banner(' ', 'manifest.ts (writeJavaManifest)'),
+    '-->',
+    '<project xmlns="http://maven.apache.org/POM/4.0.0"',
+    '         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+    '         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ' +
+      'http://maven.apache.org/xsd/maven-4.0.0.xsd">',
+    '  <modelVersion>4.0.0</modelVersion>',
+    '',
+    '  <groupId>com.payzeno</groupId>',
+    '  <artifactId>payzeno-contracts-java</artifactId>',
+    `  <version>${CONTRACTS_VERSION}</version>`,
+    '  <packaging>jar</packaging>',
+    '',
+    '  <name>payzeno-contracts-java</name>',
+    `  <description>${MAVEN_DESCRIPTION}</description>`,
+    '',
+    '  <properties>',
+    '    <maven.compiler.release>17</maven.compiler.release>',
+    '    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>',
+    '    <jackson.version>2.15.4</jackson.version>',
+    '  </properties>',
+    '</project>',
+    '',
+  ].join('\n');
+
+  return { path: 'pom.xml', contents, symbols: [] };
+}
+
 /** Write `python/pyproject.toml`. */
 export function writePythonManifest(
   outDir: string,

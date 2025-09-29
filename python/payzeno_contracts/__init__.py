@@ -3,3 +3,8 @@
 # CONTRACTS_VERSION 3.4.0.
 #
 # Source of truth is the TypeScript in payzeno-contracts/src. Edit there and
+# run `pnpm run codegen:python`.
+# ---------------------------------------------------------------------------
+
+from __future__ import annotations
+

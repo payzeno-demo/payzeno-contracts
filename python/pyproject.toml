@@ -5,4 +5,8 @@
 # ---------------------------------------------------------------------------
 
 [build-system]
+build-backend = "hatchling.build"
+
 authors = [{ name = "Payzeno Platform", email = "platform@payzeno.com" }]
+Source = "https://github.com/payzeno/payzeno-contracts"
+
