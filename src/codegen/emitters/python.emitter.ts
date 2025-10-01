@@ -77,6 +77,22 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
+    const suffix = decl.values.length === 1 ? ',' : '';
+
+    return [
+      `${doc}${this.typeAliasNameFor(decl.name)} = ${literal}`,
+      `${decl.name}: tuple[str, ...] = (${tuple}${suffix})`,
+    ].join('\n');
+  }
+
+  /**
+   * `Record<K, V>` constants become plain dicts. The keys are quoted, the
+   * values are copied through verbatim — every one of them is an integer or a
+   * quoted string in the source, and anything else would not have survived the
+   * `as const` idiom check in the loader.
+   */
+  private renderConstMap(decl: IrConstMap): string {
     const rows = decl.entries
       .map(([key, value]) => `    "${key}": ${valueType === 'int' ? value : `"${value}"`},`)
       .join('\n');
@@ -84,6 +100,20 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderModel(model: IrModel): string {
+    const lines: string[] = [];
+
+    lines.push(`class ${model.name}(${base}):`);
+    if (model.doc !== null && model.doc.trim() !== '' && this.options.includeDocs !== false) {
+      lines.push(`    """${model.doc.replace(/"""/g, "'''")}"""`);
+    }
+    lines.push("    model_config = ConfigDict(extra='forbid')");
+    lines.push('');
+
+    if (model.fields.length === 0) {
+      lines.push('    pass');
+      return lines.join('\n');
+    }
+
     const models = new Set(declarations.filter((d) => d.kind === 'model').map((d) => d.name));
     const needsRebuild: string[] = [];
 
