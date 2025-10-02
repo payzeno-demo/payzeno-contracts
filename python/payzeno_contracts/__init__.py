@@ -8,3 +8,9 @@
 
 from __future__ import annotations
 
+from payzeno_contracts import events, types
+
+__version__ = "3.4.0"
+__api_version__ = "2026-01-15"
+
+__all__ = [
