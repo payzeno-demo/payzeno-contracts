@@ -103,6 +103,15 @@ function normalize(): IrModule {
 }
 
 describe('TypeNormalizer', () => {
+  it('turns an `as const` tuple into an IrEnum', () => {
+    const module = normalize();
+    const enumDecl = module.declarations.find((d) => d.name === 'CHARGE_STATUSES');
+    expect(enumDecl?.kind).toBe('enum');
+    if (enumDecl?.kind === 'enum') {
+      expect(enumDecl.values).toEqual(['pending', 'authorized', 'captured']);
+    }
+  });
+
   it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
     expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
   });
@@ -123,4 +132,23 @@ describe('JavaEmitter', () => {
     target: { kind: 'ref', name: 'CHARGE_STATUSES' },
     doc: null,
   });
+  it('emits records with long for money', () => {
+    const record = files.find((f) => f.path.endsWith('SampleCharge.java'));
+    expect(record?.contents).toContain('public record SampleCharge(');
+    expect(record?.contents).toContain('long amount_minor');
+  });
+
+  it('is byte-stable across two runs', () => {
+    const dir = tempDir();
+    const writer = new DeterministicWriter();
+    const files = [new PythonEmitter().emitModule(normalize())];
+
+    const first = writer.writeAll(files, dir, 'write');
+    expect(first.written).toEqual(['sample.py']);
+
+    const second = writer.writeAll(files, dir, 'write');
+    expect(second.written).toEqual([]);
+    expect(second.unchanged).toEqual(['sample.py']);
+  });
+
 });

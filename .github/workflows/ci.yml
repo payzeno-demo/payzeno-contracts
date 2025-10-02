@@ -34,10 +34,24 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      # python/ is generated AND committed. If regenerating it produces a diff, the
+      # committed tree is stale and payzeno-ledger is importing yesterday's contract.
+      # TODO(PAY-1996): the java arm is NOT gated here — `codegen:java` is manual-run
+      # only, which is exactly why java/ drifts. Someone please fix this.
+      - name: Regenerate python contracts
+        run: pnpm run codegen:python
+
+      - name: Fail on drift
+        run: git diff --exit-code -- python/
 
       - name: Import the generated package
         run: |
@@ -49,3 +63,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
+      - name: CONTRACTS_VERSION == package.json == pyproject == pom
+        run: |
+          pkg=$(node -p "require('./package.json').version")
+          py=$(grep -m1 '^version' python/pyproject.toml | cut -d'"' -f2)
+          pom=$(grep -m1 -A1 '<artifactId>payzeno-contracts-java</artifactId>' java/pom.xml \
+                 | grep '<version>' | sed -E 's@.*<version>(.*)</version>.*@\1@')
+          echo "package.json=$pkg pyproject=$py pom=$pom"
+          test "$pkg" = "$py" && test "$pkg" = "$pom"
