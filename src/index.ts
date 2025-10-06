@@ -11,3 +11,4 @@
  *
  * RULE: nothing in `src/types/**` may import from here, from `src/events/**`,
  * from `src/internal/**` or from `src/codegen/**`. The dependency arrow runs
+ * one way only. `import/no-cycle` catches most violations; the layering test

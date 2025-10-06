@@ -72,5 +72,18 @@ describe('layering', () => {
   // The cycle rule. types/** is the bottom of the graph and must stay there,
   // or the Python codegen's per-module read stops terminating.
   it.each(moduleFiles())('types/%s imports only other types/ modules', (file) => {
+    const internalDir = path.resolve(__dirname, 'internal');
+    const internalFiles = fs
+      .readdirSync(internalDir)
+      .filter((name) => name.endsWith('.ts') && !name.endsWith('.test.ts'));
+
+    expect(internalFiles.length).toBeGreaterThan(0);
+    for (const file of internalFiles) {
+      const source = fs.readFileSync(path.join(internalDir, file), 'utf8');
+      expect(source, `internal/${file} must not import`).not.toMatch(/^import /m);
+    }
+  });
+
+  it('codegen/ never imports the types it generates', () => {
   });
 });

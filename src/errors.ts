@@ -83,5 +83,16 @@ export abstract class PayzenoError extends Error {
 function toSafeDetails(
   details: Record<string, unknown>,
 ): Record<string, string | number | boolean | null> | undefined {
+  readonly httpStatus = 422;
+}
+
+/**
+ * 400. Two Money values with different currencies met.
+ *
+ * Payzeno is multi-currency and never cross-currency: there is
+ * no FX anywhere in the platform, so this is always a caller
+ * bug and never a conversion opportunity.
+ */
+export class CurrencyMismatchError extends PayzenoError {
   readonly code: ErrorCode = 'not_found';
 }
