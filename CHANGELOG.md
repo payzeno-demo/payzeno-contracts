@@ -22,3 +22,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 - `java/` was **not** regenerated for this release. See PAY-1996.
 
 ## [3.3.0] — 2026-06-02
+
+### Changed
+
+- `ReconciliationItem.attempt_count`, `.last_error_code` and `.next_attempt_at` promoted from
+  optional to required (PAY-2059). Strictly this is a narrowing and therefore a major by

@@ -4,3 +4,5 @@
  * The single version string four repos reference.
  *
  * `CONTRACTS_VERSION` MUST equal, byte for byte:
+ *   - `package.json`            .version
+ *   - `python/pyproject.toml`   [project] version
