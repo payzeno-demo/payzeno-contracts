@@ -22,3 +22,9 @@ describe('EVENT_TYPES', () => {
       expect(type).toMatch(/^[a-z]+\.[a-z_]+$/);
     }
   });
+});
+
+describe('EVENT_TOPICS', () => {
+  it('covers every EVENT_TYPES member exactly once', () => {
+    const seen = new Map<string, number>();
+    for (const topic of Object.keys(EVENT_TOPICS) as TopicName[]) {

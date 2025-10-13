@@ -36,3 +36,10 @@ import type {
   PaymentAuthorizedEvent,
   PaymentCanceledEvent,
   PaymentCapturedEvent,
+  PaymentFailedEvent,
+  RefundCreatedEvent,
+  RefundFailedEvent,
+  RefundSucceededEvent,
+} from './events/payments.events';
+import type {
+  SettlementBatchClosedEvent,
