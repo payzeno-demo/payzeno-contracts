@@ -32,6 +32,21 @@ export interface LoginRequest {
   password: string;
 }
 
+/** `GET /v1/auth/me` — the console bootstrap call. */
+export interface SessionResponse {
+  object: 'session';
+  user: User;
+  merchant: Merchant;
+  permissions: string[];
+}
+
+/** `GET /healthz` on both services. */
+export interface HealthResponse {
+  status: 'ok';
+  service: string;
+  version: string;
+}
+
 /** `GET /v1/meta/currencies` */
 export interface CurrenciesResponse {
   currencies: CurrencyCode[];
@@ -45,3 +60,10 @@ export interface BalanceHistoryResponse {
   points: TimeseriesPoint[];
 }
 
+export interface VolumeTimeseries {
+  object: 'volume_timeseries';
+  merchant_id: MerchantId;
+  currency: CurrencyCode;
+  interval: TimeseriesInterval;
+  points: TimeseriesPoint[];
+}

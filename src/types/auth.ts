@@ -7,3 +7,12 @@
  */
 
 import type { ApiKeyMode } from './enums';
+import type { ApiKeyScope, UserRole } from './merchant';
+import type { ApiKeyId, MerchantId, PaymentIntentId, UserId } from './scalars';
+
+export const STAFF_ROLES = ['support', 'risk', 'finance', 'admin'] as const;
+export type StaffRole = (typeof STAFF_ROLES)[number];
+
+export type AuthPrincipal =
+  | {
+      kind: 'api_key';
