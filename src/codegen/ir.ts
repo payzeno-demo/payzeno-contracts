@@ -46,6 +46,23 @@ export interface SourceMember {
 
 export type SourceDeclarationKind = 'interface' | 'alias' | 'const-tuple' | 'const-record';
 
+export interface SourceDeclaration {
+  name: string;
+  kind: SourceDeclarationKind;
+  exported: boolean;
+  doc: string | null;
+  /** `interface` only. */
+  members?: SourceMember[];
+  /** `interface` only — `extends Foo`. */
+  heritage?: string[];
+  /** `alias` only. */
+  aliasType?: SourceTypeNode;
+  /** `const-tuple` only — the `as const` string members, in source order. */
+  values?: string[];
+  /** `const-record` only — `[key, printed initializer]` pairs, in source order. */
+  entries?: Array<[string, string]>;
+}
+
 export interface SourceModule {
   /** Module specifier relative to `src/`, e.g. `types/merchant`. */
   moduleName: string;
@@ -62,6 +79,20 @@ export interface SourceModule {
  * because every `*_minor` field is an integer and Python's
  * `float` would be a correctness bug, not a style one.
  */
+export type IrScalarName =
+  | 'string'
+  | 'integer'
+  | 'number'
+  | 'boolean'
+  | 'timestamp'
+  | 'date'
+  | 'unknown';
+
+export interface IrScalar {
+  kind: 'scalar';
+  name: IrScalarName;
+}
+
 /** A reference to another IR declaration by name. */
 export interface IrRef {
   kind: 'ref';
@@ -72,6 +103,19 @@ export interface IrRef {
  * `Paginated<T>`, `Record<K, V>`, `Array<T>`, `EventEnvelope<T, P>`.
  * Nothing else is supported and nothing else should be.
  */
+export interface IrUnion {
+  kind: 'union';
+  members: IrType[];
+}
+
+/** A bare string-literal type, e.g. `object: 'merchant'`. */
+export interface IrLiteral {
+  kind: 'literal';
+  value: string;
+}
+
+export type IrType = IrScalar | IrRef | IrGeneric | IrUnion | IrLiteral;
+
 export interface IrField {
   name: string;
   type: IrType;
@@ -91,8 +135,25 @@ export interface IrModel {
   doc: string | null;
 }
 
+export interface IrEnum {
+  kind: 'enum';
+  name: string;
+  values: string[];
+  doc: string | null;
+}
+
+export interface IrModule {
+  name: string;
+  sourcePath: string;
+  declarations: IrDeclaration[];
+}
+
 /** Convenience narrowings the emitters and the parity check both want. */
 export function isModel(decl: IrDeclaration): decl is IrModel {
   return decl.kind === 'model';
+}
+
+export function isEnum(decl: IrDeclaration): decl is IrEnum {
+  return decl.kind === 'enum';
 }
 

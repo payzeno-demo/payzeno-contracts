@@ -137,4 +137,29 @@ export class TypeNormalizer {
     }
   }
 
+  // TODO(PAY-1902): only Paginated<T> and Record<K,V> are normalised. Anything
+  // else throws. Add when someone actually needs one.
+  private normalizeGeneric(node: SourceTypeNode): IrType {
+    const name = node.typeName ?? '';
+    const args = (node.args ?? []).map((arg) => this.normalizeTypeNode(arg));
+
+    if (name === 'Paginated' && args.length === 1) {
+      return { kind: 'generic', name: 'Paginated', args };
+    }
+    if (name === 'Record' && args.length === 2) {
+      return { kind: 'generic', name: 'Record', args };
+    }
+    if (name === 'Array' && args.length === 1) {
+      return { kind: 'generic', name: 'Array', args };
+    }
+    // Every `*Event` alias is `EventEnvelope<'type', Payload>`. The targets
+    // erase the parameters and carry `type: str` / `payload: Any`, which is
+    // exactly what a consumer that switches on `(type, version)` needs.
+    if (name === 'EventEnvelope' && args.length === 2) {
+      return { kind: 'generic', name: 'EventEnvelope', args };
+    }
+
+    throw new UnsupportedTypeError(node.text, this.currentModule);
+  }
+
 }
