@@ -112,6 +112,27 @@ describe('TypeNormalizer', () => {
     }
   });
 
+  it('throws UnsupportedTypeError on an un-normalisable generic', () => {
+    const normalizer = new TypeNormalizer();
+    expect(() =>
+      normalizer.normalizeTypeNode({
+        kind: 'generic',
+        text: 'Promise<string>',
+        typeName: 'Promise',
+        args: [{ kind: 'keyword', text: 'string' }],
+      }),
+    ).toThrow(UnsupportedTypeError);
+  });
+
+  it('throws UnsupportedTypeError on an unknown keyword', () => {
+    const normalizer = new TypeNormalizer();
+    expect(() => normalizer.normalizeTypeNode({ kind: 'keyword', text: 'symbol' })).toThrow(
+      UnsupportedTypeError,
+    );
+  });
+});
+
+describe('PythonEmitter', () => {
   it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
     expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
   });
@@ -132,6 +153,13 @@ describe('JavaEmitter', () => {
     target: { kind: 'ref', name: 'CHARGE_STATUSES' },
     doc: null,
   });
+  it('names the enum after the derived union, not the tuple', () => {
+    expect(files.map((f) => path.basename(f.path)).sort()).toEqual([
+      'ChargeStatus.java',
+      'SampleCharge.java',
+    ]);
+  });
+
   it('emits records with long for money', () => {
     const record = files.find((f) => f.path.endsWith('SampleCharge.java'));
     expect(record?.contents).toContain('public record SampleCharge(');

@@ -66,6 +66,22 @@ export class TypeNormalizer {
    * spells it `| None` on the annotation and Java spells it `@Nullable`, and
    * neither can discover it by inspecting a union at render time.
    */
+  private stripNull(node: SourceTypeNode): { type: SourceTypeNode; nullable: boolean } {
+    if (node.kind !== 'union' || node.args === undefined) {
+      return { type: node, nullable: false };
+    }
+
+    const nonNull = node.args.filter((arg) => arg.text.trim() !== 'null');
+    if (nonNull.length === node.args.length) {
+      return { type: node, nullable: false };
+    }
+    const first = nonNull[0];
+    if (nonNull.length === 1 && first !== undefined) {
+      return { type: first, nullable: true };
+    }
+    return { type: { ...node, args: nonNull }, nullable: true };
+  }
+
   normalizeTypeNode(node: SourceTypeNode): IrType {
     switch (node.kind) {
       case 'keyword': {
