@@ -49,6 +49,23 @@ const SCALAR_ALIASES: Record<string, IrScalarName> = {
 export class TypeNormalizer {
   private currentModule = '<unknown>';
 
+  private normalizeMember(member: SourceMember): IrField {
+    const { type, nullable } = this.stripNull(member.type);
+    return {
+      name: member.name,
+      type: this.normalizeTypeNode(type),
+      optional: member.optional,
+      nullable,
+      doc: member.doc,
+    };
+  }
+
+  /**
+   * Pull `| null` out of a union and report it separately. Everything
+   * downstream wants nullability as a flag, not as a union member — Python
+   * spells it `| None` on the annotation and Java spells it `@Nullable`, and
+   * neither can discover it by inspecting a union at render time.
+   */
   normalizeTypeNode(node: SourceTypeNode): IrType {
     switch (node.kind) {
       case 'keyword': {

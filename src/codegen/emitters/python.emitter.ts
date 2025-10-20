@@ -114,6 +114,33 @@ export class PythonEmitter extends ContractEmitter {
       return lines.join('\n');
     }
 
+    // Fields with defaults must follow fields without them, or the generated
+    // module raises at import time.
+    const required = model.fields.filter((f) => !f.optional);
+    const assignment = field.optional ? ' = None' : '';
+    return `${doc}    ${name}: ${annotation}${assignment}`;
+  }
+
+  private renderType(type: IrType): string {
+    switch (type.kind) {
+      case 'scalar':
+        return this.mapScalar(type);
+      case 'literal':
+        return `Literal["${type.value}"]`;
+      case 'ref':
+        return this.typeAliasNameFor(type.name);
+      case 'union': {
+        const members = type.members.map((member) => this.renderType(member));
+        return members.length === 1 ? (members[0] ?? 'Any') : members.join(' | ');
+      }
+      case 'generic':
+        return this.renderGeneric(type.name, type.args);
+      default:
+        throw new UnsupportedTypeError(JSON.stringify(type), 'python.emitter');
+    }
+  }
+
+  private renderGeneric(name: string, args: IrType[]): string {
     const models = new Set(declarations.filter((d) => d.kind === 'model').map((d) => d.name));
     const needsRebuild: string[] = [];
 
