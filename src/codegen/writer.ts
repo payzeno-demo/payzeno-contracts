@@ -34,6 +34,8 @@ export class DeterministicWriter {
   writeAll(files: EmittedFile[], outDir: string, mode: WriteMode): WriteReport {
     const report: WriteReport = { written: [], unchanged: [], drifted: [], outDir };
 
+    const normalized = this.normalize(file.contents);
+
     const existing = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : null;
 
     if (existing === normalized) {
@@ -53,6 +55,7 @@ export class DeterministicWriter {
 
   /** CRLF → LF, strip trailing whitespace, exactly one final newline. */
   private normalize(contents: string): string {
+    const lf = contents.replace(/\r\n/g, '\n');
     const trimmed = lf
       .split('\n')
       .map((line) => line.replace(/[ \t]+$/, ''))

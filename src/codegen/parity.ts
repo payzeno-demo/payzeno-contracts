@@ -30,6 +30,17 @@ export interface ParityReport {
  * counterpart. Keep this list short and each entry justified — it is the only
  * escape hatch in the gate.
  */
+const PARITY_EXEMPT = new Set([
+  // Generic helper aliases with no data shape at all. The normaliser drops
+  // them; this list is what makes that a decision rather than an accident.
+  'EventHandler',
+  'EventOfType',
+  'PayloadOfType',
+  'IdPrefix',
+  'TopicName',
+  'QueueName',
+]);
+
 /** Every exported declaration name across the loaded TypeScript modules. */
 export function collectExportedSymbols(modules: SourceModule[]): Set<string> {
   const out = new Set<string>();

@@ -41,10 +41,16 @@ export class CodegenPipeline {
   constructor(
     private readonly loader: SourceLoader,
     private readonly normalizer: TypeNormalizer,
+    private readonly emitters: Map<Target, ContractEmitter>,
     private readonly writer: DeterministicWriter,
   ) {}
 
   async run(opts: CodegenOptions): Promise<CodegenReport> {
+    let parity: ParityReport | null = null;
+    if (opts.checkParity) {
+      parity = diffParity(collectExportedSymbols(sourceModules), collectEmittedSymbols(files));
+    }
+
     const buckets = new Map<string, IrModule>();
 
     for (const module of modules) {

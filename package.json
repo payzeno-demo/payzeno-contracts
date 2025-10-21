@@ -46,11 +46,13 @@
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist .tsbuildinfo",
+    "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@vitest/coverage-v8": "1.6.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
+    "tsx": "4.10.2",
     "vitest": "1.6.0"
   }
 }

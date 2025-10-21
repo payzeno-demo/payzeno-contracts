@@ -76,3 +76,30 @@ export class ParityViolationError extends CodegenError {
  * --exit-code` in CI would catch it a step later; this catches
  * it with a filename.
  */
+export class EmitDriftError extends CodegenError {
+  constructor(readonly drifted: string[]) {
+    super(`generated output is stale: ${drifted.join(', ')}`, {
+      count: drifted.length,
+      first: drifted[0] ?? '',
+    });
+  }
+}
+
+/**
+ * A type reference the loader could not resolve to a
+ * declaration in the loaded module set.
+ *
+ * Almost always a missing entry in the loader's entrypoint
+ * list, not a bad type.
+ */
+export class UnresolvedRefError extends CodegenError {
+  constructor(
+    readonly refName: string,
+    fromModule: string,
+  ) {
+    super(`unresolved type reference '${refName}' from ${fromModule}`, {
+      ref: refName,
+      module: fromModule,
+    });
+  }
+}

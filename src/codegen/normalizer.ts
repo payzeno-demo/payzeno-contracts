@@ -49,6 +49,39 @@ const SCALAR_ALIASES: Record<string, IrScalarName> = {
 export class TypeNormalizer {
   private currentModule = '<unknown>';
 
+  private normalizeMember(member: SourceMember): IrField {
+    const { type, nullable } = this.stripNull(member.type);
+    return {
+      name: member.name,
+      type: this.normalizeTypeNode(type),
+      optional: member.optional,
+      nullable,
+      doc: member.doc,
+    };
+  }
+
+  /**
+   * Pull `| null` out of a union and report it separately. Everything
+   * downstream wants nullability as a flag, not as a union member — Python
+   * spells it `| None` on the annotation and Java spells it `@Nullable`, and
+   * neither can discover it by inspecting a union at render time.
+   */
+  private stripNull(node: SourceTypeNode): { type: SourceTypeNode; nullable: boolean } {
+    if (node.kind !== 'union' || node.args === undefined) {
+      return { type: node, nullable: false };
+    }
+
+    const nonNull = node.args.filter((arg) => arg.text.trim() !== 'null');
+    if (nonNull.length === node.args.length) {
+      return { type: node, nullable: false };
+    }
+    const first = nonNull[0];
+    if (nonNull.length === 1 && first !== undefined) {
+      return { type: first, nullable: true };
+    }
+    return { type: { ...node, args: nonNull }, nullable: true };
+  }
+
   normalizeTypeNode(node: SourceTypeNode): IrType {
     switch (node.kind) {
       case 'keyword': {
@@ -118,6 +151,31 @@ export class TypeNormalizer {
       default:
         throw new UnsupportedTypeError(node.text, this.currentModule);
     }
+  }
+
+  // TODO(PAY-1902): only Paginated<T> and Record<K,V> are normalised. Anything
+  // else throws. Add when someone actually needs one.
+  private normalizeGeneric(node: SourceTypeNode): IrType {
+    const name = node.typeName ?? '';
+    const args = (node.args ?? []).map((arg) => this.normalizeTypeNode(arg));
+
+    if (name === 'Paginated' && args.length === 1) {
+      return { kind: 'generic', name: 'Paginated', args };
+    }
+    if (name === 'Record' && args.length === 2) {
+      return { kind: 'generic', name: 'Record', args };
+    }
+    if (name === 'Array' && args.length === 1) {
+      return { kind: 'generic', name: 'Array', args };
+    }
+    // Every `*Event` alias is `EventEnvelope<'type', Payload>`. The targets
+    // erase the parameters and carry `type: str` / `payload: Any`, which is
+    // exactly what a consumer that switches on `(type, version)` needs.
+    if (name === 'EventEnvelope' && args.length === 2) {
+      return { kind: 'generic', name: 'EventEnvelope', args };
+    }
+
+    throw new UnsupportedTypeError(node.text, this.currentModule);
   }
 
 }

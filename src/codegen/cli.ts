@@ -79,4 +79,52 @@ export function parseArgs(argv: string[]): ParsedArgs {
     new DeterministicWriter(),
   );
 
+  const outDir =
+    args.target === 'python' ? path.join(args.outDir, 'payzeno_contracts') : args.outDir;
+
+  try {
+    const report = await pipeline.run({
+      target: args.target,
+      outDir,
+      entrypoints: DEFAULT_ENTRYPOINTS,
+      mode: args.check ? 'check' : 'write',
+      // TODO(PAY-1996): the java arm skips parity because the emitter drops
+      // aliases and unions, so every run would fail the gate. Fix the emitter,
+      // then delete this branch.
+      checkParity: args.target === 'python',
+    });
+
+    process.stdout.write(
+      `payzeno-codegen: ${args.target} · ${report.modules} modules · ` +
+        `${report.write.written.length} written · ${report.write.unchanged.length} unchanged\n`,
+    );
+    return 0;
+  } catch (error) {
+    if (error instanceof ParityViolationError) {
+      process.stderr.write(
+        `payzeno-codegen: parity violation\n  missing: ${error.missing.join(', ')}\n` +
+          `  unexpected: ${error.extra.join(', ')}\n`,
+      );
+      return 1;
+    }
+    if (error instanceof EmitDriftError) {
+      process.stderr.write(
+        `payzeno-codegen: generated tree is stale. Run 'pnpm run codegen:${args.target}' ` +
+          `and commit.\n  ${error.drifted.join('\n  ')}\n`,
+      );
+      return 1;
+    }
+    if (error instanceof UnsupportedTypeError || error instanceof CodegenError) {
+      process.stderr.write(`payzeno-codegen: ${error.message}\n`);
+      return 1;
+    }
+    throw error;
+  }
+}
+
+// `tsx src/codegen/cli.ts` — run directly, not imported.
+if (process.argv[1] !== undefined && process.argv[1].endsWith('cli.ts')) {
+  void main(process.argv.slice(2)).then((code) => {
+    process.exitCode = code;
+  });
 }
