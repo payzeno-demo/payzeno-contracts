@@ -78,6 +78,7 @@ export class PythonEmitter extends ContractEmitter {
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
+    const tuple = decl.values.map((value) => `"${value}"`).join(', ');
     const suffix = decl.values.length === 1 ? ',' : '';
 
     return [
@@ -117,6 +118,8 @@ export class PythonEmitter extends ContractEmitter {
     // Fields with defaults must follow fields without them, or the generated
     // module raises at import time.
     const required = model.fields.filter((f) => !f.optional);
+    const name = this.quoteIdentifier(field.name);
+    const rendered = this.renderType(field.type);
     const assignment = field.optional ? ' = None' : '';
     return `${doc}    ${name}: ${annotation}${assignment}`;
   }

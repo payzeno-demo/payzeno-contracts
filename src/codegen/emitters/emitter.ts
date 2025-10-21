@@ -57,6 +57,14 @@ export abstract class ContractEmitter {
   /** Render one IR module into one target file. */
   abstract emitModule(m: IrModule): EmittedFile;
 
+  protected abstract quoteIdentifier(n: string): string;
+
+  /**
+   * The DO-NOT-EDIT banner. Identical shape in both targets so
+   * that a human who has seen one recognises the other, and
+   * stamped with `CONTRACTS_VERSION` so a stale committed file
+   * says which version it is stale from.
+   */
   /** Line-comment prefix for the target. Overridden where it differs. */
   protected commentPrefix(): string {
     return '#';
@@ -67,4 +75,17 @@ export abstract class ContractEmitter {
    * empty string when docs are off or there is nothing to say,
    * so callers can concatenate unconditionally.
    */
+  protected renderDoc(doc: string | null, indent = ''): string {
+    if (this.options.includeDocs === false || doc === null || doc.trim() === '') {
+      return '';
+    }
+    const prefix = this.commentPrefix();
+    return `${indent}${prefix} ${doc.trim()}\n`;
+  }
+
+  /** Target file name for a module, e.g. `types` → `types.py`. */
+  protected fileNameFor(m: IrModule): string {
+    const base = m.name.split('/').pop() ?? m.name;
+    return `${base}${this.fileExtension}`;
+  }
 }

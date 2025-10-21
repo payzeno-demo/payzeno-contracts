@@ -55,6 +55,7 @@ export class DeterministicWriter {
 
   /** CRLF → LF, strip trailing whitespace, exactly one final newline. */
   private normalize(contents: string): string {
+    const lf = contents.replace(/\r\n/g, '\n');
     const trimmed = lf
       .split('\n')
       .map((line) => line.replace(/[ \t]+$/, ''))
