@@ -133,8 +133,15 @@ describe('TypeNormalizer', () => {
 });
 
 describe('PythonEmitter', () => {
+  const emitted = new PythonEmitter().emitModule(normalize());
+
   it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
     expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
+  });
+
+  it('renders optional as `| None = None` and nullable as `| None`', () => {
+    expect(emitted.contents).toContain('settled_at: str | None');
+    expect(emitted.contents).toContain('metadata: dict[str, str] | None = None');
   });
 
   it('exports every symbol in __all__', () => {
@@ -177,6 +184,17 @@ describe('JavaEmitter', () => {
     const second = writer.writeAll(files, dir, 'write');
     expect(second.written).toEqual([]);
     expect(second.unchanged).toEqual(['sample.py']);
+  });
+
+  it('normalises CRLF and the trailing newline', () => {
+    const dir = tempDir();
+    const writer = new DeterministicWriter();
+    writer.writeAll(
+      [{ path: 'x.py', contents: 'a = 1\r\nb = 2   \n\n\n', symbols: [] }],
+      dir,
+      'write',
+    );
+    expect(fs.readFileSync(path.join(dir, 'x.py'), 'utf8')).toBe('a = 1\nb = 2\n');
   });
 
 });

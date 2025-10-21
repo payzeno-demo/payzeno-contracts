@@ -34,6 +34,8 @@ export class DeterministicWriter {
   writeAll(files: EmittedFile[], outDir: string, mode: WriteMode): WriteReport {
     const report: WriteReport = { written: [], unchanged: [], drifted: [], outDir };
 
+    const normalized = this.normalize(file.contents);
+
     const existing = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : null;
 
     if (existing === normalized) {
