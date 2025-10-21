@@ -51,6 +51,25 @@ describe('collectExportedSymbols', () => {
 });
 
 describe('collectEmittedSymbols', () => {
+  it('flattens symbols across files', () => {
+    const symbols = collectEmittedSymbols([
+      { path: 'a.py', contents: '', symbols: ['A', 'B'] },
+      { path: 'b.py', contents: '', symbols: ['B', 'C'] },
+    ]);
+    expect([...symbols].sort()).toEqual(['A', 'B', 'C']);
+  });
+});
+
+describe('diffParity', () => {
+  it('throws ParityViolationError on a deliberate omission', () => {
+    expect(() =>
+      diffParity(
+        collectExportedSymbols(modules),
+        collectEmittedSymbols(emitted(['Merchant'])),
+      ),
+    ).toThrow(ParityViolationError);
+  });
+
   it('names what is missing', () => {
     try {
       diffParity(collectExportedSymbols(modules), collectEmittedSymbols(emitted(['Merchant'])));
@@ -61,4 +80,13 @@ describe('collectEmittedSymbols', () => {
     }
   });
 
+  it('is a 500-class internal error, not a caller error', () => {
+    try {
+      diffParity(new Set(['Missing']), new Set<string>());
+      expect.unreachable('should have thrown');
+    } catch (error) {
+      expect((error as ParityViolationError).httpStatus).toBe(500);
+      expect((error as ParityViolationError).code).toBe('internal_error');
+    }
+  });
 });
