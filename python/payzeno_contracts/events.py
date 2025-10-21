@@ -53,6 +53,21 @@ EVENT_TOPICS: dict[str, tuple[str, ...]] = {
 }
 
 
+class LedgerTransactionPostedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    transaction_id: str
+    idempotency_key: str
+    purpose: str
+    merchant_id: str | None
+    currency: str
+    reference_type: str
+    reference_id: str
+    total_minor: int
+    entry_count: int
+    posted_at: str
+
+
 class PaymentCapturedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -76,6 +91,24 @@ class RefundSucceededPayload(BaseModel):
     succeeded_at: str
 
 
+class SettlementVarianceDetectedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    item_id: str
+    charge_id: str | None
+    merchant_id: str | None
+    line_type: str
+    expected_gross_minor: int
+    actual_gross_minor: int
+    variance_minor: int
+    tolerance_minor: int
+    currency: str
+    detected_at: str
+
+
+LedgerImbalanceDetectedEvent = EventEnvelope
+MerchantStatusChangedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
 

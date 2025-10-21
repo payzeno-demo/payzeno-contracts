@@ -15,6 +15,26 @@ from pydantic import BaseModel, ConfigDict
 T = TypeVar("T")
 
 
+ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment")
+
+
+CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
+CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
+IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
+
+
+LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "admin")
+
+
+LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment"]
+PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
+
+
+RECONCILIATION_ITEM_STATUSES_VALUES = Literal["pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded"]
+RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "chargeback_reversal", "scheme_fee", "adjustment", "reserve_hold", "reserve_release"]
+RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
+
+
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
@@ -22,6 +42,7 @@ TIMESERIES_INTERVALS_VALUES = Literal["hour", "day"]
 WEBHOOK_ENDPOINT_STATUSES: tuple[str, ...] = ("enabled", "disabled")
 
 
+WEBHOOK_EVENT_STATUSES_VALUES = Literal["pending", "delivering", "delivered", "dead"]
 class BootstrapAccountsResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
