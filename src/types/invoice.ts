@@ -22,3 +22,5 @@ import type {
 } from './scalars';
 
 export const INVOICE_STATUSES = ['draft', 'open', 'paid', 'uncollectible', 'void'] as const;
+export type InvoiceListResponse = Paginated<Invoice>;
+

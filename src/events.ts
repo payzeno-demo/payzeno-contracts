@@ -43,3 +43,9 @@ import type {
 } from './events/payments.events';
 import type {
   SettlementBatchClosedEvent,
+  SettlementCompletedEvent,
+  SettlementDuplicateDetectedEvent,
+  SettlementFundedEvent,
+  SettlementItemSettledEvent,
+  SettlementReconciliationFailedEvent,
+  SettlementVarianceDetectedEvent,

@@ -30,4 +30,22 @@ describe('EVENT_TOPICS', () => {
     }
   });
 
+  it('partitions EVENT_TYPES — total and disjoint', () => {
+    const routed = (Object.keys(EVENT_TOPICS) as TopicName[]).flatMap(
+      (topic) => EVENT_TOPICS[topic] as readonly string[],
+    );
+    expect(routed).toHaveLength(EVENT_TYPES.length);
+    expect(new Set(routed).size).toBe(EVENT_TYPES.length);
+    expect([...routed].sort()).toEqual([...EVENT_TYPES].sort());
+  });
+
+  it('carries the INC additions on the ledger topic', () => {
+    const ledger = EVENT_TOPICS['payzeno-ledger-events'] as readonly string[];
+    expect(ledger).toContain('settlement.duplicate_detected');
+    expect(ledger).toContain('settlement.variance_detected');
+    expect(ledger).toContain('settlement.funded');
+  });
+});
+
+describe('QUEUE_NAMES', () => {
 });

@@ -28,3 +28,9 @@ describe('EVENT_TOPICS', () => {
   it('covers every EVENT_TYPES member exactly once', () => {
     const seen = new Map<string, number>();
     for (const topic of Object.keys(EVENT_TOPICS) as TopicName[]) {
+      for (const type of EVENT_TOPICS[topic]) {
+        seen.set(type, (seen.get(type) ?? 0) + 1);
+      }
+    }
+
+    for (const type of EVENT_TYPES) {
