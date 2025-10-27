@@ -41,3 +41,33 @@ export interface EventEnvelope<TType extends string, TPayload> {
   payload: TPayload;
 }
 
+export const EVENT_TYPES = [
+  'payment.authorized',
+  'payment.captured',
+  'payment.failed',
+  'payment.canceled',
+  'refund.created',
+  'refund.succeeded',
+  'refund.failed',
+  'dispute.opened',
+  'dispute.evidence_submitted',
+  'dispute.closed',
+  'settlement.batch_closed',
+  'settlement.item_settled',
+  'settlement.completed',
+  'settlement.reconciliation_failed',
+  'settlement.duplicate_detected',
+  'settlement.variance_detected',
+  'settlement.funded',
+  'payout.scheduled',
+  'payout.paid',
+  'payout.failed',
+  'payout.returned',
+  'ledger.transaction_posted',
+  'ledger.imbalance_detected',
+  'merchant.created',
+  'merchant.updated',
+  'merchant.status_changed',
+  'merchant.bank_account_verified',
+  'invoice.issued',
+] as const;
