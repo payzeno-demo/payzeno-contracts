@@ -31,7 +31,31 @@ describe('EventEnvelope', () => {
     }
   });
 
+  it('prefixes every id with evt_', () => {
+    for (const event of everyEventType()) {
+      expect(event.id).toMatch(/^evt_/);
+    }
+  });
+
+  it('uses an RFC 3339 UTC string for occurred_at, never a Date', () => {
+    for (const event of everyEventType()) {
+      expect(typeof event.occurred_at).toBe('string');
+      expect(event.occurred_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/);
+    }
+  });
+});
+
+describe('source', () => {
   const PUBLISHERS = ['payzeno-api', 'payzeno-ledger', 'payzeno-billing-legacy'];
+
+  it('admits exactly the three publishers', () => {
+    const seen = new Set(everyEventType().map((event) => event.source));
+    for (const source of seen) {
+      expect(PUBLISHERS).toContain(source);
+    }
+    // All three branches must actually be reachable, or the union is a lie.
+    expect(seen.size).toBe(3);
+  });
 
   it('attributes the ledger events to payzeno-ledger', () => {
     for (const event of everyEventType()) {
@@ -51,4 +75,7 @@ describe('causation_id', () => {
 });
 
 describe('EVENT_TYPES', () => {
+  it('is frozen at 28 members', () => {
+    expect(EVENT_TYPES).toHaveLength(28);
+  });
 });

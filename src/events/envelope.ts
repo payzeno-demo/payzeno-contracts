@@ -71,3 +71,4 @@ export const EVENT_TYPES = [
   'merchant.bank_account_verified',
   'invoice.issued',
 ] as const;
+export type EventType = (typeof EVENT_TYPES)[number];
