@@ -16,6 +16,7 @@ import type { EventEnvelope, EventType, PayzenoEvent } from '../events';
 const MERCHANT_ID = 'mch_01HQ8Z3K9X4M2N7P6R5T1V0W8Y';
 const CHARGE_ID = 'ch_01HQ8Z3K9X4M2N7P6R5T1V0W91';
 const PAYMENT_INTENT_ID = 'pi_01HQ8Z3K9X4M2N7P6R5T1V0W92';
+const BANK_ACCOUNT_ID = 'ba_01HQ8Z3K9X4M2N7P6R5T1V0W98';
 const DISPUTE_ID = 'dp_01HQ8Z3K9X4M2N7P6R5T1V0W9A';
 
 function buildEvent(type: EventType): PayzenoEvent {

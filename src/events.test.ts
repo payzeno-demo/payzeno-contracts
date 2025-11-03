@@ -34,3 +34,9 @@ describe('EVENT_TOPICS', () => {
     }
 
     for (const type of EVENT_TYPES) {
+      expect(seen.get(type), `${type} is on no topic`).toBe(1);
+    }
+    expect(seen.size).toBe(EVENT_TYPES.length);
+  });
+
+  it('routes settlement.duplicate_detected onto the ledger topic', () => {
