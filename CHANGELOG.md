@@ -27,3 +27,7 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 
 - `ReconciliationItem.attempt_count`, `.last_error_code` and `.next_attempt_at` promoted from
   optional to required (PAY-2059). Strictly this is a narrowing and therefore a major by
+  ADR 0002; shipped as a minor because `ReconciliationItem` is internal-only — it is never
+  serialised past `payzeno-api`'s internal controller and the console has no view on it. Both
+  consumers were patched in the same week. Do not treat this as precedent.
+- Docblock on `ReconciliationItem.next_attempt_at` recording that the retry drain filters on it
