@@ -6,3 +6,4 @@
  * `CONTRACTS_VERSION` MUST equal, byte for byte:
  *   - `package.json`            .version
  *   - `python/pyproject.toml`   [project] version
+ *   - `java/pom.xml`            <version> of payzeno-contracts-java

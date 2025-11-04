@@ -10,6 +10,7 @@
     "registry": "https://npm.payzeno.internal/"
   },
   "repository": {
+    "type": "git",
     "pnpm": ">=8.15.0"
   },
   "packageManager": "pnpm@8.15.8",
@@ -48,6 +49,7 @@
     "clean": "rm -rf dist .tsbuildinfo",
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
+    "@types/node": "20.12.7",
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@vitest/coverage-v8": "1.6.0",
     "eslint-import-resolver-typescript": "3.6.1",

@@ -36,3 +36,10 @@ export const EVENT_TOPICS = {
     'payout.scheduled',
     'payout.paid',
     'payout.failed',
+    'payout.returned',
+    'ledger.transaction_posted',
+    'ledger.imbalance_detected',
+  ],
+  'payzeno-merchant-events': [
+    'merchant.created',
+    'merchant.updated',

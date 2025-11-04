@@ -48,4 +48,15 @@ describe('EVENT_TOPICS', () => {
 });
 
 describe('QUEUE_NAMES', () => {
+  it('has no duplicate queue name', () => {
+    const values = Object.values(QUEUE_NAMES);
+    expect(new Set(values).size).toBe(values.length);
+  });
+
+  it('resolves every event type', () => {
+    for (const type of EVENT_TYPES) {
+      expect(topicForEventType(type), `${type} has no topic`).toBeDefined();
+    }
+  });
+
 });
