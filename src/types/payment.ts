@@ -50,3 +50,55 @@ export interface PaymentIntent {
   cancellation_reason: CancellationReason | null;
 }
 
+export interface CreatePaymentIntentRequest {
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  capture_method?: CaptureMethod;
+  payment_method_token?: PaymentMethodToken;
+  customer_reference?: string;
+  description?: string;
+  statement_descriptor?: string;
+  /** When true and a payment method is supplied, confirm in the same call. */
+  confirm?: boolean;
+  metadata?: Metadata;
+}
+
+export interface Charge {
+  id: ChargeId;
+  object: 'charge';
+  merchant_id: MerchantId;
+  payment_intent_id: PaymentIntentId;
+  amount_minor: MinorUnits;
+  captured_amount_minor: MinorUnits;
+  refunded_amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  status: ChargeStatus;
+  /**
+   * The ONE name for the card fields. The DB flattens this to `card_brand`, `card_last_four`,
+   * `card_exp_month`, `card_exp_year`, `card_country`, `card_funding` (data-model.md §1.6);
+   * the API and every consumer use the nested object. There is no `payment_method_brand`.
+   */
+  card: CardSummary;
+  /** Which acquirer authorised it. Part of `uq_charge_processor_reference`. */
+  acquirer: Acquirer;
+  network_transaction_id: string | null;
+  processor_reference: string | null;
+  authorization_code: string | null;
+  capture_method: CaptureMethod;
+  three_d_secure: ThreeDSecureResult | null;
+  sca_exemption: ScaExemption | null;
+  risk_score: number;
+  failure_code: DeclineCode | null;
+  failure_message: string | null;
+  settlement_batch_id: SettlementBatchId | null;
+  livemode: boolean;
+  metadata: Metadata;
+  authorized_at: IsoTimestamp | null;
+  captured_at: IsoTimestamp | null;
+  settled_at: IsoTimestamp | null;
+  /** Auth holds expire at 7 days, or 30 for the deferred-capture MCCs. See domain-model §3. */
+  authorization_expires_at: IsoTimestamp | null;
+  created_at: IsoTimestamp;
+  updated_at: IsoTimestamp;
+}
+

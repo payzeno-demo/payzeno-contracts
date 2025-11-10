@@ -20,6 +20,7 @@ ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "
 
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
+CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
 
@@ -31,6 +32,9 @@ PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires
 
 
 RECONCILIATION_ITEM_STATUSES_VALUES = Literal["pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded"]
+RECONCILIATION_ITEM_STATUSES: tuple[str, ...] = ("pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded")
+
+
 RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "chargeback_reversal", "scheme_fee", "adjustment", "reserve_hold", "reserve_release"]
 RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
 
@@ -48,6 +52,22 @@ class BootstrapAccountsResponse(BaseModel):
 
     accounts: list[Account]
     created: int
+
+
+class CapturePaymentIntentRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    amount_minor: int | None = None
+
+
+class CreatePayoutRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    currency: CURRENCIES_VALUES
+    amount_minor: int | None = None
+    bank_account_id: str | None = None
+    method: PAYOUT_METHODS_VALUES | None = None
+    statement_descriptor: str | None = None
 
 
 class CurrenciesResponse(BaseModel):
@@ -83,6 +103,27 @@ class Merchant(BaseModel):
     updated_at: str
 
 
+class Money(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+
+
+class PaymentIntentListQuery(ListQuery):
+    model_config = ConfigDict(extra='forbid')
+
+    status: PAYMENT_INTENT_STATUSES_VALUES | None = None
+    customer_reference: str | None = None
+
+
+class ReadinessResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    status: Literal["ok"] | Literal["degraded"]
+    checks: dict[str, Any]
+
+
 class ReconciliationBacklog(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -95,6 +136,30 @@ class ReconciliationBacklog(BaseModel):
     oldest_retryable_at: str | None
 
 
+class WebhookEvent(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["webhook_event"]
+    merchant_id: str
+    endpoint_id: str
+    type: PUBLIC_EVENT_TYPES_VALUES
+    source_event_id: str
+    payload: dict[str, Any]
+    status: WEBHOOK_EVENT_STATUSES_VALUES
+    attempt_count: int
+    next_attempt_at: str | None
+    last_response_status: int | None
+    last_error: str | None
+    signature_version: Literal["v1"]
+    livemode: bool
+    created_at: str
+    delivered_at: str | None
+
+
+ApiKeyMode = API_KEY_MODES_VALUES
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+InvoiceResponse = Invoice
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
+WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES
