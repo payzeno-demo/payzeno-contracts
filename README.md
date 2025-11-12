@@ -22,3 +22,11 @@ Consumers: `payzeno-api`, `payzeno-console` (workspace deps), `payzeno-ledger`
 3. **Enums are `as const` tuples**, never the `enum` keyword. `export const FOO = [...] as const;
    export type Foo = (typeof FOO)[number];` The tuples are what back the Postgres enums and what
    the codegen turns into `Literal[...]`.
+
+Background: [`docs/adr/0002-contracts-versioning.md`](docs/adr/0002-contracts-versioning.md) and
+[`docs/adr/0005-zero-runtime-dependencies.md`](docs/adr/0005-zero-runtime-dependencies.md).
+
+## Install
+
+```bash
+pnpm add @payzeno/contracts   # inside the monorepo this resolves to workspace:*

@@ -25,6 +25,18 @@ Pydantic and to Java records. A runtime dependency has no meaning on those sides
 three targets and decorative in the other two. Whichever target the schema is
 written for becomes the real contract and the other two drift.
 
+## Consequences
+
+- Validation is the consumer's job. `payzeno-api` validates with `class-validator`
+  on DTOs that `implements` the contracts request types; the ledger validates with
+  Pydantic on the generated models; the console does not validate inbound at all
+  and trusts the API. Three mechanisms, one shape.
+- We cannot ship a runtime schema, so nothing here can be enforced at a boundary by
+  this package alone. The `extra='forbid'` on the generated Pydantic models is the
+  closest thing we have, and it is generated, not imported.
+- Someone will propose `zod` again. Point them here. The answer does not change
+  because the dependency got smaller.
+
 ## Alternatives considered
 
 **`zod` as a peer dependency.** Moves the version conflict to the consumer instead
