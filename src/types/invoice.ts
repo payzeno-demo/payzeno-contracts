@@ -24,3 +24,5 @@ import type {
 export const INVOICE_STATUSES = ['draft', 'open', 'paid', 'uncollectible', 'void'] as const;
 export type InvoiceListResponse = Paginated<Invoice>;
 
+/** @deprecated use Invoice. TODO(PAY-1611) remove after the console migration. */
+export type InvoiceResponse = Invoice;
