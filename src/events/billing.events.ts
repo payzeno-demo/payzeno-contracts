@@ -37,3 +37,4 @@ export interface InvoiceIssuedPayload {
   migrated_to_ledger: boolean;
   issued_at: IsoTimestamp;
 }
+export type InvoiceIssuedEvent = EventEnvelope<'invoice.issued', InvoiceIssuedPayload>;

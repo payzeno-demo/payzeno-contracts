@@ -22,5 +22,14 @@ import type {
 } from './scalars';
 
 export const INVOICE_STATUSES = ['draft', 'open', 'paid', 'uncollectible', 'void'] as const;
+export interface InvoiceLine {
+  description: string;
+  quantity: number;
+  unit_amount_minor: MinorUnits;
+  amount_minor: MinorUnits;
+}
+
 export type InvoiceListResponse = Paginated<Invoice>;
 
+/** @deprecated use Invoice. TODO(PAY-1611) remove after the console migration. */
+export type InvoiceResponse = Invoice;
