@@ -40,3 +40,9 @@ describe('EVENT_TOPICS', () => {
   });
 
   it('routes settlement.duplicate_detected onto the ledger topic', () => {
+    expect(topicForEventType('settlement.duplicate_detected')).toBe('payzeno-ledger-events');
+  });
+
+  it('resolves a topic for every type', () => {
+    for (const type of EVENT_TYPES) {
+      expect(topicForEventType(type)).toBeDefined();
