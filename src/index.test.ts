@@ -41,6 +41,7 @@ describe('src/index.ts', () => {
 
   it('has one re-export line per types/ module', () => {
     const source = fs.readFileSync(path.resolve(__dirname, 'index.ts'), 'utf8');
+    const source = fs.readFileSync(path.join(typesDir, file), 'utf8');
     const runtimeExports = [...source.matchAll(/^export const ([A-Za-z0-9_]+)/gm)].map(
       (m) => m[1] ?? '',
     );
@@ -72,6 +73,15 @@ describe('layering', () => {
   // The cycle rule. types/** is the bottom of the graph and must stay there,
   // or the Python codegen's per-module read stops terminating.
   it.each(moduleFiles())('types/%s imports only other types/ modules', (file) => {
+    const specifiers = [...source.matchAll(/from '([^']+)'/g)].map((m) => m[1] ?? '');
+
+    for (const specifier of specifiers) {
+      expect(specifier.startsWith('./'), `types/${file} imports '${specifier}'`).toBe(true);
+      expect(specifier).not.toContain('..');
+    }
+  });
+
+  it('internal/ imports nothing at all', () => {
     const internalDir = path.resolve(__dirname, 'internal');
     const internalFiles = fs
       .readdirSync(internalDir)
