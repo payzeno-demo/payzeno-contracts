@@ -14,3 +14,4 @@
  * one way only. `import/no-cycle` catches most violations; the layering test
  * catches the rest.
  *
+ * Re-export order is dependency order, leaves first. Keep it that way — it is

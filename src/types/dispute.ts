@@ -18,6 +18,15 @@ export const DISPUTE_STATUSES = [
   'warning_needs_response',
   'warning_closed',
 ] as const;
+export const DISPUTE_REASONS = [
+  'fraudulent',
+  'product_not_received',
+  'product_unacceptable',
+  'duplicate',
+  'subscription_canceled',
+  'credit_not_processed',
+  'general',
+] as const;
 export interface SubmitDisputeEvidenceRequest {
   evidence: DisputeEvidence;
   /** When false the evidence is staged but not sent to the network. */
