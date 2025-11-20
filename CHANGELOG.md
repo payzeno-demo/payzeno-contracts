@@ -31,3 +31,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
   serialised past `payzeno-api`'s internal controller and the console has no view on it. Both
   consumers were patched in the same week. Do not treat this as precedent.
 - Docblock on `ReconciliationItem.next_attempt_at` recording that the retry drain filters on it
+  and not on `last_attempt_at` (PAY-2071, arc PERF).
+
+## [3.2.0] — 2026-05-11
+
+### Changed

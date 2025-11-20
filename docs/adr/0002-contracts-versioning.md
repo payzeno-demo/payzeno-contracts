@@ -23,3 +23,16 @@ for that, so every change is argued from first principles in the PR.
 We also have no single place that says what version anything is. `package.json` has
 one, `pyproject.toml` has another, and `pom.xml` has a third. They have already
 drifted twice.
+
+## Decision
+
+**One version string.** `src/version.ts` exports `CONTRACTS_VERSION`. It is
+interpolated into `python/pyproject.toml` and `java/pom.xml` by the codegen, and
+`src/version.test.ts` asserts all three plus `package.json` agree. A CI job asserts
+it again without Node's help, because the test can be skipped and the job cannot.
+
+**Semver, with one rule that is not the usual one.**
+
+- **Additive is a MINOR.** A new exported type, a new optional field on a request,
+  a new member on an `as const` tuple that only producers write.
+- **Removing or NARROWING an exported symbol is a MAJOR.** Deleting a type,

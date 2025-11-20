@@ -30,3 +30,11 @@ Background: [`docs/adr/0002-contracts-versioning.md`](docs/adr/0002-contracts-ve
 
 ```bash
 pnpm add @payzeno/contracts   # inside the monorepo this resolves to workspace:*
+```
+
+Seven entrypoints, and only these seven:
+
+| Subpath | What's in it |
+| --- | --- |
+| `@payzeno/contracts` | every DTO and domain type (barrel over `src/types/**`) |
+| `@payzeno/contracts/events` | `PayzenoEvent`, `EventEnvelope`, `EVENT_TYPES`, `EVENT_SCHEMA_VERSIONS`, `EventHandler<T>` |
