@@ -18,6 +18,8 @@ export const DISPUTE_STATUSES = [
   'warning_needs_response',
   'warning_closed',
 ] as const;
+export type DisputeStatus = (typeof DISPUTE_STATUSES)[number];
+
 export const DISPUTE_REASONS = [
   'fraudulent',
   'product_not_received',
