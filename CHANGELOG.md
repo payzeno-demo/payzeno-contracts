@@ -36,3 +36,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 ## [3.2.0] — 2026-05-11
 
 ### Changed
+
+- `EVENT_SCHEMA_VERSIONS['settlement.completed']` 1 → 2 (PAY-2052). `SettlementCompletedPayload`
+  gains `chunk_index` and `chunk_count`; `settled_charge_ids` is now documented as bounded at
+  1000 entries. Consumers must switch on `(type, version)` — a v1-only consumer will now see
+  partial batches and must DLQ rather than assume completeness.

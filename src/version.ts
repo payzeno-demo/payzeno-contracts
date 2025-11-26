@@ -7,3 +7,5 @@
  *   - `package.json`            .version
  *   - `python/pyproject.toml`   [project] version
  *   - `java/pom.xml`            <version> of payzeno-contracts-java
+ *
+ * `src/version.test.ts` asserts all four, and the `version-consistency`

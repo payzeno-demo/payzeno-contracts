@@ -42,6 +42,11 @@
       "import": "./dist/guards.js",
       "require": "./dist/guards.cjs"
     },
+    "./money": {
+      "types": "./dist/money.d.ts",
+      "import": "./dist/money.js",
+      "require": "./dist/money.cjs"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -49,6 +54,7 @@
     "clean": "rm -rf dist .tsbuildinfo",
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
+    "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
     "@types/node": "20.12.7",
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@vitest/coverage-v8": "1.6.0",
