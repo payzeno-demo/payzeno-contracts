@@ -38,6 +38,37 @@ export class SourceLoader {
    * byte-compared by CI, so a non-deterministic declaration order would make
    * `git diff --exit-code` fail at random.
    */
+  load(entry: string[]): SourceModule[] {
+    const program = this.readProgram(entry);
+    const modules: SourceModule[] = [];
+
+    for (const filePath of [...entry].sort()) {
+      const sourceFile = program.getSourceFile(filePath);
+      if (sourceFile === undefined) {
+        throw new UnresolvedRefError(filePath, 'loader');
+      }
+      modules.push({
+        moduleName: this.moduleNameFor(filePath),
+        filePath,
+        declarations: this.collectDeclarations(sourceFile),
+      });
+    }
+
+    return modules;
+  }
+
+  private readProgram(entry: string[]): ts.Program {
+    return ts.createProgram(entry, {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      strict: true,
+      isolatedModules: true,
+      noEmit: true,
+      skipLibCheck: true,
+    });
+  }
+
   private collectDeclarations(sourceFile: ts.SourceFile): SourceDeclaration[] {
     const declarations: SourceDeclaration[] = [];
 
@@ -91,6 +122,48 @@ export class SourceLoader {
       .trim();
   }
 
+  private readInterface(
+    node: ts.InterfaceDeclaration,
+    sourceFile: ts.SourceFile,
+  ): SourceDeclaration {
+    const heritage: string[] = [];
+    for (const clause of node.heritageClauses ?? []) {
+      for (const type of clause.types) {
+        heritage.push(type.expression.getText(sourceFile));
+      }
+    }
+
+    return {
+      name: node.name.text,
+      kind: 'interface',
+      exported: this.isExported(node),
+      doc: this.docOf(node, sourceFile),
+      heritage,
+      members: node.members
+        .filter(ts.isPropertySignature)
+        .map((member) => this.readMember(member, sourceFile)),
+    };
+  }
+
+  private readTypeAlias(
+    node: ts.TypeAliasDeclaration,
+    sourceFile: ts.SourceFile,
+  ): SourceDeclaration {
+    return {
+      name: node.name.text,
+      kind: 'alias',
+      exported: this.isExported(node),
+      doc: this.docOf(node, sourceFile),
+      aliasType: this.readTypeNode(node.type, sourceFile),
+    };
+  }
+
+  /**
+   * `export const FOO = [...] as const;` is the org's only enum idiom, so it is
+   * the only const shape the loader keeps. `CURRENCY_EXPONENT` and
+   * `EVENT_SCHEMA_VERSIONS` are Records and are handled as `const-record`;
+   * everything else (functions, plain objects) is skipped.
+   */
   private readTypeNode(node: ts.TypeNode, sourceFile: ts.SourceFile): SourceTypeNode {
     const text = node.getText(sourceFile);
 
