@@ -41,3 +41,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
   gains `chunk_index` and `chunk_count`; `settled_charge_ids` is now documented as bounded at
   1000 entries. Consumers must switch on `(type, version)` — a v1-only consumer will now see
   partial batches and must DLQ rather than assume completeness.
+
+### Added
+
+- `ERROR_CODES`: `batch_not_reconcilable`, `retry_exhausted` (PAY-2050).
+

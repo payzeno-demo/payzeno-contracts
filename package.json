@@ -52,11 +52,13 @@
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist .tsbuildinfo",
+    "lint": "eslint \"src/**/*.ts\" --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
     "@types/node": "20.12.7",
     "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.8.0",
     "@vitest/coverage-v8": "1.6.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
