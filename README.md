@@ -38,3 +38,11 @@ Seven entrypoints, and only these seven:
 | --- | --- |
 | `@payzeno/contracts` | every DTO and domain type (barrel over `src/types/**`) |
 | `@payzeno/contracts/events` | `PayzenoEvent`, `EventEnvelope`, `EVENT_TYPES`, `EVENT_SCHEMA_VERSIONS`, `EventHandler<T>` |
+| `@payzeno/contracts/errors` | `PayzenoError` and the four concrete subclasses |
+| `@payzeno/contracts/guards` | `isEventOfType`, `isApiError`, `assertNever` |
+| `@payzeno/contracts/money` | minor-unit arithmetic, formatting, basis points |
+| `@payzeno/contracts/ids` | the ID prefix table, `parseId`, `validateId` |
+| `@payzeno/contracts/version` | `CONTRACTS_VERSION`, `API_VERSION` |
+
+Deep imports into `dist/` are not supported and we will break them without warning.
+
