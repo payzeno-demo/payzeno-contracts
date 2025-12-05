@@ -63,6 +63,12 @@ export interface CreatePaymentIntentRequest {
   metadata?: Metadata;
 }
 
+export interface ConfirmPaymentIntentRequest {
+  payment_method_token?: PaymentMethodToken;
+  /** 3DS / redirect return target. */
+  return_url?: string;
+}
+
 export interface Charge {
   id: ChargeId;
   object: 'charge';
@@ -101,4 +107,6 @@ export interface Charge {
   created_at: IsoTimestamp;
   updated_at: IsoTimestamp;
 }
+
+export type ChargeListResponse = Paginated<Charge>;
 
