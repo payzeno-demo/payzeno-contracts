@@ -21,7 +21,20 @@ import type {
 import type { Acquirer } from './settlement';
 
 export const CARD_BRANDS = ['visa', 'mastercard', 'amex', 'discover'] as const;
+export type CardBrand = (typeof CARD_BRANDS)[number];
+
+export interface ThreeDSecureResult {
+  version: string;
+  authentication_flow: 'frictionless' | 'challenge';
+  result: 'authenticated' | 'attempted' | 'failed' | 'unavailable';
+  /** Electronic Commerce Indicator, scheme-specific. */
+  eci: string;
+  liability_shifted: boolean;
+}
+
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
+
+export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
 
 export interface PaymentIntent {
   id: PaymentIntentId;
