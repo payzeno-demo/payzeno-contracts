@@ -82,8 +82,24 @@ export interface ConfirmPaymentIntentRequest {
   return_url?: string;
 }
 
+export interface CancelPaymentIntentRequest {
+  cancellation_reason?: CancellationReason;
+}
+
 export type PaymentIntentListResponse = Paginated<PaymentIntent>;
 
+export const DECLINE_CODES = [
+  'do_not_honor',
+  'insufficient_funds',
+  'lost_card',
+  'stolen_card',
+  'expired_card',
+  'incorrect_cvc',
+  'processing_error',
+  'issuer_unavailable',
+  'velocity_exceeded',
+  'fraud_suspected',
+] as const;
 export interface Charge {
   id: ChargeId;
   object: 'charge';

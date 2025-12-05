@@ -67,3 +67,13 @@ export function isUlid(s: string): boolean {
   return s.charAt(0) <= '7';
 }
 
+function isKnownPrefix(prefix: string): prefix is IdPrefix {
+  return Object.prototype.hasOwnProperty.call(ID_PREFIXES, prefix);
+}
+
+/**
+ * Split `<prefix>_<ulid>`.
+ *
+ * @throws ValidationError when the id has no separator, an
+ *   unknown prefix, or a malformed ULID body.
+ */
