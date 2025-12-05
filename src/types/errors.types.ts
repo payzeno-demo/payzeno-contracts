@@ -4,3 +4,8 @@
  *
  * NOTE: this is the only file in `types/` with a `.types.ts` suffix. It was
  * extracted out of the barrel six months after the rest of the split and
+ * nobody renamed it. Not a pattern — do not copy it.
+ */
+
+import type { IsoTimestamp } from './scalars';
+

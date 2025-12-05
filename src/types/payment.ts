@@ -21,7 +21,20 @@ import type {
 import type { Acquirer } from './settlement';
 
 export const CARD_BRANDS = ['visa', 'mastercard', 'amex', 'discover'] as const;
+export type CardBrand = (typeof CARD_BRANDS)[number];
+
+export interface ThreeDSecureResult {
+  version: string;
+  authentication_flow: 'frictionless' | 'challenge';
+  result: 'authenticated' | 'attempted' | 'failed' | 'unavailable';
+  /** Electronic Commerce Indicator, scheme-specific. */
+  eci: string;
+  liability_shifted: boolean;
+}
+
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
+
+export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
 
 export interface PaymentIntent {
   id: PaymentIntentId;
@@ -63,6 +76,30 @@ export interface CreatePaymentIntentRequest {
   metadata?: Metadata;
 }
 
+export interface ConfirmPaymentIntentRequest {
+  payment_method_token?: PaymentMethodToken;
+  /** 3DS / redirect return target. */
+  return_url?: string;
+}
+
+export interface CancelPaymentIntentRequest {
+  cancellation_reason?: CancellationReason;
+}
+
+export type PaymentIntentListResponse = Paginated<PaymentIntent>;
+
+export const DECLINE_CODES = [
+  'do_not_honor',
+  'insufficient_funds',
+  'lost_card',
+  'stolen_card',
+  'expired_card',
+  'incorrect_cvc',
+  'processing_error',
+  'issuer_unavailable',
+  'velocity_exceeded',
+  'fraud_suspected',
+] as const;
 export interface Charge {
   id: ChargeId;
   object: 'charge';
@@ -102,3 +139,10 @@ export interface Charge {
   updated_at: IsoTimestamp;
 }
 
+export type ChargeListResponse = Paginated<Charge>;
+
+export interface ChargeListQuery extends ListQuery {
+  status?: ChargeStatus;
+  payment_intent_id?: PaymentIntentId;
+  settlement_batch_id?: SettlementBatchId;
+}

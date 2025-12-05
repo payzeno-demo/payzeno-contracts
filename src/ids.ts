@@ -49,6 +49,8 @@ export const ID_PREFIXES = {
   bat: { entity: null, owner: 'payzeno-vault' },
 } as const;
 
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
 /** True when `s` is a syntactically valid uppercase Crockford ULID. */
 export function isUlid(s: string): boolean {
   if (s.length !== ULID_LENGTH) {
@@ -65,3 +67,13 @@ export function isUlid(s: string): boolean {
   return s.charAt(0) <= '7';
 }
 
+function isKnownPrefix(prefix: string): prefix is IdPrefix {
+  return Object.prototype.hasOwnProperty.call(ID_PREFIXES, prefix);
+}
+
+/**
+ * Split `<prefix>_<ulid>`.
+ *
+ * @throws ValidationError when the id has no separator, an
+ *   unknown prefix, or a malformed ULID body.
+ */

@@ -17,6 +17,12 @@ describe('ID_PREFIXES', () => {
     expect(PREFIXES).toContain('bat');
   });
 
+  it('marks the vault prefixes as owning no Payzeno entity', () => {
+    expect(ID_PREFIXES.pmt.entity).toBeNull();
+    expect(ID_PREFIXES.bat.entity).toBeNull();
+    expect(ID_PREFIXES.pmt.owner).toBe('payzeno-vault');
+  });
+
   it('names an owner service for every prefix', () => {
     for (const prefix of PREFIXES) {
       expect(ID_PREFIXES[prefix].owner).toMatch(/^payzeno-/);
@@ -29,6 +35,24 @@ describe('isUlid', () => {
     expect(isUlid(ULID.toLowerCase())).toBe(false);
     expect(isUlid(ULID.slice(0, 25))).toBe(false);
     expect(isUlid(`${ULID}Z`)).toBe(false);
+  });
+
+  it('rejects a timestamp that overflows 48 bits', () => {
+    expect(isUlid(`8${ULID.slice(1)}`)).toBe(false);
+    expect(isUlid(`Z${ULID.slice(1)}`)).toBe(false);
+  });
+});
+
+describe('parseId', () => {
+  it.each(PREFIXES)('round-trips %s_', (prefix) => {
+    const parsed = parseId(`${prefix}_${ULID}`);
+    expect(parsed.prefix).toBe(prefix);
+    expect(parsed.ulid).toBe(ULID);
+  });
+
+  it('throws ValidationError on a missing separator', () => {
+    expect(() => parseId(ULID)).toThrow(ValidationError);
+    expect(() => parseId(`_${ULID}`)).toThrow(ValidationError);
   });
 
 });
