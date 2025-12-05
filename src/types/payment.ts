@@ -82,6 +82,8 @@ export interface ConfirmPaymentIntentRequest {
   return_url?: string;
 }
 
+export type PaymentIntentListResponse = Paginated<PaymentIntent>;
+
 export interface Charge {
   id: ChargeId;
   object: 'charge';
@@ -123,3 +125,8 @@ export interface Charge {
 
 export type ChargeListResponse = Paginated<Charge>;
 
+export interface ChargeListQuery extends ListQuery {
+  status?: ChargeStatus;
+  payment_intent_id?: PaymentIntentId;
+  settlement_batch_id?: SettlementBatchId;
+}
