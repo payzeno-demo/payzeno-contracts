@@ -49,6 +49,8 @@ export const ID_PREFIXES = {
   bat: { entity: null, owner: 'payzeno-vault' },
 } as const;
 
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
 /** True when `s` is a syntactically valid uppercase Crockford ULID. */
 export function isUlid(s: string): boolean {
   if (s.length !== ULID_LENGTH) {
