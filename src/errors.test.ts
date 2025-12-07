@@ -39,9 +39,36 @@ describe('the four concrete subclasses', () => {
 
 describe('toApiError', () => {
   it('produces the exact envelope both other repos parse', () => {
+    const error = new NotFoundError('merchant not found');
+    const envelope = new ConflictError('already settled').toApiError(REQUEST_ID);
+    expect('field_errors' in envelope.error).toBe(false);
+    expect('details' in envelope.error).toBe(false);
+  });
+
+  it('includes field_errors when present', () => {
     const error = new ValidationError('invalid body', {}, [
       { path: 'payment_method.exp_month', code: 'out_of_range', message: 'must be 1-12' },
     ]);
+    const error = new ValidationError('nope', {
+      merchant_id: 'mch_1',
+      attempt: 3,
+      retryable: false,
+      nothing: null,
+      body: { card_number: '4242424242424242' },
+      cb: () => undefined,
+    });
+    const envelope = error.toApiError(REQUEST_ID);
+
+    expect(envelope.error.details).toEqual({
+      merchant_id: 'mch_1',
+      attempt: 3,
+      retryable: false,
+      nothing: null,
+    });
+    expect(JSON.stringify(envelope)).not.toContain('4242');
+  });
+
+  it('drops non-finite numbers from details', () => {
     const envelope = new ConflictError('x', { ratio: Number.NaN }).toApiError(REQUEST_ID);
     expect(envelope.error.details).toBeUndefined();
   });
