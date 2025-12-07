@@ -51,6 +51,8 @@ export const ID_PREFIXES = {
 
 const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
+const ULID_LENGTH = 26;
+
 /** True when `s` is a syntactically valid uppercase Crockford ULID. */
 export function isUlid(s: string): boolean {
   if (s.length !== ULID_LENGTH) {
@@ -77,3 +79,14 @@ function isKnownPrefix(prefix: string): prefix is IdPrefix {
  * @throws ValidationError when the id has no separator, an
  *   unknown prefix, or a malformed ULID body.
  */
+export function validateId(id: string, prefix?: IdPrefix): boolean {
+  try {
+    const parsed = parseId(id);
+    return prefix === undefined || parsed.prefix === prefix;
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return false;
+    }
+    throw error;
+  }
+}

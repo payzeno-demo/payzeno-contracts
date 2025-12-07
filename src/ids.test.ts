@@ -55,4 +55,12 @@ describe('parseId', () => {
     expect(() => parseId(`_${ULID}`)).toThrow(ValidationError);
   });
 
+  it('throws ValidationError on an unknown prefix', () => {
+    expect(() => parseId(`zzz_${ULID}`)).toThrow(ValidationError);
+  });
+
+  it('throws ValidationError on a malformed body', () => {
+    expect(() => parseId('mch_not-a-ulid')).toThrow(ValidationError);
+  });
+
 });
