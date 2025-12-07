@@ -34,6 +34,13 @@ export interface ThreeDSecureResult {
 
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
 
+export const CANCELLATION_REASONS = [
+  'requested_by_customer',
+  'duplicate',
+  'fraudulent',
+  'abandoned',
+  'expired',
+] as const;
 export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
 
 export const PAYMENT_INTENT_STATUSES = [
@@ -97,6 +104,7 @@ export interface CancelPaymentIntentRequest {
   cancellation_reason?: CancellationReason;
 }
 
+export type PaymentIntentResponse = PaymentIntent;
 export type PaymentIntentListResponse = Paginated<PaymentIntent>;
 
 export interface PaymentIntentListQuery extends ListQuery {
