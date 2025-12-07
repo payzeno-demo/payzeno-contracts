@@ -41,6 +41,13 @@ describe('src/index.ts', () => {
 
   it('has one re-export line per types/ module', () => {
     const source = fs.readFileSync(path.resolve(__dirname, 'index.ts'), 'utf8');
+    const reexported = [...source.matchAll(/export \* from '\.\/types\/([A-Za-z0-9_.]+)';/g)].map(
+      (m) => `${m[1] ?? ''}.ts`,
+    );
+    expect(reexported.sort()).toEqual(files);
+  });
+
+  it.each(moduleFiles())('re-exports every runtime symbol of types/%s', (file) => {
     const source = fs.readFileSync(path.join(typesDir, file), 'utf8');
     const runtimeExports = [...source.matchAll(/^export const ([A-Za-z0-9_]+)/gm)].map(
       (m) => m[1] ?? '',
@@ -95,5 +102,30 @@ describe('layering', () => {
   });
 
   it('codegen/ never imports the types it generates', () => {
+    const walk = (dir: string): string[] =>
+      fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          return walk(full);
+        }
+        return entry.name.endsWith('.ts') && !entry.name.endsWith('.test.ts') ? [full] : [];
+      });
+
+    for (const file of walk(codegenDir)) {
+      const source = fs.readFileSync(file, 'utf8');
+      const outward = [...source.matchAll(/from '(\.\.\/[^']+)'/g)].map((m) => m[1] ?? '');
+      for (const specifier of outward) {
+        expect(
+          ['../version', '../errors', '../index', '../ir', '../errors.js'].some((allowed) =>
+            specifier.endsWith(allowed.replace('../', '')),
+          ),
+          `${path.basename(file)} imports '${specifier}'`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('has 14 type modules — the count the blueprint freezes', () => {
+    expect(files).toHaveLength(14);
   });
 });
