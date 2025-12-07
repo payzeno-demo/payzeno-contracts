@@ -36,3 +36,15 @@ it again without Node's help, because the test can be skipped and the job cannot
 - **Additive is a MINOR.** A new exported type, a new optional field on a request,
   a new member on an `as const` tuple that only producers write.
 - **Removing or NARROWING an exported symbol is a MAJOR.** Deleting a type,
+  deleting a field, tightening a union — and, explicitly, **making an optional
+  field required**. That last one is where people argue, so it is written down:
+  a consumer that omits the field compiles today and fails validation tomorrow.
+  It is a break. It gets a major.
+- **Adding a member to a tuple that CONSUMERS switch on is a major** even though it
+  is additive, because an exhaustive switch stops being exhaustive. In practice
+  this means `ERROR_CODES` and `LEDGER_PURPOSES` are minors (consumers have a
+  default branch, and we test that they do) and `PAYMENT_INTENT_STATUSES` is a
+  major.
+- **`API_VERSION` is a different axis** and does not move with this one. It is the
+  date-stamped public HTTP contract. It changes when the outside world's view of
+  Payzeno changes, which is rarely.
