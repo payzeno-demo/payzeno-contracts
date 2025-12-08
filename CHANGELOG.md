@@ -46,3 +46,8 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 
 - `ERROR_CODES`: `batch_not_reconcilable`, `retry_exhausted` (PAY-2050).
 
+## [3.1.0] — 2026-04-29
+
+Post-incident. Shipped ~14 hours after the duplicate-settlement sev1.
+
+### Added

@@ -18,9 +18,22 @@ T = TypeVar("T")
 ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment")
 
 
+ACQUIRERS_VALUES = Literal["worldflow", "nordpay"]
+API_KEY_MODES: tuple[str, ...] = ("test", "live")
+
+
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
+CURRENCY_EXPONENT: dict[str, int] = {
+    "USD": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "ILS": 2,
+    "JPY": 0,
+}
+
+
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
 
@@ -29,6 +42,9 @@ LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "
 
 LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
+
+
+PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invalid_details", "debit_not_authorized", "insufficient_funds", "bank_rejected")
 
 
 RECONCILIATION_ITEM_STATUSES_VALUES = Literal["pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded"]
@@ -58,6 +74,17 @@ class CapturePaymentIntentRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     amount_minor: int | None = None
+
+
+class CardSummary(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    brand: CARD_BRANDS_VALUES
+    last_four: str
+    exp_month: int
+    exp_year: int
+    country: str | None
+    funding: CARD_FUNDINGS_VALUES
 
 
 class CreatePayoutRequest(BaseModel):
@@ -136,6 +163,32 @@ class ReconciliationBacklog(BaseModel):
     oldest_retryable_at: str | None
 
 
+class Refund(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["refund"]
+    merchant_id: str
+    charge_id: str
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+    status: REFUND_STATUSES_VALUES
+    reason: REFUND_REASONS_VALUES
+    failure_reason: str | None
+    processor_reference: str | None
+    metadata: dict[str, str]
+    created_at: str
+    succeeded_at: str | None
+
+
+class TimeseriesPoint(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    bucket_start: str
+    amount_minor: int
+    count: int
+
+
 class WebhookEvent(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -159,7 +212,11 @@ class WebhookEvent(BaseModel):
 
 ApiKeyMode = API_KEY_MODES_VALUES
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+DisputeStatus = DISPUTE_STATUSES_VALUES
 InvoiceResponse = Invoice
+PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
+RiskTier = RISK_TIERS_VALUES
+SettlementBatchId = str
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES

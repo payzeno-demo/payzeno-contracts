@@ -9,3 +9,9 @@
 
 import type { IsoTimestamp } from './scalars';
 
+export const ERROR_CODES = [
+  'invalid_request',
+  'refund_window_closed',
+  'retryable_settlement',
+  'orphaned_item',
+  'retry_exhausted',
