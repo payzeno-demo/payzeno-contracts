@@ -15,6 +15,9 @@ from pydantic import BaseModel, ConfigDict
 T = TypeVar("T")
 
 
+ACCOUNT_STATUSES: tuple[str, ...] = ("active", "frozen", "closed")
+
+
 ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment")
 
 
@@ -45,6 +48,12 @@ PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires
 
 
 PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invalid_details", "debit_not_authorized", "insufficient_funds", "bank_rejected")
+
+
+PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed", "returned", "canceled")
+
+
+PRICING_MODELS: tuple[str, ...] = ("blended", "interchange_plus")
 
 
 RECONCILIATION_ITEM_STATUSES_VALUES = Literal["pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded"]
@@ -87,6 +96,14 @@ class CardSummary(BaseModel):
     funding: CARD_FUNDINGS_VALUES
 
 
+class ChargeListQuery(ListQuery):
+    model_config = ConfigDict(extra='forbid')
+
+    status: CHARGE_STATUSES_VALUES | None = None
+    payment_intent_id: str | None = None
+    settlement_batch_id: str | None = None
+
+
 class CreatePayoutRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -101,6 +118,25 @@ class CurrenciesResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     currencies: list[CURRENCIES_VALUES]
+
+
+class LedgerTransaction(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["ledger_transaction"]
+    idempotency_key: str
+    request_fingerprint: str
+    purpose: LEDGER_PURPOSES_VALUES
+    merchant_id: str | None
+    currency: CURRENCIES_VALUES
+    livemode: bool
+    reference_type: LEDGER_REFERENCE_TYPES_VALUES
+    reference_id: str
+    reverses_transaction_id: str | None
+    created_by: LEDGER_ACTORS_VALUES
+    entries: list[LedgerEntry]
+    posted_at: str
 
 
 class Merchant(BaseModel):
@@ -130,11 +166,34 @@ class Merchant(BaseModel):
     updated_at: str
 
 
+class MerchantSettlementBatch(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["merchant_settlement_batch"]
+    merchant_id: str
+    currency: CURRENCIES_VALUES
+    processing_date: str
+    acquirer: ACQUIRERS_VALUES
+    status: SETTLEMENT_BATCH_STATUSES_VALUES
+    item_count: int
+    net_minor: int
+    funded_at: str | None
+
+
 class Money(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     amount_minor: int
     currency: CURRENCIES_VALUES
+
+
+class Paginated(BaseModel, Generic[T]):
+    model_config = ConfigDict(extra='forbid')
+
+    data: list[T]
+    next_cursor: str | None
+    has_more: bool
 
 
 class PaymentIntentListQuery(ListQuery):
@@ -210,13 +269,17 @@ class WebhookEvent(BaseModel):
     delivered_at: str | None
 
 
+Acquirer = ACQUIRERS_VALUES
 ApiKeyMode = API_KEY_MODES_VALUES
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+ChargeStatus = CHARGE_STATUSES_VALUES
 DisputeStatus = DISPUTE_STATUSES_VALUES
 InvoiceResponse = Invoice
+IsoDate = str
 PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
 RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
+UserId = str
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES

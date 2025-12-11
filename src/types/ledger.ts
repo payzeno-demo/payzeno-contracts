@@ -46,6 +46,8 @@ export interface Account {
   created_at: IsoTimestamp;
 }
 
+export type LedgerPurpose = (typeof LEDGER_PURPOSES)[number];
+
 export interface Balance {
   object: 'balance';
   merchant_id: MerchantId;
@@ -66,3 +68,8 @@ export interface Balance {
   as_of: IsoTimestamp;
 }
 
+export interface PostTransactionLine {
+  account_type: AccountType;
+  direction: EntryDirection;
+  amount_minor: MinorUnits;
+}
