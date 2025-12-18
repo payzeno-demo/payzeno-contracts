@@ -31,3 +31,18 @@ export interface CreateApiKeyRequest {
   scopes?: ApiKeyScope[];
 }
 
+export const BANK_ACCOUNT_STATUSES = [
+  'new',
+  'validated',
+  'verification_failed',
+  'errored',
+] as const;
+export interface CreateBankAccountRequest {
+  country: string;
+  currency: CurrencyCode;
+  scheme: BankAccountScheme;
+  /** Opaque vault token, `bat_` prefixed. Payzeno never sees the account number. */
+  bank_account_token: string;
+  account_holder_name: string;
+  is_default?: boolean;
+}
