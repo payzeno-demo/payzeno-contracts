@@ -24,6 +24,10 @@ export const MERCHANT_STATUSES = [
   'rejected',
   'closed',
 ] as const;
+export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
+
+export type RiskTier = (typeof RISK_TIERS)[number];
+
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
