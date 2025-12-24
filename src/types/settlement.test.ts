@@ -20,6 +20,11 @@ const source = fs.readFileSync(path.join(__dirname, 'settlement.ts'), 'utf8');
 function interfaceBody(name: string): string {
   const start = source.indexOf(`export interface ${name} {`);
   expect(start, `${name} not found`).toBeGreaterThan(-1);
+  const end = source.indexOf('\n}', start);
+  return source.slice(start, end);
+}
+
+describe('MerchantSettlementBatch', () => {
   it('carries no acquirer-level money key', () => {
     expect(body).not.toContain('expected_total_minor');
     expect(body).not.toContain('posted_total_minor');
@@ -32,5 +37,16 @@ function interfaceBody(name: string): string {
 
 describe('RECONCILIATION_LINE_TYPES', () => {
   const body = interfaceBody('ReconciliationItem');
+
+  // PAY-2059 promoted these from optional to required. A nullable
+  // attempt_count means the retry drain cannot tell "never tried" from
+  // "tried and the column was never written".
+  it('has attempt_count, last_error_code and next_attempt_at as required', () => {
+    expect(body).toContain('attempt_count: number;');
+    expect(body).toContain('last_error_code: string | null;');
+    expect(body).toContain('next_attempt_at: IsoTimestamp;');
+    expect(body).not.toContain('attempt_count?');
+    expect(body).not.toContain('next_attempt_at?');
+  });
 
 });
