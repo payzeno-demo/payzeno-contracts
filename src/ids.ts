@@ -49,6 +49,14 @@ export const ID_PREFIXES = {
   bat: { entity: null, owner: 'payzeno-vault' },
 } as const;
 
+export type IdPrefix = keyof typeof ID_PREFIXES;
+
+/**
+ * Crockford base32 alphabet. I, L, O and U are excluded on
+ * purpose: I/L look like 1, O looks like 0, and U was dropped
+ * to avoid accidental obscenities. An id containing any of them
+ * is not a ULID, it is a transcription of one.
+ */
 const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const ULID_LENGTH = 26;

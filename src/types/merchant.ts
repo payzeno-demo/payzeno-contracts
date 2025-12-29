@@ -28,6 +28,16 @@ export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
 
 export type RiskTier = (typeof RISK_TIERS)[number];
 
+export interface CreateMerchantRequest {
+  legal_name: string;
+  display_name: string;
+  country: string;
+  default_currency: CurrencyCode;
+  mcc: string;
+  payout_schedule?: PayoutSchedule;
+  metadata?: Metadata;
+}
+
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
@@ -41,6 +51,8 @@ export const BANK_ACCOUNT_STATUSES = [
   'verification_failed',
   'errored',
 ] as const;
+/** Which rail's coordinates a bank account carries. Drives validation and payout method. */
+export const BANK_ACCOUNT_SCHEMES = ['aba', 'iban', 'uk_sort_code'] as const;
 export interface CreateBankAccountRequest {
   country: string;
   currency: CurrencyCode;
