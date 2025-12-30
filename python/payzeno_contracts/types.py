@@ -37,6 +37,10 @@ CURRENCY_EXPONENT: dict[str, int] = {
 }
 
 
+DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "lost", "warning_needs_response", "warning_closed")
+
+
+IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
 
@@ -50,6 +54,7 @@ PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires
 PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invalid_details", "debit_not_authorized", "insufficient_funds", "bank_rejected")
 
 
+PAYOUT_METHODS_VALUES = Literal["standard_ach", "same_day_ach", "sepa", "faster_payments", "debit_ach"]
 PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed", "returned", "canceled")
 
 
@@ -64,6 +69,7 @@ RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "char
 RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
 
 
+REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
@@ -114,10 +120,58 @@ class CreatePayoutRequest(BaseModel):
     statement_descriptor: str | None = None
 
 
+class CreateRefundRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    charge_id: str
+    amount_minor: int | None = None
+    reason: REFUND_REASONS_VALUES | None = None
+    metadata: dict[str, str] | None = None
+
+
 class CurrenciesResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     currencies: list[CURRENCIES_VALUES]
+
+
+class DashboardSummary(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["dashboard_summary"]
+    merchant_id: str
+    currency: CURRENCIES_VALUES
+    window: REPORTING_WINDOWS_VALUES
+    gross_volume_minor: int
+    net_volume_minor: int
+    refunded_minor: int
+    dispute_count: int
+    succeeded_count: int
+    failed_count: int
+    next_payout: Payout | None
+    balance: Balance
+
+
+class Dispute(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["dispute"]
+    merchant_id: str
+    charge_id: str
+    amount_minor: int
+    fee_minor: int
+    currency: CURRENCIES_VALUES
+    status: DISPUTE_STATUSES_VALUES
+    reason: DISPUTE_REASONS_VALUES
+    network_reason_code: str
+    evidence_due_by: str | None
+    evidence: DisputeEvidence
+    is_charge_refundable: bool
+    liability_shifted: bool
+    submitted_at: str | None
+    resolved_at: str | None
+    created_at: str
 
 
 class LedgerTransaction(BaseModel):
@@ -137,6 +191,13 @@ class LedgerTransaction(BaseModel):
     created_by: LEDGER_ACTORS_VALUES
     entries: list[LedgerEntry]
     posted_at: str
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    email: str
+    password: str
 
 
 class Merchant(BaseModel):
@@ -274,8 +335,11 @@ ApiKeyMode = API_KEY_MODES_VALUES
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
 ChargeStatus = CHARGE_STATUSES_VALUES
 DisputeStatus = DISPUTE_STATUSES_VALUES
+InvoiceId = str
 InvoiceResponse = Invoice
 IsoDate = str
+LedgerPurpose = LEDGER_PURPOSES_VALUES
+MinorUnits = int
 PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str

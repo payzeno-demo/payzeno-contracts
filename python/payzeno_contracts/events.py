@@ -53,6 +53,26 @@ EVENT_TOPICS: dict[str, tuple[str, ...]] = {
 }
 
 
+EVENT_TYPES_VALUES = Literal["payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.batch_closed", "settlement.item_settled", "settlement.completed", "settlement.reconciliation_failed", "settlement.duplicate_detected", "settlement.variance_detected", "settlement.funded", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned", "ledger.transaction_posted", "ledger.imbalance_detected", "merchant.created", "merchant.updated", "merchant.status_changed", "merchant.bank_account_verified", "invoice.issued"]
+class InvoiceIssuedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    invoice_public_id: str
+    merchant_id: str
+    subscription_public_id: str | None
+    number: str
+    status: str
+    currency: str
+    subtotal_minor: int
+    tax_minor: int
+    total_minor: int
+    period_start: str
+    period_end: str
+    due_at: str | None
+    migrated_to_ledger: bool
+    issued_at: str
+
+
 class LedgerTransactionPostedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -68,6 +88,27 @@ class LedgerTransactionPostedPayload(BaseModel):
     posted_at: str
 
 
+class PaymentAuthorizedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    charge_id: str
+    payment_intent_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    capture_method: Literal["automatic"] | Literal["manual"]
+    capture_at_settlement: bool
+    card_brand: str
+    card_last_four: str
+    authorization_code: str
+    network_transaction_id: str
+    reserve_bps: int
+    processor_reference: str
+    acquirer: str
+    risk_score: int
+    authorized_at: str
+
+
 class PaymentCapturedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -78,6 +119,19 @@ class PaymentCapturedPayload(BaseModel):
     authorized_amount_minor: int
     currency: str
     captured_at: str
+
+
+class RefundCreatedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    refund_id: str
+    charge_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    reason: str
+    nets_against_settlement: bool
+    created_at: str
 
 
 class RefundSucceededPayload(BaseModel):
@@ -109,6 +163,7 @@ class SettlementVarianceDetectedPayload(BaseModel):
 
 LedgerImbalanceDetectedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
+PaymentCapturedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
 
