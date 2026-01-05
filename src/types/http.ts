@@ -32,6 +32,13 @@ export interface LoginRequest {
   password: string;
 }
 
+/** `POST /v1/auth/login` */
+export interface LoginResponse {
+  object: 'login';
+  user: User;
+  merchant: Merchant;
+}
+
 /** `GET /v1/auth/me` — the console bootstrap call. */
 export interface SessionResponse {
   object: 'session';
@@ -52,12 +59,33 @@ export interface CurrenciesResponse {
   currencies: CurrencyCode[];
 }
 
+/** `POST /internal/v1/accounts/bootstrap` */
+export interface BootstrapAccountsResponse {
+  accounts: Account[];
+  created: number;
+}
+
 /** `GET /internal/v1/balances/:merchantId/history`, `GET /v1/reporting/balance-history` */
 export interface BalanceHistoryResponse {
   merchant_id: MerchantId;
   currency: CurrencyCode;
   interval: TimeseriesInterval;
   points: TimeseriesPoint[];
+}
+
+export interface DashboardSummary {
+  object: 'dashboard_summary';
+  merchant_id: MerchantId;
+  currency: CurrencyCode;
+  window: ReportingWindow;
+  gross_volume_minor: MinorUnits;
+  net_volume_minor: MinorUnits;
+  refunded_minor: MinorUnits;
+  dispute_count: number;
+  succeeded_count: number;
+  failed_count: number;
+  next_payout: Payout | null;
+  balance: Balance;
 }
 
 export interface VolumeTimeseries {
