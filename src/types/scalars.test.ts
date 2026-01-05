@@ -10,6 +10,10 @@ describe('CURRENCIES', () => {
     }
   });
 
+  it('has a key per CURRENCIES member and no extras', () => {
+    expect(Object.keys(CURRENCY_EXPONENT).sort()).toEqual([...CURRENCIES].sort());
+  });
+
   it('is JPY = 0 — anything that hardcodes 100 is a bug', () => {
     expect(CURRENCY_EXPONENT.JPY).toBe(0);
   });
