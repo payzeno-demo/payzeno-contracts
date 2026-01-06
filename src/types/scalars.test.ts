@@ -18,4 +18,19 @@ describe('CURRENCIES', () => {
     expect(CURRENCY_EXPONENT.JPY).toBe(0);
   });
 
+  it('is 2 for the rest', () => {
+    for (const currency of CURRENCIES) {
+      if (currency !== 'JPY') {
+        expect(CURRENCY_EXPONENT[currency]).toBe(2);
+      }
+    }
+  });
+
+  it('is a non-negative integer everywhere', () => {
+    for (const currency of CURRENCIES) {
+      const exponent = CURRENCY_EXPONENT[currency];
+      expect(Number.isInteger(exponent)).toBe(true);
+      expect(exponent).toBeGreaterThanOrEqual(0);
+    }
+  });
 });
