@@ -77,6 +77,7 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const doc = this.renderDoc(decl.doc);
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
     const tuple = decl.values.map((value) => `"${value}"`).join(', ');
     const suffix = decl.values.length === 1 ? ',' : '';
@@ -101,6 +102,15 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderModel(model: IrModel): string {
+    // The loader drops type parameters, so a generic model cannot be detected
+    // from the IR. There is exactly one — `Paginated<T>` — and hardcoding it
+    // was cheaper than teaching the whole pipeline about type parameters for
+    // a single user. If a second one ever appears, do that instead.
+    const base = GENERIC_MODELS.has(model.name)
+      ? 'BaseModel, Generic[T]'
+      : model.base === null
+        ? 'BaseModel'
+        : model.base;
     const lines: string[] = [];
 
     lines.push(`class ${model.name}(${base}):`);
