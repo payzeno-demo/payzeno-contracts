@@ -40,4 +40,13 @@ describe('API_VERSION', () => {
     expect(pkg.dependencies ?? {}).toEqual({});
   });
 
+  it('does not sneak one in via peerDependencies either', () => {
+    const pkg = JSON.parse(read('package.json')) as {
+      peerDependencies?: Record<string, string>;
+    };
+    expect(pkg.peerDependencies ?? {}).toEqual({});
+  });
+});
+
+describe('CHANGELOG', () => {
 });

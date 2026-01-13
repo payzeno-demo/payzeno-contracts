@@ -11,3 +11,5 @@
  * `src/version.test.ts` asserts all four, and the `version-consistency`
  * CI job asserts it again without Node's help. Two gates, because a
  * version skew here is invisible until a consumer deserialises a payload
+ * that no longer has the shape its pinned typings promised.
+ *

@@ -32,6 +32,13 @@ export interface LoginRequest {
   password: string;
 }
 
+/** `POST /v1/auth/login` */
+export interface LoginResponse {
+  object: 'login';
+  user: User;
+  merchant: Merchant;
+}
+
 /** `GET /v1/auth/me` — the console bootstrap call. */
 export interface SessionResponse {
   object: 'session';
@@ -52,12 +59,66 @@ export interface CurrenciesResponse {
   currencies: CurrencyCode[];
 }
 
+/** `POST /internal/v1/accounts/bootstrap` */
+export interface BootstrapAccountsResponse {
+  accounts: Account[];
+  created: number;
+}
+
+export interface TimeseriesPoint {
+  bucket_start: IsoTimestamp;
+  amount_minor: MinorUnits;
+  count: number;
+}
+
 /** `GET /internal/v1/balances/:merchantId/history`, `GET /v1/reporting/balance-history` */
 export interface BalanceHistoryResponse {
   merchant_id: MerchantId;
   currency: CurrencyCode;
   interval: TimeseriesInterval;
   points: TimeseriesPoint[];
+}
+
+/** `POST /internal/v1/ops/audit/trial-balance` */
+export interface TrialBalanceResult {
+  object: 'trial_balance';
+  currency: CurrencyCode;
+  balanced: boolean;
+  delta_minor: MinorUnits;
+  debit_total_minor: MinorUnits;
+  credit_total_minor: MinorUnits;
+  as_of: IsoTimestamp;
+}
+
+/** `POST /internal/v1/ops/adjustments*` — maker-checker on manual ledger entries. */
+export interface LedgerAdjustmentRequest {
+  id: string;
+  object: 'ledger_adjustment_request';
+  merchant_id: MerchantId | null;
+  currency: CurrencyCode;
+  lines: PostTransactionLine[];
+  reason_code: string;
+  requested_by: string;
+  requested_at: IsoTimestamp;
+  approved_by: string | null;
+  approved_at: IsoTimestamp | null;
+  posted_transaction_id: LedgerTransactionId | null;
+  status: 'pending' | 'approved' | 'rejected' | 'posted';
+}
+
+export interface DashboardSummary {
+  object: 'dashboard_summary';
+  merchant_id: MerchantId;
+  currency: CurrencyCode;
+  window: ReportingWindow;
+  gross_volume_minor: MinorUnits;
+  net_volume_minor: MinorUnits;
+  refunded_minor: MinorUnits;
+  dispute_count: number;
+  succeeded_count: number;
+  failed_count: number;
+  next_payout: Payout | null;
+  balance: Balance;
 }
 
 export interface VolumeTimeseries {
