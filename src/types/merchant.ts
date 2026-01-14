@@ -26,6 +26,7 @@ export const MERCHANT_STATUSES = [
 ] as const;
 export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
 
+export const RISK_TIERS = ['standard', 'elevated', 'high'] as const;
 export type RiskTier = (typeof RISK_TIERS)[number];
 
 export interface CreateMerchantRequest {
@@ -38,6 +39,23 @@ export interface CreateMerchantRequest {
   metadata?: Metadata;
 }
 
+export const API_KEY_SCOPES = [
+  'merchants:read',
+  'payment_intents:read',
+  'payment_intents:write',
+  'charges:read',
+  'refunds:read',
+  'refunds:write',
+  'disputes:read',
+  'disputes:write',
+  'balance:read',
+  'payouts:read',
+  'payouts:write',
+  'settlements:read',
+  'invoices:read',
+  'webhooks:read',
+  'webhooks:write',
+] as const;
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;

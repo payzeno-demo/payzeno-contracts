@@ -32,6 +32,7 @@ export interface ThreeDSecureResult {
   liability_shifted: boolean;
 }
 
+export const CAPTURE_METHODS = ['automatic', 'manual'] as const;
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
 
 export const CANCELLATION_REASONS = [
@@ -112,6 +113,16 @@ export interface PaymentIntentListQuery extends ListQuery {
   customer_reference?: string;
 }
 
+export const CHARGE_STATUSES = [
+  'pending',
+  'authorized',
+  'captured',
+  'settled',
+  'failed',
+  'voided',
+  'expired',
+  'reversed',
+] as const;
 export type ChargeStatus = (typeof CHARGE_STATUSES)[number];
 
 export const DECLINE_CODES = [
