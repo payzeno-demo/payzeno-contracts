@@ -51,3 +51,7 @@ minor, removing or narrowing an exported symbol is a major. Every entry links it
 Post-incident. Shipped ~14 hours after the duplicate-settlement sev1.
 
 ### Added
+
+- `SettlementDuplicateDetectedPayload` / `SettlementDuplicateDetectedEvent`, including
+  `detected_by: 'batch_pass' | 'retry_scheduler'` (PAY-2043).
+- `settlement.duplicate_detected` registered in `EVENT_TYPES`, `PayzenoEvent`,

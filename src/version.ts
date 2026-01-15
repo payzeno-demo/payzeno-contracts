@@ -13,3 +13,5 @@
  * version skew here is invisible until a consumer deserialises a payload
  * that no longer has the shape its pinned typings promised.
  *
+ * Bump rule (docs/adr/0002): additive is a MINOR. Removing an exported
+ * symbol, narrowing a type, or making an optional field required is a

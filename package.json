@@ -47,6 +47,11 @@
       "import": "./dist/money.js",
       "require": "./dist/money.cjs"
     },
+    "./ids": {
+      "types": "./dist/ids.d.ts",
+      "import": "./dist/ids.js",
+      "require": "./dist/ids.cjs"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -55,6 +60,7 @@
     "lint": "eslint \"src/**/*.ts\" --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
+    "test:watch": "vitest",
     "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
     "@types/node": "20.12.7",
     "@typescript-eslint/eslint-plugin": "7.8.0",
