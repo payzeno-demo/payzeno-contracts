@@ -69,6 +69,11 @@ export class SourceLoader {
     });
   }
 
+  private moduleNameFor(filePath: string): string {
+    const relative = path.relative(this.rootDir, filePath);
+    return relative.replace(/\\/g, '/').replace(/\.ts$/, '');
+  }
+
   private collectDeclarations(sourceFile: ts.SourceFile): SourceDeclaration[] {
     const declarations: SourceDeclaration[] = [];
 
@@ -145,6 +150,22 @@ export class SourceLoader {
     };
   }
 
+  private readMember(node: ts.PropertySignature, sourceFile: ts.SourceFile): SourceMember {
+    const name = ts.isIdentifier(node.name)
+      ? node.name.text
+      : node.name.getText(sourceFile).replace(/['"]/g, '');
+
+    return {
+      name,
+      optional: node.questionToken !== undefined,
+      doc: this.docOf(node, sourceFile),
+      type:
+        node.type === undefined
+          ? { kind: 'keyword', text: 'unknown' }
+          : this.readTypeNode(node.type, sourceFile),
+    };
+  }
+
   private readTypeAlias(
     node: ts.TypeAliasDeclaration,
     sourceFile: ts.SourceFile,
@@ -164,6 +185,62 @@ export class SourceLoader {
    * `EVENT_SCHEMA_VERSIONS` are Records and are handled as `const-record`;
    * everything else (functions, plain objects) is skipped.
    */
+  private readConst(
+    statement: ts.VariableStatement,
+    sourceFile: ts.SourceFile,
+  ): SourceDeclaration | null {
+    const declaration = statement.declarationList.declarations[0];
+    if (declaration === undefined || !ts.isIdentifier(declaration.name)) {
+      return null;
+    }
+
+    const initializer = declaration.initializer;
+    if (initializer === undefined) {
+      return null;
+    }
+
+    const unwrapped = ts.isAsExpression(initializer) ? initializer.expression : initializer;
+
+    if (ts.isArrayLiteralExpression(unwrapped)) {
+      const values: string[] = [];
+      for (const element of unwrapped.elements) {
+        if (ts.isStringLiteral(element)) {
+          values.push(element.text);
+        }
+      }
+      return {
+        name: declaration.name.text,
+        kind: 'const-tuple',
+        exported: this.isExported(statement),
+        doc: this.docOf(statement, sourceFile),
+        values,
+      };
+    }
+
+    if (ts.isObjectLiteralExpression(unwrapped)) {
+      const entries: Array<[string, string]> = [];
+      for (const prop of unwrapped.properties) {
+        if (!ts.isPropertyAssignment(prop)) {
+          continue;
+        }
+        entries.push([
+          prop.name.getText(sourceFile).replace(/['"]/g, ''),
+          prop.initializer.getText(sourceFile),
+        ]);
+      }
+      return {
+        name: declaration.name.text,
+        kind: 'const-record',
+        exported: this.isExported(statement),
+        doc: this.docOf(statement, sourceFile),
+        values: entries.map(([key]) => key),
+        entries,
+      };
+    }
+
+    return null;
+  }
+
   private readTypeNode(node: ts.TypeNode, sourceFile: ts.SourceFile): SourceTypeNode {
     const text = node.getText(sourceFile);
 
