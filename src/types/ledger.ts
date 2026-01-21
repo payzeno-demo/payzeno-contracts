@@ -34,6 +34,8 @@ export const ACCOUNT_TYPES = [
   'cash',
   'rounding_adjustment',
 ] as const;
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
+
 export interface Account {
   id: AccountId;
   object: 'account';
@@ -47,6 +49,18 @@ export interface Account {
 }
 
 export type LedgerPurpose = (typeof LEDGER_PURPOSES)[number];
+
+export interface LedgerEntry {
+  id: LedgerEntryId;
+  object: 'ledger_entry';
+  transaction_id: LedgerTransactionId;
+  account_id: AccountId;
+  direction: EntryDirection;
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  sequence: number;
+  created_at: IsoTimestamp;
+}
 
 export interface Balance {
   object: 'balance';
