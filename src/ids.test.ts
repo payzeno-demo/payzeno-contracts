@@ -31,6 +31,13 @@ describe('ID_PREFIXES', () => {
 });
 
 describe('isUlid', () => {
+  it('rejects the Crockford-excluded letters I, L, O and U', () => {
+    expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8I')).toBe(false);
+    expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8L')).toBe(false);
+    expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8O')).toBe(false);
+    expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8U')).toBe(false);
+  });
+
   it('rejects lowercase and wrong lengths', () => {
     expect(isUlid(ULID.toLowerCase())).toBe(false);
     expect(isUlid(ULID.slice(0, 25))).toBe(false);
@@ -61,6 +68,22 @@ describe('parseId', () => {
 
   it('throws ValidationError on a malformed body', () => {
     expect(() => parseId('mch_not-a-ulid')).toThrow(ValidationError);
+  });
+
+  it('carries the id in details for the log line', () => {
+    try {
+      parseId(`zzz_${ULID}`);
+      expect.unreachable('should have thrown');
+    } catch (error) {
+      expect((error as ValidationError).details).toMatchObject({ prefix: 'zzz' });
+    }
+  });
+});
+
+describe('validateId', () => {
+  it('is the non-throwing twin of parseId', () => {
+    expect(validateId(`ch_${ULID}`)).toBe(true);
+    expect(validateId('nonsense')).toBe(false);
   });
 
 });

@@ -87,6 +87,31 @@ function isKnownPrefix(prefix: string): prefix is IdPrefix {
  * @throws ValidationError when the id has no separator, an
  *   unknown prefix, or a malformed ULID body.
  */
+export function parseId(id: string): { prefix: IdPrefix; ulid: string } {
+  const separator = id.indexOf('_');
+  if (separator <= 0) {
+    throw new ValidationError(`malformed identifier: ${id}`, { id });
+  }
+
+  const prefix = id.slice(0, separator);
+  const ulid = id.slice(separator + 1);
+
+  if (!isKnownPrefix(prefix)) {
+    throw new ValidationError(`unknown identifier prefix: ${prefix}`, { id, prefix });
+  }
+  if (!isUlid(ulid)) {
+    throw new ValidationError(`identifier body is not a ULID: ${id}`, { id, prefix });
+  }
+
+  return { prefix, ulid };
+}
+
+/**
+ * Non-throwing check. Pass `expected` to also assert the id
+ * names the entity you think it names — passing a `ch_` where a
+ * `pi_` belongs is the single most common shape of caller bug
+ * on the payments routes.
+ */
 export function validateId(id: string, prefix?: IdPrefix): boolean {
   try {
     const parsed = parseId(id);
