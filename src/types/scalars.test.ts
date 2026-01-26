@@ -10,8 +10,33 @@ describe('CURRENCIES', () => {
     }
   });
 
+  it('has no duplicates', () => {
+    expect(new Set(CURRENCIES).size).toBe(CURRENCIES.length);
+  });
+});
+
+describe('CURRENCY_EXPONENT', () => {
+  it('has a key per CURRENCIES member and no extras', () => {
+    expect(Object.keys(CURRENCY_EXPONENT).sort()).toEqual([...CURRENCIES].sort());
+  });
+
   it('is JPY = 0 — anything that hardcodes 100 is a bug', () => {
     expect(CURRENCY_EXPONENT.JPY).toBe(0);
   });
 
+  it('is 2 for the rest', () => {
+    for (const currency of CURRENCIES) {
+      if (currency !== 'JPY') {
+        expect(CURRENCY_EXPONENT[currency]).toBe(2);
+      }
+    }
+  });
+
+  it('is a non-negative integer everywhere', () => {
+    for (const currency of CURRENCIES) {
+      const exponent = CURRENCY_EXPONENT[currency];
+      expect(Number.isInteger(exponent)).toBe(true);
+      expect(exponent).toBeGreaterThanOrEqual(0);
+    }
+  });
 });

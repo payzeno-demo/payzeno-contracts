@@ -31,6 +31,10 @@ describe('ID_PREFIXES', () => {
 });
 
 describe('isUlid', () => {
+  it('accepts a canonical ULID', () => {
+    expect(isUlid(ULID)).toBe(true);
+  });
+
   it('rejects the Crockford-excluded letters I, L, O and U', () => {
     expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8I')).toBe(false);
     expect(isUlid('01HQ8Z3K9X4M2N7P6R5T1V0W8L')).toBe(false);
@@ -86,4 +90,8 @@ describe('validateId', () => {
     expect(validateId('nonsense')).toBe(false);
   });
 
+  it('checks the expected prefix — ch_ where pi_ belongs is the common bug', () => {
+    expect(validateId(`ch_${ULID}`, 'ch')).toBe(true);
+    expect(validateId(`ch_${ULID}`, 'pi')).toBe(false);
+  });
 });
