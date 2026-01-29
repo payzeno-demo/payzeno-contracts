@@ -40,10 +40,12 @@ CURRENCY_EXPONENT: dict[str, int] = {
 DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "lost", "warning_needs_response", "warning_closed")
 
 
+ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
 IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
 
+LEDGER_ACTORS_VALUES = Literal["system", "reconciliation", "payout_worker", "admin"]
 LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "admin")
 
 
@@ -73,11 +75,27 @@ REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
+SETTLEMENT_BATCH_STATUSES: tuple[str, ...] = ("open", "closed", "reconciling", "reconciled", "partially_reconciled", "funded", "failed")
+
+
 TIMESERIES_INTERVALS_VALUES = Literal["hour", "day"]
+TIMESERIES_INTERVALS: tuple[str, ...] = ("hour", "day")
+
+
+USER_ROLES_VALUES = Literal["owner", "admin", "developer", "viewer"]
 WEBHOOK_ENDPOINT_STATUSES: tuple[str, ...] = ("enabled", "disabled")
 
 
 WEBHOOK_EVENT_STATUSES_VALUES = Literal["pending", "delivering", "delivered", "dead"]
+class BalanceHistoryResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    merchant_id: str
+    currency: CURRENCIES_VALUES
+    interval: TIMESERIES_INTERVALS_VALUES
+    points: list[TimeseriesPoint]
+
+
 class BootstrapAccountsResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -172,6 +190,35 @@ class Dispute(BaseModel):
     submitted_at: str | None
     resolved_at: str | None
     created_at: str
+
+
+class DisputeEvidence(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    product_description: str | None = None
+    customer_name: str | None = None
+    customer_email: str | None = None
+    shipping_tracking_number: str | None = None
+    receipt_file_id: str | None = None
+    service_documentation_file_id: str | None = None
+    uncategorized_text: str | None = None
+
+
+class LedgerAdjustmentRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["ledger_adjustment_request"]
+    merchant_id: str | None
+    currency: CURRENCIES_VALUES
+    lines: list[PostTransactionLine]
+    reason_code: str
+    requested_by: str
+    requested_at: str
+    approved_by: str | None
+    approved_at: str | None
+    posted_transaction_id: str | None
+    status: Literal["pending"] | Literal["approved"] | Literal["rejected"] | Literal["posted"]
 
 
 class LedgerTransaction(BaseModel):
@@ -301,6 +348,14 @@ class Refund(BaseModel):
     succeeded_at: str | None
 
 
+class StartReconciliationRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    trigger: RECONCILIATION_TRIGGERS_VALUES | None = None
+    max_items: int | None = None
+
+
 class TimeseriesPoint(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -332,10 +387,12 @@ class WebhookEvent(BaseModel):
 
 Acquirer = ACQUIRERS_VALUES
 ApiKeyMode = API_KEY_MODES_VALUES
+AuthPrincipal = dict[str, Any]
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
 ChargeStatus = CHARGE_STATUSES_VALUES
 DisputeStatus = DISPUTE_STATUSES_VALUES
 InvoiceId = str
+InvoiceListResponse = Paginated[Invoice]
 InvoiceResponse = Invoice
 IsoDate = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES

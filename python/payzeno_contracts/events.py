@@ -121,6 +121,18 @@ class PaymentCapturedPayload(BaseModel):
     captured_at: str
 
 
+class PayoutReturnedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payout_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    return_code: str
+    reversal_transaction_id: str
+    returned_at: str
+
+
 class RefundCreatedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -164,6 +176,9 @@ class SettlementVarianceDetectedPayload(BaseModel):
 LedgerImbalanceDetectedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
+PayoutReturnedEvent = EventEnvelope
+RefundFailedEvent = EventEnvelope
+SettlementFundedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
 
