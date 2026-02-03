@@ -23,6 +23,10 @@ import type { Acquirer } from './settlement';
 export const CARD_BRANDS = ['visa', 'mastercard', 'amex', 'discover'] as const;
 export type CardBrand = (typeof CARD_BRANDS)[number];
 
+/** Opaque vault token, `pmt_` prefixed. The only card handle Payzeno stores. */
+export type PaymentMethodToken = string;
+
+export const SCA_EXEMPTIONS = ['low_value', 'tra', 'moto', 'recurring'] as const;
 export interface ThreeDSecureResult {
   version: string;
   authentication_flow: 'frictionless' | 'challenge';
@@ -32,6 +36,7 @@ export interface ThreeDSecureResult {
   liability_shifted: boolean;
 }
 
+export const CAPTURE_METHODS = ['automatic', 'manual'] as const;
 export type CaptureMethod = (typeof CAPTURE_METHODS)[number];
 
 export const CANCELLATION_REASONS = [
@@ -112,6 +117,16 @@ export interface PaymentIntentListQuery extends ListQuery {
   customer_reference?: string;
 }
 
+export const CHARGE_STATUSES = [
+  'pending',
+  'authorized',
+  'captured',
+  'settled',
+  'failed',
+  'voided',
+  'expired',
+  'reversed',
+] as const;
 export type ChargeStatus = (typeof CHARGE_STATUSES)[number];
 
 export const DECLINE_CODES = [
@@ -126,6 +141,8 @@ export const DECLINE_CODES = [
   'velocity_exceeded',
   'fraud_suspected',
 ] as const;
+export type DeclineCode = (typeof DECLINE_CODES)[number];
+
 export interface Charge {
   id: ChargeId;
   object: 'charge';

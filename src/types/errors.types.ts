@@ -27,3 +27,8 @@ export const ERROR_CODES = [
   'conflict',
   'rate_limited',
   'card_declined',
+  'insufficient_funds',
+  'expired_card',
+  'processor_unavailable',
+  'currency_mismatch',
+  'amount_too_small',

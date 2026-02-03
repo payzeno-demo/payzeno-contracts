@@ -27,6 +27,9 @@ API_KEY_MODES: tuple[str, ...] = ("test", "live")
 
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
+CAPTURE_METHODS: tuple[str, ...] = ("automatic", "manual")
+
+
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
 CURRENCY_EXPONENT: dict[str, int] = {
     "USD": 2,
@@ -101,6 +104,12 @@ class BootstrapAccountsResponse(BaseModel):
 
     accounts: list[Account]
     created: int
+
+
+class CancelPaymentIntentRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    cancellation_reason: CANCELLATION_REASONS_VALUES | None = None
 
 
 class CapturePaymentIntentRequest(BaseModel):
@@ -364,6 +373,23 @@ class TimeseriesPoint(BaseModel):
     count: int
 
 
+class UpdateMerchantRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    display_name: str | None = None
+    payout_schedule: PAYOUT_SCHEDULES_VALUES | None = None
+    statement_descriptor: str | None = None
+    risk_tier: RISK_TIERS_VALUES | None = None
+    reserve_bps: int | None = None
+    reserve_hold_days: int | None = None
+    payout_delay_days: int | None = None
+    platform_fee_bps: int | None = None
+    platform_fee_fixed_minor: int | None = None
+    settlement_tolerance_minor: int | None = None
+    capture_at_settlement: bool | None = None
+    metadata: dict[str, str] | None = None
+
+
 class WebhookEvent(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -389,17 +415,25 @@ Acquirer = ACQUIRERS_VALUES
 ApiKeyMode = API_KEY_MODES_VALUES
 AuthPrincipal = dict[str, Any]
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+CardFunding = CARD_FUNDINGS_VALUES
 ChargeStatus = CHARGE_STATUSES_VALUES
+CurrencyCode = CURRENCIES_VALUES
 DisputeStatus = DISPUTE_STATUSES_VALUES
 InvoiceId = str
 InvoiceListResponse = Paginated[Invoice]
 InvoiceResponse = Invoice
+InvoiceStatus = INVOICE_STATUSES_VALUES
 IsoDate = str
+LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
+LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
 MinorUnits = int
 PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
+PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
+ReconciliationRunId = str
+RefundId = str
 RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
 UserId = str
