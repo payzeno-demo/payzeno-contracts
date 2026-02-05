@@ -56,6 +56,8 @@ function assertBps(bps: BasisPoints): void {
  *   fractional digits than the currency has.
  */
 export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
+  const trimmed = amount.trim();
+
   const fraction = match[3] ?? '';
 
   if (fraction.length > exponent) {
@@ -65,7 +67,54 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
     );
   }
 
+  const padded = fraction.padEnd(exponent, '0');
   const whole = magnitude / divisor;
+  const formatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: m.currency,
+    minimumFractionDigits: exponent,
+    maximumFractionDigits: exponent,
+  });
+
+  return formatter.format(Number(decimal));
+}
+
+/**
+ * @throws CurrencyMismatchError when the two currencies differ.
+ *   Payzeno has no FX; there is nothing sensible to do here.
+ */
+export function assertSameCurrency(a: Money, b: Money): void {
+  if (a.currency !== b.currency) {
+    throw new CurrencyMismatchError(
+      `cannot combine ${a.currency} and ${b.currency}`,
+      { left: a.currency, right: b.currency },
+    );
+  }
+}
+
+/** @throws CurrencyMismatchError */
+export function addMoney(a: Money, b: Money): Money {
+  assertSameCurrency(a, b);
+  return { amount_minor: a.amount_minor + b.amount_minor, currency: a.currency };
+}
+
+/** @throws CurrencyMismatchError */
+export function subMoney(a: Money, b: Money): Money {
+  assertSameCurrency(a, b);
+  return { amount_minor: a.amount_minor - b.amount_minor, currency: a.currency };
+}
+
+// TODO(PAY-1493): applyBps rounds each call independently. Do NOT use it to split a fee
+// across interchange/scheme/markup — that needs largest-remainder, which lives in
+// payzeno-ledger app/domain/fees.py::apportion_fee. There is no TS implementation and
+// there should not be two.
+/**
+ * `m * bps / 10000`, ROUND_HALF_UP at the minor unit.
+ *
+ * @throws ValidationError when `bps` is not an integer in 0..10000.
+ */
+export function applyBps(m: Money, bps: BasisPoints): Money {
+  assertBps(bps);
   const result = mulDivRoundHalfUp(BigInt(m.amount_minor), BigInt(bps), 10_000n);
   return { amount_minor: Number(result), currency: m.currency };
 }

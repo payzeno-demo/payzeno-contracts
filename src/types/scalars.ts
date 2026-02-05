@@ -14,15 +14,24 @@ export type BasisPoints = number;
 
 export type UserId = string;
 export type BankAccountId = string;
+export type PaymentIntentId = string;
 export type ChargeId = string;
 export type RefundId = string;
 export type DisputeId = string;
 export type WebhookEventId = string;
 export type LedgerTransactionId = string;
 export type LedgerEntryId = string;
+export type SettlementBatchId = string;
 export type ReconciliationRunId = string;
+export type ReconciliationItemId = string;
 export type PayoutId = string;
 export const CURRENCIES = ['USD', 'EUR', 'GBP', 'ILS', 'JPY'] as const;
+export type CurrencyCode = (typeof CURRENCIES)[number];
+
+/**
+ * ISO-4217 minor-unit exponent. JPY is 0 — anything that hardcodes 100 is a bug.
+ * Consumed by `formatMoney` in payzeno-console and `format_money` in payzeno-ledger.
+ */
 export interface Money {
   amount_minor: MinorUnits;
   currency: CurrencyCode;
