@@ -29,9 +29,20 @@ export const DISPUTE_REASONS = [
   'credit_not_processed',
   'general',
 ] as const;
+export interface DisputeEvidence {
+  product_description?: string;
+  customer_name?: string;
+  customer_email?: string;
+  shipping_tracking_number?: string;
+  receipt_file_id?: string;
+  service_documentation_file_id?: string;
+  uncategorized_text?: string;
+}
+
 export interface SubmitDisputeEvidenceRequest {
   evidence: DisputeEvidence;
   /** When false the evidence is staged but not sent to the network. */
   submit?: boolean;
 }
 
+export type DisputeResponse = Dispute;
