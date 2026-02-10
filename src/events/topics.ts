@@ -43,3 +43,9 @@ export const EVENT_TOPICS = {
   'payzeno-merchant-events': [
     'merchant.created',
     'merchant.updated',
+    'merchant.status_changed',
+    'merchant.bank_account_verified',
+  ],
+  /** The only topic payzeno-billing-legacy publishes on — its single EMITS surface. */
+  'payzeno-billing-events': ['invoice.issued'],
+} as const satisfies Record<string, readonly EventType[]>;

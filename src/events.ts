@@ -49,3 +49,9 @@ import type {
   SettlementItemSettledEvent,
   SettlementReconciliationFailedEvent,
   SettlementVarianceDetectedEvent,
+} from './events/settlement.events';
+import type {
+  PayoutFailedEvent,
+  PayoutPaidEvent,
+  PayoutReturnedEvent,
+  PayoutScheduledEvent,

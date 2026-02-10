@@ -20,3 +20,13 @@ import type {
   ReconciliationRunId,
   SettlementBatchId,
 } from '../index';
+import type { EventEnvelope } from './envelope';
+
+export interface SettlementBatchClosedPayload {
+  batch_id: SettlementBatchId;
+  acquirer: Acquirer;
+  currency: CurrencyCode;
+  processing_date: IsoDate;
+  item_count: number;
+  expected_total_minor: MinorUnits;
+  closed_at: IsoTimestamp;

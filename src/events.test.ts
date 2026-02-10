@@ -46,3 +46,9 @@ describe('EVENT_TOPICS', () => {
   it('resolves a topic for every type', () => {
     for (const type of EVENT_TYPES) {
       expect(topicForEventType(type)).toBeDefined();
+    }
+  });
+});
+
+describe('EVENT_SCHEMA_VERSIONS', () => {
+  it('has a key per EVENT_TYPES member and nothing else', () => {
