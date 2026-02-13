@@ -27,6 +27,8 @@ export type CardBrand = (typeof CARD_BRANDS)[number];
 export type PaymentMethodToken = string;
 
 export const SCA_EXEMPTIONS = ['low_value', 'tra', 'moto', 'recurring'] as const;
+export type ScaExemption = (typeof SCA_EXEMPTIONS)[number];
+
 export interface ThreeDSecureResult {
   version: string;
   authentication_flow: 'frictionless' | 'challenge';
@@ -182,6 +184,7 @@ export interface Charge {
   updated_at: IsoTimestamp;
 }
 
+export type ChargeResponse = Charge;
 export type ChargeListResponse = Paginated<Charge>;
 
 export interface ChargeListQuery extends ListQuery {

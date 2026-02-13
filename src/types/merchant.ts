@@ -26,6 +26,7 @@ export const MERCHANT_STATUSES = [
 ] as const;
 export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
 
+export const RISK_TIERS = ['standard', 'elevated', 'high'] as const;
 export type RiskTier = (typeof RISK_TIERS)[number];
 
 export interface CreateMerchantRequest {
@@ -38,11 +39,34 @@ export interface CreateMerchantRequest {
   metadata?: Metadata;
 }
 
+export const API_KEY_SCOPES = [
+  'merchants:read',
+  'payment_intents:read',
+  'payment_intents:write',
+  'charges:read',
+  'refunds:read',
+  'refunds:write',
+  'disputes:read',
+  'disputes:write',
+  'balance:read',
+  'payouts:read',
+  'payouts:write',
+  'settlements:read',
+  'invoices:read',
+  'webhooks:read',
+  'webhooks:write',
+] as const;
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
   /** Defaults to every read scope. */
   scopes?: ApiKeyScope[];
+}
+
+/** The plaintext secret is returned exactly once, here, and never again. */
+export interface CreateApiKeyResponse extends ApiKey {
+  /** Full token: `sk_live_<key_id_suffix>_<secret>`. */
+  secret: string;
 }
 
 export const BANK_ACCOUNT_STATUSES = [
@@ -51,6 +75,8 @@ export const BANK_ACCOUNT_STATUSES = [
   'verification_failed',
   'errored',
 ] as const;
+export type BankAccountStatus = (typeof BANK_ACCOUNT_STATUSES)[number];
+
 /** Which rail's coordinates a bank account carries. Drives validation and payout method. */
 export const BANK_ACCOUNT_SCHEMES = ['aba', 'iban', 'uk_sort_code'] as const;
 export interface CreateBankAccountRequest {

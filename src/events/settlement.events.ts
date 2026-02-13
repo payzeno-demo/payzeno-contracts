@@ -30,3 +30,14 @@ export interface SettlementBatchClosedPayload {
   item_count: number;
   expected_total_minor: MinorUnits;
   closed_at: IsoTimestamp;
+}
+export type SettlementBatchClosedEvent = EventEnvelope<
+  'settlement.batch_closed',
+  SettlementBatchClosedPayload
+>;
+
+export interface SettlementItemSettledPayload {
+  item_id: ReconciliationItemId;
+  batch_id: SettlementBatchId;
+  charge_id: ChargeId;
+  merchant_id: MerchantId;
