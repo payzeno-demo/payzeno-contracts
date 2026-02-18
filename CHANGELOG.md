@@ -55,3 +55,8 @@ Post-incident. Shipped ~14 hours after the duplicate-settlement sev1.
 - `SettlementDuplicateDetectedPayload` / `SettlementDuplicateDetectedEvent`, including
   `detected_by: 'batch_pass' | 'retry_scheduler'` (PAY-2043).
 - `settlement.duplicate_detected` registered in `EVENT_TYPES`, `PayzenoEvent`,
+  `EVENT_SCHEMA_VERSIONS` (v1) and the `payzeno-ledger-events` topic.
+- `ERROR_CODES`: `duplicate_settlement`, `settlement_locked` (PAY-2043).
+
+## [3.0.0] — 2026-03-09
+
