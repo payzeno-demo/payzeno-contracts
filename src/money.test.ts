@@ -34,6 +34,12 @@ describe('toMinor', () => {
 });
 
 describe('fromMinor', () => {
+  it('round-trips through toMinor', () => {
+    for (const amount of ['0.00', '0.01', '12.34', '-12.34', '99999.99']) {
+      expect(fromMinor(toMinor(amount, 'USD'), 'USD')).toBe(amount);
+    }
+  });
+
   it('pads the fraction', () => {
     expect(fromMinor(5, 'USD')).toBe('0.05');
     expect(fromMinor(-5, 'USD')).toBe('-0.05');
@@ -45,6 +51,21 @@ describe('fromMinor', () => {
 });
 
 describe('formatMoney', () => {
+  // dhotfix: JPY is exponent 0 — see CURRENCY_EXPONENT.
+  it('does not divide JPY by 100', () => {
+    const formatted = formatMoney({ amount_minor: 1200, currency: 'JPY' }, 'en-US');
+    expect(formatted).toContain('1,200');
+    expect(formatted).not.toContain('12.00');
+  });
+});
+
+describe('assertSameCurrency', () => {
+  it('throws CurrencyMismatchError, never converts', () => {
+    expect(() => assertSameCurrency(sampleMoney('USD'), sampleMoney('EUR'))).toThrow(
+      CurrencyMismatchError,
+    );
+  });
+
   it('throws ValidationError outside 0..10000', () => {
     expect(() => applyBps(sampleMoney(), -1)).toThrow(ValidationError);
     expect(() => applyBps(sampleMoney(), 10_001)).toThrow(ValidationError);

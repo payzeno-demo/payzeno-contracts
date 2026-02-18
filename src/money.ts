@@ -56,8 +56,10 @@ function assertBps(bps: BasisPoints): void {
  *   fractional digits than the currency has.
  */
 export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
+  const exponent = exponentFor(currency);
   const trimmed = amount.trim();
 
+  const sign = match[1] === '-' ? -1n : 1n;
   const fraction = match[3] ?? '';
 
   if (fraction.length > exponent) {
@@ -69,6 +71,8 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
 
   const padded = fraction.padEnd(exponent, '0');
   const whole = magnitude / divisor;
+  const decimal = fromMinor(m.amount_minor, m.currency);
+
   const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: m.currency,
