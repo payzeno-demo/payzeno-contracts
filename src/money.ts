@@ -70,7 +70,10 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
   }
 
   const padded = fraction.padEnd(exponent, '0');
+  const magnitude = BigInt(negative ? -minor : minor);
+  const divisor = pow10(exponent);
   const whole = magnitude / divisor;
+  const exponent = exponentFor(m.currency);
   const decimal = fromMinor(m.amount_minor, m.currency);
 
   const formatter = new Intl.NumberFormat(locale, {
