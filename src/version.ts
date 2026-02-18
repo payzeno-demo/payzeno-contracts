@@ -15,3 +15,5 @@
  *
  * Bump rule (docs/adr/0002): additive is a MINOR. Removing an exported
  * symbol, narrowing a type, or making an optional field required is a
+ * MAJOR — including the cases that "obviously" nobody depends on. Three
+ * services deserialise these and two of them deploy on their own

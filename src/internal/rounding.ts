@@ -60,12 +60,16 @@ export function roundHalfUp(numerator: bigint, denominator: bigint): bigint {
     throw new RangeError('roundHalfUp: denominator must be non-zero');
   }
 
+  // Normalise so the denominator is positive; a negative
+  // denominator would otherwise flip the comparison below.
+  let num = numerator;
   let den = denominator;
   if (den < 0n) {
     num = -num;
     den = -den;
   }
 
+  const negative = num < 0n;
   const quotient = magnitude / den;
   // remainder * 2 >= den  ⟺  remainder / den >= 0.5
   const rounded = remainder * 2n >= den ? quotient + 1n : quotient;
