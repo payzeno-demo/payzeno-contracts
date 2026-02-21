@@ -34,6 +34,24 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Zero runtime dependencies (docs/adr/0005)
+        # Cheap, blunt, and it has caught a `zod` twice. `dependencies` must be `{}`.
+        run: |
+          deps=$(node -p "JSON.stringify(require('./package.json').dependencies || {})")
+          if [ "$deps" != "{}" ]; then
+            echo "::error file=package.json::payzeno-contracts must have zero runtime dependencies, found $deps"
+            exit 1
+          fi
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+
       - uses: pnpm/action-setup@v3
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -42,6 +60,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
 
       # python/ is generated AND committed. If regenerating it produces a diff, the
       # committed tree is stale and payzeno-ledger is importing yesterday's contract.
