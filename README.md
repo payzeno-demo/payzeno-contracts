@@ -46,3 +46,11 @@ Seven entrypoints, and only these seven:
 
 Deep imports into `dist/` are not supported and we will break them without warning.
 
+## Develop
+
+```bash
+pnpm install
+pnpm run typecheck        # tsc --noEmit; the real gate
+pnpm test                 # vitest, 95% coverage threshold
+pnpm run lint
+pnpm run build            # tsup, esm + cjs + .d.ts

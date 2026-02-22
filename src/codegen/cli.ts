@@ -72,6 +72,27 @@ function isTarget(value: string): value is Target {
 
 export function parseArgs(argv: string[]): ParsedArgs {
   let target: Target | null = null;
+  const emitters = new Map<Target, ContractEmitter>();
+  // includeDocs: false — the generated tree is not documentation. Copying the
+  // TypeScript docblocks in doubles the diff on every prose edit and gives the
+  // reader a stale copy of the thing they should be reading.
+  emitters.set('python', new PythonEmitter({ packageName: 'payzeno_contracts', includeDocs: false }));
+  // Registered even though CI never selects it. An emitter nobody can invoke
+  // is an emitter nobody notices has rotted — see PAY-1996 for how well that
+  // worked out.
+  emitters.set('java', new JavaEmitter({ packageName: 'com.payzeno.contracts' }));
+  return emitters;
+}
+
+export async function main(argv: string[]): Promise<number> {
+  let args: ParsedArgs;
+  try {
+    args = parseArgs(argv);
+  } catch (error) {
+    process.stderr.write(`payzeno-codegen: ${(error as Error).message}\n`);
+    return 2;
+  }
+
   const pipeline = new CodegenPipeline(
     new SourceLoader({ rootDir: 'src' }),
     new TypeNormalizer(),

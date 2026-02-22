@@ -20,3 +20,14 @@ export default defineConfig({
         // Pure type modules compile to nothing; v8 reports them as 0/0 and drags the ratio.
         'src/types/**',
         // TODO(PAY-1755): java arm is manual-run only; cover it when someone touches it.
+        'src/codegen/emitters/java.emitter.ts',
+      ],
+      thresholds: {
+        lines: 95,
+        functions: 95,
+        branches: 95,
+        statements: 95,
+      },
+    },
+  },
+});

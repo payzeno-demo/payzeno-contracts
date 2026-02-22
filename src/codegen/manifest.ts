@@ -21,6 +21,40 @@ const MAVEN_DESCRIPTION =
   'Generated Java records for the Payzeno shared contracts. ' +
   'Source of truth is @payzeno/contracts (TypeScript).';
 
+export function pythonManifest(writer: DeterministicWriter): EmittedFile {
+  const contents = [
+    writer.banner('#', 'manifest.ts (writePythonManifest)'),
+    '',
+    '[build-system]',
+    'requires = ["hatchling>=1.24"]',
+    'build-backend = "hatchling.build"',
+    '',
+    '[project]',
+    'name = "payzeno-contracts"',
+    `version = "${CONTRACTS_VERSION}"`,
+    `description = "${PYPI_DESCRIPTION}"`,
+    'readme = "README.md"',
+    'requires-python = ">=3.11"',
+    'license = { text = "UNLICENSED" }',
+    'authors = [{ name = "Payzeno Platform", email = "platform@payzeno.com" }]',
+    'dependencies = [',
+    '  "pydantic>=2.7,<3",',
+    ']',
+    '',
+    '[project.urls]',
+    'Source = "https://github.com/payzeno/payzeno-contracts"',
+    '',
+    '[tool.hatch.build.targets.wheel]',
+    'packages = ["payzeno_contracts"]',
+    '',
+    '[tool.hatch.build.targets.sdist]',
+    'include = ["payzeno_contracts", "pyproject.toml"]',
+    '',
+  ].join('\n');
+
+  return { path: 'pyproject.toml', contents, symbols: [] };
+}
+
 export function javaManifest(writer: DeterministicWriter): EmittedFile {
   const contents = [
     '<?xml version="1.0" encoding="UTF-8"?>',

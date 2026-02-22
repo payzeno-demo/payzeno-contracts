@@ -9,3 +9,13 @@
 src/errors.ts                       @dhotfix
 src/version.ts                      @dhotfix
 src/internal/                       @dhotfix
+src/codegen/ir.ts                   @dhotfix
+src/codegen/emitters/emitter.ts     @dhotfix
+docs/adr/                           @dhotfix
+
+# --- Event schemas. Core owns the consumer side of every one of these. ------
+src/events.ts                       @nmigration @dhotfix
+src/events/                         @nmigration
+src/test-support/                   @nmigration
+
+# --- Type surface. Platform. -----------------------------------------------
