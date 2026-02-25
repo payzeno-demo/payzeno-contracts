@@ -157,6 +157,34 @@ class RefundSucceededPayload(BaseModel):
     succeeded_at: str
 
 
+class SettlementBatchClosedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    acquirer: str
+    currency: str
+    processing_date: str
+    item_count: int
+    expected_total_minor: int
+    closed_at: str
+
+
+class SettlementFundedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    funding_event_id: str
+    acquirer: str
+    currency: str
+    expected_total_minor: int
+    funded_amount_minor: int
+    variance_minor: int
+    bank_reference: str
+    value_date: str
+    transaction_id: str
+    funded_at: str
+
+
 class SettlementVarianceDetectedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -177,7 +205,9 @@ LedgerImbalanceDetectedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope
+PayoutScheduledEvent = EventEnvelope
 RefundFailedEvent = EventEnvelope
+RefundSucceededEvent = EventEnvelope
 SettlementFundedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 

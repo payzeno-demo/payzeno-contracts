@@ -22,7 +22,13 @@ ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "
 
 
 ACQUIRERS_VALUES = Literal["worldflow", "nordpay"]
+ACQUIRERS: tuple[str, ...] = ("worldflow", "nordpay")
+
+
 API_KEY_MODES: tuple[str, ...] = ("test", "live")
+
+
+API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "payment_intents:write", "charges:read", "refunds:read", "refunds:write", "disputes:read", "disputes:write", "balance:read", "payouts:read", "payouts:write", "settlements:read", "invoices:read", "webhooks:read", "webhooks:write")
 
 
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
@@ -74,7 +80,14 @@ RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "char
 RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
 
 
+RECONCILIATION_TRIGGERS_VALUES = Literal["scheduled", "manual", "retry"]
+RECONCILIATION_TRIGGERS: tuple[str, ...] = ("scheduled", "manual", "retry")
+
+
 REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
+REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
+
+
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
@@ -86,6 +99,7 @@ TIMESERIES_INTERVALS: tuple[str, ...] = ("hour", "day")
 
 
 USER_ROLES_VALUES = Literal["owner", "admin", "developer", "viewer"]
+WEBHOOK_ENDPOINT_STATUSES_VALUES = Literal["enabled", "disabled"]
 WEBHOOK_ENDPOINT_STATUSES: tuple[str, ...] = ("enabled", "disabled")
 
 
@@ -127,6 +141,13 @@ class CardSummary(BaseModel):
     exp_year: int
     country: str | None
     funding: CARD_FUNDINGS_VALUES
+
+
+class ChargeLedgerResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    charge_id: str
+    transactions: list[LedgerTransaction]
 
 
 class ChargeListQuery(ListQuery):
@@ -313,6 +334,30 @@ class Paginated(BaseModel, Generic[T]):
     has_more: bool
 
 
+class PaymentIntent(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["payment_intent"]
+    merchant_id: str
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+    status: PAYMENT_INTENT_STATUSES_VALUES
+    capture_method: CAPTURE_METHODS_VALUES
+    customer_reference: str | None
+    description: str | None
+    statement_descriptor: str | None
+    latest_charge_id: str | None
+    client_secret: str
+    next_action: NextAction | None
+    livemode: bool
+    metadata: dict[str, str]
+    created_at: str
+    updated_at: str
+    canceled_at: str | None
+    cancellation_reason: CANCELLATION_REASONS_VALUES | None
+
+
 class PaymentIntentListQuery(ListQuery):
     model_config = ConfigDict(extra='forbid')
 
@@ -424,9 +469,11 @@ InvoiceListResponse = Paginated[Invoice]
 InvoiceResponse = Invoice
 InvoiceStatus = INVOICE_STATUSES_VALUES
 IsoDate = str
+IsoTimestamp = str
 LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
+Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
@@ -438,3 +485,4 @@ RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
 UserId = str
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES
+WebhookEventId = str
