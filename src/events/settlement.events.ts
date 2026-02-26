@@ -41,3 +41,14 @@ export interface SettlementItemSettledPayload {
   batch_id: SettlementBatchId;
   charge_id: ChargeId;
   merchant_id: MerchantId;
+  gross_minor: MinorUnits;
+  fee_minor: MinorUnits;
+  net_minor: MinorUnits;
+  currency: CurrencyCode;
+  transaction_id: LedgerTransactionId;
+  attempt_count: number;
+  settled_at: IsoTimestamp;
+}
+export type SettlementItemSettledEvent = EventEnvelope<
+  'settlement.item_settled',
+  SettlementItemSettledPayload

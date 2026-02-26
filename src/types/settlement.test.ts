@@ -30,6 +30,15 @@ describe('MerchantSettlementBatch', () => {
     expect(body).not.toContain('posted_total_minor');
   });
 
+  it('carries merchant_id so the scope guard can filter it', () => {
+    expect(body).toContain('merchant_id: MerchantId;');
+  });
+
+  it('does keep the acquirer totals — it is the internal object', () => {
+    expect(body).toContain('expected_total_minor: MinorUnits;');
+    expect(body).toContain('posted_total_minor: MinorUnits;');
+  });
+
   it('has no merchant_id at all', () => {
     expect(body).not.toContain('merchant_id');
   });

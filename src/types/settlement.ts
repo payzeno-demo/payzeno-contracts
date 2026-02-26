@@ -29,6 +29,7 @@ export const SETTLEMENT_BATCH_STATUSES = [
   'funded',
   'failed',
 ] as const;
+export const ACQUIRERS = ['worldflow', 'nordpay'] as const;
 export type Acquirer = (typeof ACQUIRERS)[number];
 
 export interface MerchantSettlementBatch {
@@ -45,5 +46,13 @@ export interface MerchantSettlementBatch {
   funded_at: IsoTimestamp | null;
 }
 
+export type ReconciliationItemStatus = (typeof RECONCILIATION_ITEM_STATUSES)[number];
+
+/**
+ * Acquirer settlement files carry far more than sales. Without a line type every refund,
+ * chargeback and fee line matches no charge and lands in `orphaned` — "manual investigation"
+ * for a large fraction of every batch — and SettlementPoster builds a sale posting for all
+ * of them regardless.
+ */
 export type ReconciliationLineType = (typeof RECONCILIATION_LINE_TYPES)[number];
 
