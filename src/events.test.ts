@@ -52,3 +52,9 @@ describe('EVENT_TOPICS', () => {
 
 describe('EVENT_SCHEMA_VERSIONS', () => {
   it('has a key per EVENT_TYPES member and nothing else', () => {
+    const keys = Object.keys(EVENT_SCHEMA_VERSIONS).sort();
+    expect(keys).toEqual([...EVENT_TYPES].sort());
+  });
+
+  it('is a positive integer everywhere', () => {
+    for (const type of EVENT_TYPES) {
