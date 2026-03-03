@@ -12,12 +12,16 @@ import type {
 } from './scalars';
 
 export const REFUND_STATUSES = ['pending', 'succeeded', 'failed', 'canceled'] as const;
+export type RefundStatus = (typeof REFUND_STATUSES)[number];
+
 export const REFUND_REASONS = [
   'duplicate',
   'fraudulent',
   'requested_by_customer',
   'expired_uncaptured_auth',
 ] as const;
+export type RefundReason = (typeof REFUND_REASONS)[number];
+
 export interface Refund {
   id: RefundId;
   object: 'refund';
