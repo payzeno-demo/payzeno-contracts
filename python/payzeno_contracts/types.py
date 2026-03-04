@@ -46,12 +46,18 @@ CURRENCY_EXPONENT: dict[str, int] = {
 }
 
 
+DISPUTE_REASONS: tuple[str, ...] = ("fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general")
+
+
 DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "lost", "warning_needs_response", "warning_closed")
 
 
 ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
 IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
+
+
+INVOICE_STATUSES: tuple[str, ...] = ("draft", "open", "paid", "uncollectible", "void")
 
 
 LEDGER_ACTORS_VALUES = Literal["system", "reconciliation", "payout_worker", "admin"]
@@ -69,6 +75,7 @@ PAYOUT_METHODS_VALUES = Literal["standard_ach", "same_day_ach", "sepa", "faster_
 PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed", "returned", "canceled")
 
 
+PRICING_MODELS_VALUES = Literal["blended", "interchange_plus"]
 PRICING_MODELS: tuple[str, ...] = ("blended", "interchange_plus")
 
 
@@ -141,6 +148,40 @@ class CardSummary(BaseModel):
     exp_year: int
     country: str | None
     funding: CARD_FUNDINGS_VALUES
+
+
+class Charge(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["charge"]
+    merchant_id: str
+    payment_intent_id: str
+    amount_minor: int
+    captured_amount_minor: int
+    refunded_amount_minor: int
+    currency: CURRENCIES_VALUES
+    status: CHARGE_STATUSES_VALUES
+    card: CardSummary
+    acquirer: ACQUIRERS_VALUES
+    network_transaction_id: str | None
+    processor_reference: str | None
+    authorization_code: str | None
+    capture_method: CAPTURE_METHODS_VALUES
+    three_d_secure: ThreeDSecureResult | None
+    sca_exemption: SCA_EXEMPTIONS_VALUES | None
+    risk_score: int
+    failure_code: DECLINE_CODES_VALUES | None
+    failure_message: str | None
+    settlement_batch_id: str | None
+    livemode: bool
+    metadata: dict[str, str]
+    authorized_at: str | None
+    captured_at: str | None
+    settled_at: str | None
+    authorization_expires_at: str | None
+    created_at: str
+    updated_at: str
 
 
 class ChargeLedgerResponse(BaseModel):
@@ -402,6 +443,25 @@ class Refund(BaseModel):
     succeeded_at: str | None
 
 
+class SettlementBatch(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["settlement_batch"]
+    currency: CURRENCIES_VALUES
+    processing_date: str
+    acquirer: ACQUIRERS_VALUES
+    file_reference: str
+    expected_total_minor: int
+    posted_total_minor: int
+    item_count: int
+    status: SETTLEMENT_BATCH_STATUSES_VALUES
+    opened_at: str
+    closed_at: str | None
+    reconciled_at: str | None
+    funded_at: str | None
+
+
 class StartReconciliationRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -458,11 +518,14 @@ class WebhookEvent(BaseModel):
 
 Acquirer = ACQUIRERS_VALUES
 ApiKeyMode = API_KEY_MODES_VALUES
+ApiKeyScope = API_KEY_SCOPES_VALUES
 AuthPrincipal = dict[str, Any]
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
 ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
+DisputeListResponse = Paginated[Dispute]
 DisputeStatus = DISPUTE_STATUSES_VALUES
 InvoiceId = str
 InvoiceListResponse = Paginated[Invoice]
@@ -479,10 +542,13 @@ PaymentIntentId = str
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
 PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
+PayoutId = str
 ReconciliationRunId = str
+ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES
 RefundId = str
 RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
+SettlementBatchStatus = SETTLEMENT_BATCH_STATUSES_VALUES
 UserId = str
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES
 WebhookEventId = str
