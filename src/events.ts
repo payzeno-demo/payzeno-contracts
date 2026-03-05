@@ -55,3 +55,10 @@ import type {
   PayoutPaidEvent,
   PayoutReturnedEvent,
   PayoutScheduledEvent,
+} from './events/payout.events';
+import type {
+  LedgerImbalanceDetectedEvent,
+  LedgerTransactionPostedEvent,
+} from './events/ledger.events';
+import type {
+  MerchantBankAccountVerifiedEvent,

@@ -88,6 +88,29 @@ class LedgerTransactionPostedPayload(BaseModel):
     posted_at: str
 
 
+class MerchantCreatedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    merchant_id: str
+    legal_name: str
+    display_name: str
+    country: str
+    default_currency: str
+    mcc: str
+    status: str
+    risk_tier: str
+    payout_schedule: str
+    pricing_model: str
+    reserve_bps: int
+    reserve_hold_days: int
+    payout_delay_days: int
+    settlement_tolerance_minor: int
+    capture_at_settlement: bool
+    platform_fee_bps: int
+    platform_fee_fixed_minor: int
+    created_at: str
+
+
 class PaymentAuthorizedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -119,6 +142,22 @@ class PaymentCapturedPayload(BaseModel):
     authorized_amount_minor: int
     currency: str
     captured_at: str
+
+
+class PayoutFailedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payout_id: str
+    merchant_id: str
+    bank_account_id: str
+    amount_minor: int
+    currency: str
+    failure_code: str
+    failure_message: str
+    reversal_transaction_id: str
+    requires_merchant_action: bool
+    retry_scheduled_for: str | None
+    failed_at: str
 
 
 class PayoutReturnedPayload(BaseModel):
@@ -206,8 +245,11 @@ MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope
 PayoutScheduledEvent = EventEnvelope
+RefundCreatedEvent = EventEnvelope
 RefundFailedEvent = EventEnvelope
 RefundSucceededEvent = EventEnvelope
+SettlementBatchClosedEvent = EventEnvelope
+SettlementCompletedEvent = EventEnvelope
 SettlementFundedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 

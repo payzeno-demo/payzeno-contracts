@@ -19,6 +19,9 @@ const PAYMENT_INTENT_ID = 'pi_01HQ8Z3K9X4M2N7P6R5T1V0W92';
 const BANK_ACCOUNT_ID = 'ba_01HQ8Z3K9X4M2N7P6R5T1V0W98';
 const DISPUTE_ID = 'dp_01HQ8Z3K9X4M2N7P6R5T1V0W9A';
 
+const OCCURRED_AT = '2026-04-29T02:14:07.412Z';
+const VALUE_DATE = '2026-04-29';
+
 function buildEvent(type: EventType): PayzenoEvent {
   switch (type) {
     case 'payment.authorized':
