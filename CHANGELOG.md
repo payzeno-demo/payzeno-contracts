@@ -60,3 +60,8 @@ Post-incident. Shipped ~14 hours after the duplicate-settlement sev1.
 
 ## [3.0.0] — 2026-03-09
 
+**Breaking.** Arc PCI, scope reduction. Both TypeScript consumers and the ledger had to move
+together; the release was coordinated on the day.
+
+### Removed
+
