@@ -17,3 +17,5 @@
  * symbol, narrowing a type, or making an optional field required is a
  * MAJOR — including the cases that "obviously" nobody depends on. Three
  * services deserialise these and two of them deploy on their own
+ * schedule, so "obviously nobody" is not a fact anyone here can check.
+ *

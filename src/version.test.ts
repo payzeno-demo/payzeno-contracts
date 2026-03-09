@@ -16,6 +16,11 @@ describe('CONTRACTS_VERSION', () => {
     expect(CONTRACTS_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
+  it('matches package.json', () => {
+    const pkg = JSON.parse(read('package.json')) as { version: string };
+    expect(pkg.version).toBe(CONTRACTS_VERSION);
+  });
+
   it('matches python/pyproject.toml', () => {
     const match = /^version = "(.+)"$/m.exec(read('python/pyproject.toml'));
     expect(match?.[1]).toBe(CONTRACTS_VERSION);
@@ -35,6 +40,14 @@ describe('API_VERSION', () => {
     expect(API_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  it('moves on a different axis to CONTRACTS_VERSION', () => {
+    expect(API_VERSION).not.toBe(CONTRACTS_VERSION);
+  });
+});
+
+// docs/adr/0005. Asserted here as well as in CI because the CI step is the one
+// people delete when it goes red on a Friday.
+describe('zero runtime dependencies', () => {
   it('package.json declares no dependencies at all', () => {
     const pkg = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
     expect(pkg.dependencies ?? {}).toEqual({});

@@ -65,3 +65,8 @@ together; the release was coordinated on the day.
 
 ### Removed
 
+- `CreateBankAccountRequest.account_number` and `.routing_number`. Bank details are now vaulted
+  and referenced by `bank_account_token` (`bat_` prefix) (PAY-1874).
+- `CardSummary.pan_first_six`. `CardSummary` is now brand / last_four / exp_month / exp_year /
+  country / funding, and nothing else. There is no field in this package that can hold a PAN
+  and that is deliberate (PAY-1861).
