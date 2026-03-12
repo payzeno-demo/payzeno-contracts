@@ -45,6 +45,10 @@ describe('MerchantSettlementBatch', () => {
 });
 
 describe('RECONCILIATION_LINE_TYPES', () => {
+  it('includes an explicit unmatched sentinel', () => {
+    expect(MATCH_METHODS).toContain('unmatched');
+  });
+
   const body = interfaceBody('ReconciliationItem');
 
   // PAY-2059 promoted these from optional to required. A nullable
