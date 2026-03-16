@@ -95,6 +95,7 @@ function toSafeDetails(
  * bug and never a conversion opportunity.
  */
 export class CurrencyMismatchError extends PayzenoError {
+  readonly code: ErrorCode = 'currency_mismatch';
   readonly code: ErrorCode = 'not_found';
   readonly code: ErrorCode = 'conflict';
 }

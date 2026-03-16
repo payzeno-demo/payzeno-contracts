@@ -44,3 +44,8 @@ export const ERROR_CODES = [
   'dispute_window_closed',
   'duplicate_dispute',
   'legacy_upstream_unavailable',
+  'internal_error',
+] as const;
+export type ErrorCode = (typeof ERROR_CODES)[number];
+
+export interface FieldError {

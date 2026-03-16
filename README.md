@@ -54,3 +54,12 @@ pnpm run typecheck        # tsc --noEmit; the real gate
 pnpm test                 # vitest, 95% coverage threshold
 pnpm run lint
 pnpm run build            # tsup, esm + cjs + .d.ts
+pnpm run codegen:python   # rewrites python/ — commit the result
+pnpm run codegen:java     # rewrites java/  — see the gotcha below
+```
+
+## Layering
+
+`IMPORTS` runs strictly downward and CI will not tell you nicely if you break it:
+
+```
