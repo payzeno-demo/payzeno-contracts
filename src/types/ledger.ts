@@ -62,6 +62,24 @@ export interface LedgerEntry {
   created_at: IsoTimestamp;
 }
 
+export interface LedgerTransaction {
+  id: LedgerTransactionId;
+  object: 'ledger_transaction';
+  idempotency_key: string;
+  /** sha256 over the canonicalised request minus `idempotency_key`. Added by migration 0020. */
+  request_fingerprint: string;
+  purpose: LedgerPurpose;
+  merchant_id: MerchantId | null;
+  currency: CurrencyCode;
+  livemode: boolean;
+  reference_type: LedgerReferenceType;
+  reference_id: string;
+  reverses_transaction_id: LedgerTransactionId | null;
+  created_by: LedgerActor;
+  entries: LedgerEntry[];
+  posted_at: IsoTimestamp;
+}
+
 export interface Balance {
   object: 'balance';
   merchant_id: MerchantId;
@@ -80,6 +98,18 @@ export interface Balance {
   negative_balance_minor: MinorUnits;
   buckets: BalanceBucket[];
   as_of: IsoTimestamp;
+}
+
+/** Internal ledger posting request — payzeno-api → payzeno-ledger. */
+export interface PostTransactionRequest {
+  idempotency_key: string;
+  purpose: LedgerPurpose;
+  merchant_id: MerchantId | null;
+  currency: CurrencyCode;
+  livemode: boolean;
+  reference_type: LedgerReferenceType;
+  reference_id: string;
+  lines: PostTransactionLine[];
 }
 
 export interface PostTransactionLine {
