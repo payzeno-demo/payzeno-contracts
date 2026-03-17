@@ -16,3 +16,11 @@ export type StaffRole = (typeof STAFF_ROLES)[number];
 export type AuthPrincipal =
   | {
       kind: 'api_key';
+      merchant_id: MerchantId;
+      api_key_id: ApiKeyId;
+      mode: ApiKeyMode;
+      scopes: ApiKeyScope[];
+    }
+  | {
+      kind: 'dashboard_session';
+      merchant_id: MerchantId;
