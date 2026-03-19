@@ -23,6 +23,16 @@ import type { Acquirer } from './settlement';
 export const CARD_BRANDS = ['visa', 'mastercard', 'amex', 'discover'] as const;
 export type CardBrand = (typeof CARD_BRANDS)[number];
 
+export interface CardSummary {
+  brand: CardBrand;
+  last_four: string;
+  exp_month: number;
+  exp_year: number;
+  /** Issuer country, ISO-3166-1 alpha-2. */
+  country: string | null;
+  funding: CardFunding;
+}
+
 /** Opaque vault token, `pmt_` prefixed. The only card handle Payzeno stores. */
 export type PaymentMethodToken = string;
 
@@ -36,6 +46,12 @@ export interface ThreeDSecureResult {
   /** Electronic Commerce Indicator, scheme-specific. */
   eci: string;
   liability_shifted: boolean;
+}
+
+export interface NextAction {
+  type: 'redirect_to_url' | 'use_sdk';
+  url?: string;
+  sdk_payload?: Record<string, string>;
 }
 
 export const CAPTURE_METHODS = ['automatic', 'manual'] as const;

@@ -63,3 +63,11 @@ pnpm run codegen:java     # rewrites java/  — see the gotcha below
 `IMPORTS` runs strictly downward and CI will not tell you nicely if you break it:
 
 ```
+codegen/cli → codegen/pipeline → {loader, normalizer, emitters, writer, manifest, parity}
+guards / money / ids / errors / events  →  index (the barrel)
+index → types/**
+types/scalars, types/enums, internal/**  →  nothing
+```
+
+- `src/types/**` may import other `src/types/**` modules and nothing else. Not the barrel, not
+  `events/`, not `internal/`.

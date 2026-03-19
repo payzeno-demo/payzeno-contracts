@@ -39,6 +39,23 @@ export interface CreateMerchantRequest {
   metadata?: Metadata;
 }
 
+export type MerchantResponse = Merchant;
+export interface User {
+  id: UserId;
+  object: 'user';
+  merchant_id: MerchantId;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  last_login_at: IsoTimestamp | null;
+  created_at: IsoTimestamp;
+}
+
+/**
+ * Scope vocabulary for `api_key.scopes` (migration 19) and `AuthPrincipal.scopes`.
+ * `@RequiredScopes(...)` checks against exactly this list. Without it the column has no
+ * reader and no guard has anything to check.
+ */
 export const API_KEY_SCOPES = [
   'merchants:read',
   'payment_intents:read',
