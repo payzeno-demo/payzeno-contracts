@@ -178,4 +178,13 @@ export class TypeNormalizer {
     throw new UnsupportedTypeError(node.text, this.currentModule);
   }
 
+  private normalizeConstTuple(decl: SourceDeclaration): IrEnum {
+    return {
+      kind: 'enum',
+      name: decl.name,
+      values: decl.values ?? [],
+      doc: decl.doc,
+    };
+  }
+
 }
