@@ -135,6 +135,10 @@ describe('TypeNormalizer', () => {
 describe('PythonEmitter', () => {
   const emitted = new PythonEmitter().emitModule(normalize());
 
+  it('emits a .py file named after the module', () => {
+    expect(emitted.path).toBe('sample.py');
+  });
+
   it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
     expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
   });
@@ -142,6 +146,10 @@ describe('PythonEmitter', () => {
   it('renders optional as `| None = None` and nullable as `| None`', () => {
     expect(emitted.contents).toContain('settled_at: str | None');
     expect(emitted.contents).toContain('metadata: dict[str, str] | None = None');
+  });
+
+  it('escapes the `object` field name, which is a Python builtin', () => {
+    expect(emitted.contents).toContain('object_: Literal["charge"]');
   });
 
   it('exports every symbol in __all__', () => {
@@ -197,4 +205,15 @@ describe('JavaEmitter', () => {
     expect(fs.readFileSync(path.join(dir, 'x.py'), 'utf8')).toBe('a = 1\nb = 2\n');
   });
 
+  it('does not write in check mode', () => {
+    const dir = tempDir();
+    const writer = new DeterministicWriter();
+    expect(() =>
+      writer.writeAll([{ path: 'x.py', contents: 'a = 1\n', symbols: [] }], dir, 'check'),
+    ).toThrow(EmitDriftError);
+    expect(fs.existsSync(path.join(dir, 'x.py'))).toBe(false);
+  });
+});
+
+describe('cli.parseArgs', () => {
 });
