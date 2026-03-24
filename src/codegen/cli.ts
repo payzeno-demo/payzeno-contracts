@@ -72,6 +72,40 @@ function isTarget(value: string): value is Target {
 
 export function parseArgs(argv: string[]): ParsedArgs {
   let target: Target | null = null;
+  let check = false;
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--target') {
+      const value = argv[i + 1] ?? '';
+      if (!isTarget(value)) {
+        throw new RangeError(`--target must be one of ${TARGETS.join(', ')}, got '${value}'`);
+      }
+      target = value;
+      i += 1;
+    } else if (arg === '--out') {
+      const value = argv[i + 1];
+      if (value === undefined) {
+        throw new RangeError('--out requires a directory');
+      }
+      outDir = value;
+      i += 1;
+    } else if (arg === '--check') {
+      check = true;
+    }
+  }
+
+  if (target === null) {
+    throw new RangeError('--target is required');
+  }
+  if (outDir === null) {
+    throw new RangeError('--out is required');
+  }
+
+  return { target, outDir, check };
+}
+
+function buildEmitters(): Map<Target, ContractEmitter> {
   const emitters = new Map<Target, ContractEmitter>();
   // includeDocs: false — the generated tree is not documentation. Copying the
   // TypeScript docblocks in doubles the diff on every prose edit and gives the

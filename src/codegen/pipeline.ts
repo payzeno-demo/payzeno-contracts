@@ -51,6 +51,38 @@ export class CodegenPipeline {
       parity = diffParity(collectExportedSymbols(sourceModules), collectEmittedSymbols(files));
     }
 
+    const write = this.writer.writeAll(files, opts.outDir, opts.mode);
+
+    // The manifest is written last so that a parity failure leaves the
+    // version stamp untouched — a half-written tree with a bumped version is
+    // worse than a stale one.
+    if (opts.mode === 'write') {
+      if (opts.target === 'python') {
+        writePythonManifest(opts.outDir, this.writer, opts.mode);
+      } else {
+        writeJavaManifest(opts.outDir, this.writer, opts.mode);
+      }
+    }
+
+    return {
+      target: opts.target,
+      modules: irModules.length,
+      files: files.length,
+      parity,
+      write,
+    };
+  }
+
+  /**
+   * Collapse `types/*` into one bundle and `events/*` into another.
+   *
+   * The TypeScript side is fourteen files because humans read it; the Python
+   * side is `types.py` and `events.py` because `payzeno-ledger` imports
+   * `from payzeno_contracts.types import ...` and a per-module tree would make
+   * every one of those imports a guess. Declarations keep their sorted order
+   * inside the bundle, so the concatenation is still deterministic.
+   */
+  private bundle(modules: IrModule[]): IrModule[] {
     const buckets = new Map<string, IrModule>();
 
     for (const module of modules) {
@@ -65,6 +97,11 @@ export class CodegenPipeline {
       } else {
         existing.declarations.push(...module.declarations);
       }
+    }
+
+    const emitter = this.emitters.get(target);
+    if (emitter === undefined) {
+      throw new UnresolvedRefError(`emitter:${target}`, 'pipeline');
     }
 
   }
