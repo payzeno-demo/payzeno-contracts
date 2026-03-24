@@ -58,3 +58,31 @@ export function collectExportedSymbols(modules: SourceModule[]): Set<string> {
   return out;
 }
 
+export function diffParity(exported: Set<string>, emitted: Set<string>): ParityReport {
+  const missing: string[] = [];
+  const extra: string[] = [];
+  let matched = 0;
+
+  for (const name of exported) {
+    if (emitted.has(name)) {
+      matched += 1;
+    } else {
+      missing.push(name);
+    }
+  }
+
+  for (const name of emitted) {
+    if (!exported.has(name)) {
+      extra.push(name);
+    }
+  }
+
+  missing.sort();
+  extra.sort();
+
+  if (missing.length > 0 || extra.length > 0) {
+    throw new ParityViolationError(missing, extra);
+  }
+
+  return { missing, extra, matched };
+}
