@@ -99,10 +99,32 @@ export class CodegenPipeline {
       }
     }
 
+    const bundled = [...buckets.values()];
+    for (const bundleModule of bundled) {
+      bundleModule.declarations.sort((a, b) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      );
+    }
+    return bundled.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  }
+
+  /**
+   * Render every module with the emitter registered for `target`.
+   *
+   * Async because the java arm used to shell out to `google-java-format` and
+   * may again; the python arm never awaits anything.
+   */
+  private async emit(modules: IrModule[], target: Target): Promise<EmittedFile[]> {
     const emitter = this.emitters.get(target);
     if (emitter === undefined) {
       throw new UnresolvedRefError(`emitter:${target}`, 'pipeline');
     }
 
+    const files: EmittedFile[] = [];
+    for (const module of modules) {
+      files.push(emitter.emitModule(module));
+    }
+
+    return Promise.resolve(files);
   }
 }
