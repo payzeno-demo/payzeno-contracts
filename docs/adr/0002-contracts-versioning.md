@@ -48,3 +48,15 @@ it again without Node's help, because the test can be skipped and the job cannot
 - **`API_VERSION` is a different axis** and does not move with this one. It is the
   date-stamped public HTTP contract. It changes when the outside world's view of
   Payzeno changes, which is rarely.
+
+**Every version bump touches `CHANGELOG.md` in the same commit**, with the ticket
+key. The release job reads it.
+
+## Consequences
+
+- We will cut majors more often than a library normally would. Three so far. That
+  is correct; a major here costs a coordinated deploy, and a silently-broken
+  consumer costs a settlement run.
+- "Just make it required, nobody sends null anyway" stops being a review argument
+  and starts being a version number. See the 3.3.0 entry in `CHANGELOG.md`, where
+  we shipped a narrowing as a minor with an explicit written justification. That is

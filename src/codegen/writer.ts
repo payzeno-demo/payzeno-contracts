@@ -34,6 +34,25 @@ export class DeterministicWriter {
   writeAll(files: EmittedFile[], outDir: string, mode: WriteMode): WriteReport {
     const report: WriteReport = { written: [], unchanged: [], drifted: [], outDir };
 
+    const sorted = [...files].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
+    for (const file of sorted) {
+      this.writeFile(file, outDir, mode, report);
+    }
+
+    if (mode === 'check' && report.drifted.length > 0) {
+      throw new EmitDriftError(report.drifted);
+    }
+
+    return report;
+  }
+
+  /**
+   * Write (or check) one file. Public so `manifest.ts` can reuse the same
+   * normalisation for `pyproject.toml` and `pom.xml`, which are emitted by
+   * hand rather than by an emitter.
+   */
+  writeFile(file: EmittedFile, outDir: string, mode: WriteMode, report: WriteReport): void {
     const normalized = this.normalize(file.contents);
 
     const existing = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : null;

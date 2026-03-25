@@ -49,6 +49,21 @@ const SCALAR_ALIASES: Record<string, IrScalarName> = {
 export class TypeNormalizer {
   private currentModule = '<unknown>';
 
+  private normalizeDeclaration(decl: SourceDeclaration): IrDeclaration | null {
+    switch (decl.kind) {
+      case 'interface':
+        return this.normalizeInterface(decl);
+      case 'const-tuple':
+        return this.normalizeConstTuple(decl);
+      case 'alias':
+        return this.normalizeAlias(decl);
+      case 'const-record':
+        return this.normalizeConstRecord(decl);
+      default:
+        return null;
+    }
+  }
+
   private normalizeMember(member: SourceMember): IrField {
     const { type, nullable } = this.stripNull(member.type);
     return {
@@ -178,4 +193,44 @@ export class TypeNormalizer {
     throw new UnsupportedTypeError(node.text, this.currentModule);
   }
 
+  private normalizeConstTuple(decl: SourceDeclaration): IrEnum {
+    return {
+      kind: 'enum',
+      name: decl.name,
+      values: decl.values ?? [],
+      doc: decl.doc,
+    };
+  }
+
+  private normalizeAlias(decl: SourceDeclaration): IrDeclaration | null {
+    if (decl.aliasType === undefined) {
+      return null;
+    }
+    // `export type CurrencyCode = (typeof CURRENCIES)[number]` becomes a real
+    // alias pointing at the tuple's Literal. Dropping it was tried first and
+    // every field typed `CurrencyCode` then referenced a name the generated
+    // module did not define.
+    const { type, nullable } = this.stripNull(decl.aliasType);
+
+    let target: IrType;
+    try {
+      target = this.normalizeTypeNode(type);
+    } catch (error) {
+      // A generic helper alias (`EventHandler<T>`, `EventOfType<T>`) has no
+      // target-language counterpart. Dropping it is correct; the parity
+      // exemption list in parity.ts is what keeps that honest rather than
+      // silent.
+      if (error instanceof UnsupportedTypeError) {
+        return null;
+      }
+      throw error;
+    }
+
+    return {
+      kind: 'alias',
+      name: decl.name,
+      target: nullable ? { kind: 'union', members: [target] } : target,
+      doc: decl.doc,
+    };
+  }
 }
