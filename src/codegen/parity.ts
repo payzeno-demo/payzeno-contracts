@@ -58,6 +58,24 @@ export function collectExportedSymbols(modules: SourceModule[]): Set<string> {
   return out;
 }
 
+/** Every symbol the emitted files declare. */
+export function collectEmittedSymbols(files: EmittedFile[]): Set<string> {
+  const out = new Set<string>();
+  for (const file of files) {
+    for (const symbol of file.symbols) {
+      out.add(symbol);
+    }
+  }
+  return out;
+}
+
+/**
+ * Compare the two sets.
+ *
+ * @throws ParityViolationError when either side has an entry the other lacks.
+ *   Both directions are fatal: an extra symbol means the emitter invented a
+ *   name, and an invented name is one nothing can ever remove.
+ */
 export function diffParity(exported: Set<string>, emitted: Set<string>): ParityReport {
   const missing: string[] = [];
   const extra: string[] = [];

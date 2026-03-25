@@ -61,6 +61,16 @@ describe('collectEmittedSymbols', () => {
 });
 
 describe('diffParity', () => {
+  it('passes when both sides agree', () => {
+    const report = diffParity(
+      collectExportedSymbols(modules),
+      collectEmittedSymbols(emitted(['Merchant', 'MERCHANT_STATUSES'])),
+    );
+    expect(report.matched).toBe(2);
+    expect(report.missing).toEqual([]);
+    expect(report.extra).toEqual([]);
+  });
+
   it('throws ParityViolationError on a deliberate omission', () => {
     expect(() =>
       diffParity(
@@ -77,6 +87,18 @@ describe('diffParity', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(ParityViolationError);
       expect((error as ParityViolationError).missing).toEqual(['MERCHANT_STATUSES']);
+    }
+  });
+
+  it('also fails on an INVENTED symbol — a name nothing can ever remove', () => {
+    try {
+      diffParity(
+        collectExportedSymbols(modules),
+        collectEmittedSymbols(emitted(['Merchant', 'MERCHANT_STATUSES', 'MerchantHelper'])),
+      );
+      expect.unreachable('should have thrown');
+    } catch (error) {
+      expect((error as ParityViolationError).extra).toEqual(['MerchantHelper']);
     }
   });
 
