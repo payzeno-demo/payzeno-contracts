@@ -71,3 +71,11 @@ types/scalars, types/enums, internal/**  →  nothing
 
 - `src/types/**` may import other `src/types/**` modules and nothing else. Not the barrel, not
   `events/`, not `internal/`.
+- `src/internal/**` imports **nothing at all**. It's arithmetic and serialisation; it has no
+  business knowing what a Merchant is.
+- `src/codegen/**` may reach `../version` and `../errors` and that's it. The generator must not
+  depend on the types it generates, or you get a bootstrap problem the first time someone
+  renames a scalar.
+
+`import/no-cycle` and the `no-restricted-imports` overrides in `.eslintrc.cjs` enforce most of
+this. `src/index.test.ts` covers the rest.
