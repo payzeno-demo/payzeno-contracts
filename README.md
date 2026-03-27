@@ -79,3 +79,11 @@ types/scalars, types/enums, internal/**  →  nothing
 
 `import/no-cycle` and the `no-restricted-imports` overrides in `.eslintrc.cjs` enforce most of
 this. `src/index.test.ts` covers the rest.
+
+## Versioning
+
+Additive is a **minor**. Removing or narrowing an exported symbol is a **major**, including
+"just making an optional field required" — three services deserialise these and two of them
+deploy on their own schedule. `src/version.ts` is the source of truth and `src/version.test.ts`
+asserts it matches `package.json`, `python/pyproject.toml` and `java/pom.xml`. Bump
+`CHANGELOG.md` in the same commit; the release job reads it.

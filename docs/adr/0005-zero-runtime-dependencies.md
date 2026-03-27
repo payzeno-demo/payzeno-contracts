@@ -25,6 +25,31 @@ Pydantic and to Java records. A runtime dependency has no meaning on those sides
 three targets and decorative in the other two. Whichever target the schema is
 written for becomes the real contract and the other two drift.
 
+## Decision
+
+**`"dependencies": {}`. This is a contract, not a preference.**
+
+- Asserted by `src/version.test.ts`, which reads `package.json` and checks both
+  `dependencies` and `peerDependencies` are empty.
+- Asserted again by a CI step, because a test can be skipped.
+- `typescript` is a devDependency and is used by `src/codegen/loader.ts` only. It is
+  listed in `tsup.config.ts`'s `external` so it can never be bundled into `dist`;
+  a 6MB compiler in every consumer's install is exactly the outcome this ADR exists
+  to prevent.
+
+Concretely, this is why:
+
+- **`src/ids.ts` validates but does not generate.** Generating a ULID needs entropy
+  and a monotonic clock. Each service brings its own library — `ulid` in
+  payzeno-api, `python-ulid` in the ledger, `de.huxhorn.sulky.ulid` in the biller —
+  and all three validate with ours.
+- **There is no `Date` anywhere in this package.** Timestamps are RFC 3339 strings.
+  A `Date` does not survive the Python emitter and does not survive JSON, so a date
+  library would only be papering over a shape we should not have.
+- **There is no HTTP client and no SDK here.** If a consumer needs one, it builds
+  its own. Two of them have, and they look nothing alike, and that is fine —
+  they have different auth, different retry policy and different error surfaces.
+
 ## Consequences
 
 - Validation is the consumer's job. `payzeno-api` validates with `class-validator`
