@@ -45,8 +45,35 @@ describe('MerchantSettlementBatch', () => {
 });
 
 describe('RECONCILIATION_LINE_TYPES', () => {
+  it('covers every non-sale line an acquirer file carries', () => {
+    // Without these, every refund/chargeback/fee line matches no charge and
+    // lands in `orphaned` — "manual investigation" for a large fraction of
+    // every batch.
+    for (const required of [
+      'sale',
+      'refund',
+      'chargeback',
+      'chargeback_reversal',
+      'scheme_fee',
+      'adjustment',
+      'reserve_hold',
+      'reserve_release',
+    ]) {
+      expect(RECONCILIATION_LINE_TYPES).toContain(required);
+    }
+    expect(RECONCILIATION_LINE_TYPES).toHaveLength(8);
+  });
+});
+
+describe('MATCH_METHODS', () => {
   it('includes an explicit unmatched sentinel', () => {
     expect(MATCH_METHODS).toContain('unmatched');
+  });
+
+  it('orders strongest match first', () => {
+    expect(MATCH_METHODS.indexOf('exact_reference')).toBeLessThan(
+      MATCH_METHODS.indexOf('heuristic'),
+    );
   });
 
   const body = interfaceBody('ReconciliationItem');

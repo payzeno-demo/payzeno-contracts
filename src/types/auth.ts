@@ -24,3 +24,12 @@ export type AuthPrincipal =
   | {
       kind: 'dashboard_session';
       merchant_id: MerchantId;
+      user_id: UserId;
+      role: UserRole;
+    }
+  | {
+      /**
+       * A PAYZENO operator, not a merchant user. Without this variant every platform action —
+       * creating a merchant, suspending one, accepting a dispute, forcing a payout, retrying a
+       * settlement item — resolves as the merchant's own `admin`, and a merchant can
+       * un-suspend itself.
