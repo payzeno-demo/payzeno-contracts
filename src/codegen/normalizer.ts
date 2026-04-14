@@ -64,6 +64,23 @@ export class TypeNormalizer {
     }
   }
 
+  private normalizeInterface(decl: SourceDeclaration): IrModel {
+    const fields: IrField[] = [];
+    for (const member of decl.members ?? []) {
+      fields.push(this.normalizeMember(member));
+    }
+
+    const base = decl.heritage !== undefined && decl.heritage.length > 0 ? decl.heritage[0] : null;
+
+    return {
+      kind: 'model',
+      name: decl.name,
+      fields,
+      base: base ?? null,
+      doc: decl.doc,
+    };
+  }
+
   private normalizeMember(member: SourceMember): IrField {
     const { type, nullable } = this.stripNull(member.type);
     return {

@@ -77,6 +77,8 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const doc = this.renderDoc(decl.doc);
+    const members = decl.values.map((value) => `"${value}"`).join(', ');
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
     const tuple = decl.values.map((value) => `"${value}"`).join(', ');
     const suffix = decl.values.length === 1 ? ',' : '';
@@ -94,6 +96,8 @@ export class PythonEmitter extends ContractEmitter {
    * `as const` idiom check in the loader.
    */
   private renderConstMap(decl: IrConstMap): string {
+    const doc = this.renderDoc(decl.doc);
+    const valueType = decl.entries.every(([, value]) => /^-?\d+$/.test(value)) ? 'int' : 'str';
     const rows = decl.entries
       .map(([key, value]) => `    "${key}": ${valueType === 'int' ? value : `"${value}"`},`)
       .join('\n');
@@ -101,6 +105,15 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderModel(model: IrModel): string {
+    // The loader drops type parameters, so a generic model cannot be detected
+    // from the IR. There is exactly one — `Paginated<T>` — and hardcoding it
+    // was cheaper than teaching the whole pipeline about type parameters for
+    // a single user. If a second one ever appears, do that instead.
+    const base = GENERIC_MODELS.has(model.name)
+      ? 'BaseModel, Generic[T]'
+      : model.base === null
+        ? 'BaseModel'
+        : model.base;
     const lines: string[] = [];
 
     lines.push(`class ${model.name}(${base}):`);
@@ -144,6 +157,61 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderGeneric(name: string, args: IrType[]): string {
+    const rendered = args.map((arg) => this.renderType(arg));
+    switch (name) {
+      case 'Array':
+        return `list[${rendered[0] ?? 'Any'}]`;
+      case 'Record':
+        return `dict[${rendered[0] ?? 'str'}, ${rendered[1] ?? 'Any'}]`;
+      case 'Paginated':
+        return `Paginated[${rendered[0] ?? 'Any'}]`;
+      case 'EventEnvelope':
+        // Parameters erased — see the normaliser.
+        return 'EventEnvelope';
+      default:
+        throw new UnsupportedTypeError(`generic ${name}`, 'python.emitter');
+    }
+  }
+
+  /**
+   * A tuple constant and its derived union share a TypeScript name only by
+   * convention (`CURRENCIES` / `CurrencyCode`). In Python both live in one
+   * namespace, so the Literal alias gets a distinct, predictable name.
+   */
+  private typeAliasNameFor(name: string): string {
+    if (name === name.toUpperCase() && name.includes('_')) {
+      return `${name}_VALUES`;
+    }
+    return name;
+  }
+
+  protected mapScalar(s: IrScalar): string {
+    switch (s.name) {
+      case 'string':
+        return 'str';
+      case 'integer':
+        return 'int';
+      case 'number':
+        return 'int';
+      case 'boolean':
+        return 'bool';
+      case 'timestamp':
+        return 'str';
+      case 'date':
+        return 'str';
+      case 'unknown':
+        return 'Any';
+      default:
+        throw new UnsupportedTypeError(`scalar ${String(s.name)}`, 'python.emitter');
+    }
+  }
+
+  protected quoteIdentifier(n: string): string {
+    return PYTHON_RESERVED.has(n) ? `${n}_` : n;
+  }
+
+  /** `Model.model_rebuild()` for every model that references another model. */
+  private renderRebuilds(declarations: readonly { kind: string; name: string }[]): string {
     const models = new Set(declarations.filter((d) => d.kind === 'model').map((d) => d.name));
     const needsRebuild: string[] = [];
 
@@ -163,5 +231,7 @@ export class PythonEmitter extends ContractEmitter {
 
   private renderAll(symbols: string[]): string {
     const sorted = [...symbols].sort();
+    const entries = sorted.map((symbol) => `    "${symbol}",`).join('\n');
+    return `__all__ = [\n${entries}\n]`;
   }
 }
