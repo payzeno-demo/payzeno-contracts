@@ -87,3 +87,11 @@ Additive is a **minor**. Removing or narrowing an exported symbol is a **major**
 deploy on their own schedule. `src/version.ts` is the source of truth and `src/version.test.ts`
 asserts it matches `package.json`, `python/pyproject.toml` and `java/pom.xml`. Bump
 `CHANGELOG.md` in the same commit; the release job reads it.
+
+Events additionally carry a schema version in `EVENT_SCHEMA_VERSIONS`. Consumers switch on
+`(type, version)` and DLQ anything they don't recognise — that convention came out of the
+duplicate-settlement incident, see `docs/adr/0016-event-schema-versioning.md`.
+
+## Gotchas
+
+- **Zero runtime dependencies. This is a contract, not a preference.** `"dependencies": {}` is

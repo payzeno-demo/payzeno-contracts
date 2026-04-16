@@ -46,6 +46,12 @@ export class CodegenPipeline {
   ) {}
 
   async run(opts: CodegenOptions): Promise<CodegenReport> {
+    const sourceModules: SourceModule[] = this.loader.load(opts.entrypoints);
+
+    const irModules: IrModule[] = sourceModules.map((module) =>
+      this.normalizer.normalizeModule(module),
+    );
+
     let parity: ParityReport | null = null;
     if (opts.checkParity) {
       parity = diffParity(collectExportedSymbols(sourceModules), collectEmittedSymbols(files));
