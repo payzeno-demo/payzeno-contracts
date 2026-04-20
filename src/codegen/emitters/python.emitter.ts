@@ -77,6 +77,14 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const body: string[] = [];
+
+    // Constants, then models, then aliases. `from __future__ import
+    // annotations` makes ANNOTATIONS lazy, but a base class and an alias
+    // right-hand side are evaluated at import time — `ChargeListResponse =
+    // Paginated[Charge]` sorted alphabetically ahead of `Paginated` is a
+    // NameError on import, in the ledger, at boot.
+    const order: Record<string, number> = { enum: 0, 'const-map': 0, model: 1, alias: 2 };
     const doc = this.renderDoc(decl.doc);
     const members = decl.values.map((value) => `"${value}"`).join(', ');
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
@@ -133,6 +141,7 @@ export class PythonEmitter extends ContractEmitter {
     const required = model.fields.filter((f) => !f.optional);
     const name = this.quoteIdentifier(field.name);
     const rendered = this.renderType(field.type);
+    const annotation = field.nullable || field.optional ? `${rendered} | None` : rendered;
     const assignment = field.optional ? ' = None' : '';
     return `${doc}    ${name}: ${annotation}${assignment}`;
   }

@@ -37,6 +37,7 @@ CAPTURE_METHODS: tuple[str, ...] = ("automatic", "manual")
 
 
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
+CHARGE_STATUSES_VALUES = Literal["pending", "authorized", "captured", "settled", "failed", "voided", "expired", "reversed"]
 CURRENCY_EXPONENT: dict[str, int] = {
     "USD": 2,
     "EUR": 2,
@@ -46,6 +47,7 @@ CURRENCY_EXPONENT: dict[str, int] = {
 }
 
 
+DECLINE_CODES_VALUES = Literal["do_not_honor", "insufficient_funds", "lost_card", "stolen_card", "expired_card", "incorrect_cvc", "processing_error", "issuer_unavailable", "velocity_exceeded", "fraud_suspected"]
 DISPUTE_REASONS: tuple[str, ...] = ("fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general")
 
 
@@ -53,6 +55,9 @@ DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "l
 
 
 ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
+ENTRY_DIRECTIONS: tuple[str, ...] = ("debit", "credit")
+
+
 IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
@@ -65,6 +70,7 @@ LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "
 
 
 LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment"]
+PAYMENT_INTENT_STATUSES_VALUES = Literal["requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
 
 
@@ -111,6 +117,9 @@ WEBHOOK_ENDPOINT_STATUSES: tuple[str, ...] = ("enabled", "disabled")
 
 
 WEBHOOK_EVENT_STATUSES_VALUES = Literal["pending", "delivering", "delivered", "dead"]
+WEBHOOK_EVENT_STATUSES: tuple[str, ...] = ("pending", "delivering", "delivered", "dead")
+
+
 class BalanceHistoryResponse(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -197,6 +206,17 @@ class ChargeListQuery(ListQuery):
     status: CHARGE_STATUSES_VALUES | None = None
     payment_intent_id: str | None = None
     settlement_batch_id: str | None = None
+
+
+class CreateBankAccountRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    country: str
+    currency: CURRENCIES_VALUES
+    scheme: BANK_ACCOUNT_SCHEMES_VALUES
+    bank_account_token: str
+    account_holder_name: str
+    is_default: bool | None = None
 
 
 class CreatePayoutRequest(BaseModel):
@@ -533,6 +553,7 @@ InvoiceResponse = Invoice
 InvoiceStatus = INVOICE_STATUSES_VALUES
 IsoDate = str
 IsoTimestamp = str
+LedgerActor = LEDGER_ACTORS_VALUES
 LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
@@ -543,9 +564,13 @@ PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
 PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
 PayoutId = str
+PayoutListResponse = Paginated[Payout]
+ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES
 ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES
 RefundId = str
+RefundResponse = Refund
+RefundStatus = REFUND_STATUSES_VALUES
 RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
 SettlementBatchStatus = SETTLEMENT_BATCH_STATUSES_VALUES

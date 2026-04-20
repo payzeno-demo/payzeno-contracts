@@ -210,6 +210,15 @@ export class TypeNormalizer {
     throw new UnsupportedTypeError(node.text, this.currentModule);
   }
 
+  private normalizeIndexed(node: SourceTypeNode): IrType {
+    const match = /typeof\s+([A-Za-z0-9_]+)/.exec(node.text);
+    const tupleName = match?.[1];
+    if (tupleName === undefined) {
+      throw new UnsupportedTypeError(node.text, this.currentModule);
+    }
+    return { kind: 'ref', name: tupleName };
+  }
+
   private normalizeConstTuple(decl: SourceDeclaration): IrEnum {
     return {
       kind: 'enum',
