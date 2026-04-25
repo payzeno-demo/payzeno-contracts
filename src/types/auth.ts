@@ -33,3 +33,12 @@ export type AuthPrincipal =
        * creating a merchant, suspending one, accepting a dispute, forcing a payout, retrying a
        * settlement item — resolves as the merchant's own `admin`, and a merchant can
        * un-suspend itself.
+       */
+      kind: 'staff_session';
+      staff_id: string;
+      role: StaffRole;
+      /** Required on every staff-marked merchant-scoped read; MerchantScopeGuard reads it. */
+      acting_merchant_id: MerchantId | null;
+    }
+  | {
+      kind: 'internal_service';
