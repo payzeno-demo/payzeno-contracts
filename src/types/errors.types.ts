@@ -55,3 +55,9 @@ export interface FieldError {
    * dhotfix: redaction applies to this too. A path is a path, but the
    * validator used to interpolate the offending VALUE into `message` and
    * the path pointed straight at it. PAY-1874.
+   */
+  path: string;
+  code: string;
+  message: string;
+}
+

@@ -97,5 +97,10 @@ function toSafeDetails(
 export class CurrencyMismatchError extends PayzenoError {
   readonly code: ErrorCode = 'currency_mismatch';
   readonly code: ErrorCode = 'not_found';
+  readonly httpStatus = 404;
+}
+
+/** 409. The resource exists and is in a state that refuses this transition. */
+export class ConflictError extends PayzenoError {
   readonly code: ErrorCode = 'conflict';
 }

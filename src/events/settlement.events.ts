@@ -63,3 +63,14 @@ export interface SettlementCompletedPayload {
   run_id: ReconciliationRunId;
   acquirer: Acquirer;
   currency: CurrencyCode;
+  processing_date: IsoDate;
+  items_total: number;
+  items_settled: number;
+  items_failed: number;
+  posted_total_minor: MinorUnits;
+  fee_total_minor: MinorUnits;
+  net_total_minor: MinorUnits;
+  /**
+   * Charges the API side should mark `settled`. Chunked at 1000 per event.
+   *
+   * This is the SOLE driver of `charge captured -> settled`, over an at-least-once,
