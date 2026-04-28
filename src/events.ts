@@ -68,3 +68,9 @@ import type {
 } from './events/merchant.events';
 import type { InvoiceIssuedEvent } from './events/billing.events';
 
+export type PayzenoEvent =
+  | PaymentAuthorizedEvent
+  | PaymentCapturedEvent
+  | PaymentFailedEvent
+  | PaymentCanceledEvent
+  | RefundCreatedEvent

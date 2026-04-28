@@ -31,3 +31,10 @@ export interface PayoutScheduledPayload {
   available_on: IsoDate;
   scheduled_at: IsoTimestamp;
 }
+export type PayoutScheduledEvent = EventEnvelope<'payout.scheduled', PayoutScheduledPayload>;
+
+export interface PayoutPaidPayload {
+  payout_id: PayoutId;
+  merchant_id: MerchantId;
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
