@@ -24,3 +24,10 @@ import type { EventEnvelope } from './envelope';
 export interface PayoutScheduledPayload {
   payout_id: PayoutId;
   merchant_id: MerchantId;
+  bank_account_id: BankAccountId;
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  method: PayoutMethod;
+  available_on: IsoDate;
+  scheduled_at: IsoTimestamp;
+}
