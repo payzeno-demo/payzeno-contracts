@@ -58,3 +58,9 @@ describe('EVENT_SCHEMA_VERSIONS', () => {
 
   it('is a positive integer everywhere', () => {
     for (const type of EVENT_TYPES) {
+      const version = EVENT_SCHEMA_VERSIONS[type];
+      expect(Number.isInteger(version)).toBe(true);
+      expect(version).toBeGreaterThanOrEqual(1);
+    }
+  });
+
