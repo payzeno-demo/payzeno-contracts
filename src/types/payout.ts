@@ -20,6 +20,14 @@ export const PAYOUT_STATUSES = [
   'returned',
   'canceled',
 ] as const;
+export const PAYOUT_METHODS = [
+  'standard_ach',
+  'same_day_ach',
+  'sepa',
+  'faster_payments',
+  /** Pulls funds FROM the merchant when their balance has gone negative. */
+  'debit_ach',
+] as const;
 export type PayoutMethod = (typeof PAYOUT_METHODS)[number];
 
 export interface Payout {
@@ -49,4 +57,18 @@ export interface Payout {
   created_at: IsoTimestamp;
 }
 
+export interface CreatePayoutRequest {
+  amount_minor?: MinorUnits;
+  currency: CurrencyCode;
+  /**
+   * Optional; defaults to the merchant's `is_default` account **for this currency**. The
+   * account's `currency` must equal `currency` — Payzeno does not convert (domain-model §0.1).
+   * Mismatch is `BankAccountUnusableError`.
+   */
+  bank_account_id?: BankAccountId;
+  method?: PayoutMethod;
+  statement_descriptor?: string;
+}
+
 export type PayoutResponse = Payout;
+export type PayoutListResponse = Paginated<Payout>;

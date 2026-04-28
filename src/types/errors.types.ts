@@ -61,3 +61,8 @@ export interface FieldError {
   message: string;
 }
 
+/**
+ * The single error envelope every Payzeno HTTP surface returns on non-2xx.
+ * payzeno-api's `HttpExceptionFilter` produces exactly this; payzeno-ledger's
+ * `problem_handler` produces exactly this; payzeno-console's `ApiClient` parses
+ * exactly this.

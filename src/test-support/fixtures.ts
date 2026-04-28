@@ -16,12 +16,23 @@ import type { EventEnvelope, EventType, PayzenoEvent } from '../events';
 const MERCHANT_ID = 'mch_01HQ8Z3K9X4M2N7P6R5T1V0W8Y';
 const CHARGE_ID = 'ch_01HQ8Z3K9X4M2N7P6R5T1V0W91';
 const PAYMENT_INTENT_ID = 'pi_01HQ8Z3K9X4M2N7P6R5T1V0W92';
+const TRANSACTION_ID = 'txn_01HQ8Z3K9X4M2N7P6R5T1V0W96';
 const BANK_ACCOUNT_ID = 'ba_01HQ8Z3K9X4M2N7P6R5T1V0W98';
 const DISPUTE_ID = 'dp_01HQ8Z3K9X4M2N7P6R5T1V0W9A';
 
 const OCCURRED_AT = '2026-04-29T02:14:07.412Z';
 const VALUE_DATE = '2026-04-29';
 
+/** `{ amount_minor: 1234, currency: 'USD' }` unless told otherwise. */
+export function sampleMoney(currency: CurrencyCode = 'USD', amountMinor = 1234): Money {
+  return { amount_minor: amountMinor, currency };
+}
+
+/**
+ * A structurally complete envelope around `payload`. `version` comes from
+ * `EVENT_SCHEMA_VERSIONS` rather than being hardcoded to 1, so a fixture never
+ * disagrees with the map a consumer switches on.
+ */
 function sourceFor(type: EventType): EventEnvelope<string, unknown>['source'] {
   if (type === 'invoice.issued') {
     return 'payzeno-billing-legacy';

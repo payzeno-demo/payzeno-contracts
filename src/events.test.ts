@@ -64,3 +64,9 @@ describe('EVENT_SCHEMA_VERSIONS', () => {
     }
   });
 
+  // PAY-2052. Chunking settled_charge_ids was breaking for a v1-only consumer,
+  // so it bumped. Nothing else has ever needed to.
+  it('has settlement.completed at 2 and everything else at 1', () => {
+    expect(EVENT_SCHEMA_VERSIONS['settlement.completed']).toBe(2);
+    const bumped = EVENT_TYPES.filter((type) => EVENT_SCHEMA_VERSIONS[type] !== 1);
+    expect(bumped).toEqual(['settlement.completed']);
