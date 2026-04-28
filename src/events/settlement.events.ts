@@ -52,3 +52,14 @@ export interface SettlementItemSettledPayload {
 export type SettlementItemSettledEvent = EventEnvelope<
   'settlement.item_settled',
   SettlementItemSettledPayload
+>;
+
+/**
+ * The batch finished. payzeno-api consumes this to flip every charge in the batch
+ * `captured -> settled` and to stamp `settlement_batch_id`.
+ */
+export interface SettlementCompletedPayload {
+  batch_id: SettlementBatchId;
+  run_id: ReconciliationRunId;
+  acquirer: Acquirer;
+  currency: CurrencyCode;

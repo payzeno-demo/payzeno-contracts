@@ -54,5 +54,15 @@ export type ReconciliationItemStatus = (typeof RECONCILIATION_ITEM_STATUSES)[num
  * for a large fraction of every batch — and SettlementPoster builds a sale posting for all
  * of them regardless.
  */
+export const RECONCILIATION_LINE_TYPES = [
+  'sale',
+  'refund',
+  'chargeback',
+  'chargeback_reversal',
+  'scheme_fee',
+  'adjustment',
+  'reserve_hold',
+  'reserve_release',
+] as const;
 export type ReconciliationLineType = (typeof RECONCILIATION_LINE_TYPES)[number];
 

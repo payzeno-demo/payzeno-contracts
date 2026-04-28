@@ -62,3 +62,9 @@ import type {
 } from './events/ledger.events';
 import type {
   MerchantBankAccountVerifiedEvent,
+  MerchantCreatedEvent,
+  MerchantStatusChangedEvent,
+  MerchantUpdatedEvent,
+} from './events/merchant.events';
+import type { InvoiceIssuedEvent } from './events/billing.events';
+
