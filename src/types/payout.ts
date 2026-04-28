@@ -57,4 +57,18 @@ export interface Payout {
   created_at: IsoTimestamp;
 }
 
+export interface CreatePayoutRequest {
+  amount_minor?: MinorUnits;
+  currency: CurrencyCode;
+  /**
+   * Optional; defaults to the merchant's `is_default` account **for this currency**. The
+   * account's `currency` must equal `currency` — Payzeno does not convert (domain-model §0.1).
+   * Mismatch is `BankAccountUnusableError`.
+   */
+  bank_account_id?: BankAccountId;
+  method?: PayoutMethod;
+  statement_descriptor?: string;
+}
+
 export type PayoutResponse = Payout;
+export type PayoutListResponse = Paginated<Payout>;
