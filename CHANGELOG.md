@@ -70,3 +70,8 @@ together; the release was coordinated on the day.
 - `CardSummary.pan_first_six`. `CardSummary` is now brand / last_four / exp_month / exp_year /
   country / funding, and nothing else. There is no field in this package that can hold a PAN
   and that is deliberate (PAY-1861).
+
+### Added
+
+- `PaymentMethodToken` (`pmt_`) as the only card handle.
+- `pmt_` and `bat_` in `ID_PREFIXES`, flagged as vault-owned — they resolve to no Payzeno entity.
