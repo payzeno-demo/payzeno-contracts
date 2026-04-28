@@ -32,6 +32,9 @@ API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "pa
 
 
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
+CANCELLATION_REASONS: tuple[str, ...] = ("requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired")
+
+
 CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
 CAPTURE_METHODS: tuple[str, ...] = ("automatic", "manual")
 
@@ -56,6 +59,9 @@ DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "l
 
 ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
 ENTRY_DIRECTIONS: tuple[str, ...] = ("debit", "credit")
+
+
+ERROR_CODES: tuple[str, ...] = ("invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error")
 
 
 IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
@@ -208,6 +214,12 @@ class ChargeListQuery(ListQuery):
     settlement_batch_id: str | None = None
 
 
+class CreateApiKeyResponse(ApiKey):
+    model_config = ConfigDict(extra='forbid')
+
+    secret: str
+
+
 class CreateBankAccountRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -293,6 +305,28 @@ class DisputeEvidence(BaseModel):
     receipt_file_id: str | None = None
     service_documentation_file_id: str | None = None
     uncategorized_text: str | None = None
+
+
+class Invoice(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["invoice"]
+    merchant_id: str
+    subscription_id: str | None
+    number: str
+    status: INVOICE_STATUSES_VALUES
+    currency: CURRENCIES_VALUES
+    subtotal_minor: int
+    tax_minor: int
+    total_minor: int
+    amount_paid_minor: int
+    lines: list[InvoiceLine]
+    period_start: str
+    period_end: str
+    due_at: str | None
+    migrated_to_ledger: bool
+    created_at: str
 
 
 class LedgerAdjustmentRequest(BaseModel):
@@ -445,6 +479,22 @@ class ReconciliationBacklog(BaseModel):
     oldest_retryable_at: str | None
 
 
+class ReconciliationRun(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["reconciliation_run"]
+    batch_id: str
+    trigger: RECONCILIATION_TRIGGERS_VALUES
+    status: RECONCILIATION_RUN_STATUSES_VALUES
+    items_total: int
+    items_settled: int
+    items_failed: int
+    started_at: str
+    finished_at: str | None
+    error_summary: str | None
+
+
 class Refund(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -537,6 +587,7 @@ class WebhookEvent(BaseModel):
 
 
 Acquirer = ACQUIRERS_VALUES
+ApiKeyId = str
 ApiKeyMode = API_KEY_MODES_VALUES
 ApiKeyScope = API_KEY_SCOPES_VALUES
 AuthPrincipal = dict[str, Any]
@@ -547,6 +598,7 @@ ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
 DisputeListResponse = Paginated[Dispute]
 DisputeStatus = DISPUTE_STATUSES_VALUES
+ErrorCode = ERROR_CODES_VALUES
 InvoiceId = str
 InvoiceListResponse = Paginated[Invoice]
 InvoiceResponse = Invoice
@@ -557,6 +609,7 @@ LedgerActor = LEDGER_ACTORS_VALUES
 LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
+MatchMethod = MATCH_METHODS_VALUES
 Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
@@ -574,6 +627,10 @@ RefundStatus = REFUND_STATUSES_VALUES
 RiskTier = RISK_TIERS_VALUES
 SettlementBatchId = str
 SettlementBatchStatus = SETTLEMENT_BATCH_STATUSES_VALUES
+StaffRole = STAFF_ROLES_VALUES
 UserId = str
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES
 WebhookEventId = str
+WebhookEventStatus = WEBHOOK_EVENT_STATUSES_VALUES
+
+

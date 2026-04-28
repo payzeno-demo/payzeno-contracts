@@ -54,6 +54,19 @@ EVENT_TOPICS: dict[str, tuple[str, ...]] = {
 
 
 EVENT_TYPES_VALUES = Literal["payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.batch_closed", "settlement.item_settled", "settlement.completed", "settlement.reconciliation_failed", "settlement.duplicate_detected", "settlement.variance_detected", "settlement.funded", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned", "ledger.transaction_posted", "ledger.imbalance_detected", "merchant.created", "merchant.updated", "merchant.status_changed", "merchant.bank_account_verified", "invoice.issued"]
+class DisputeClosedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    dispute_id: str
+    charge_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    outcome: Literal["won"] | Literal["lost"] | Literal["warning_closed"]
+    reversal_transaction_id: str | None
+    closed_at: str
+
+
 class InvoiceIssuedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -109,6 +122,27 @@ class MerchantCreatedPayload(BaseModel):
     platform_fee_bps: int
     platform_fee_fixed_minor: int
     created_at: str
+
+
+class MerchantUpdatedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    merchant_id: str
+    display_name: str
+    status: str
+    risk_tier: str
+    payout_schedule: str
+    pricing_model: str
+    reserve_bps: int
+    reserve_hold_days: int
+    payout_delay_days: int
+    settlement_tolerance_minor: int
+    capture_at_settlement: bool
+    platform_fee_bps: int
+    platform_fee_fixed_minor: int
+    statement_descriptor: str | None
+    changed_by: str
+    changed_at: str
 
 
 class PaymentAuthorizedPayload(BaseModel):
@@ -240,6 +274,7 @@ class SettlementVarianceDetectedPayload(BaseModel):
     detected_at: str
 
 
+DisputeOpenedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
@@ -251,6 +286,7 @@ RefundSucceededEvent = EventEnvelope
 SettlementBatchClosedEvent = EventEnvelope
 SettlementCompletedEvent = EventEnvelope
 SettlementFundedEvent = EventEnvelope
+SettlementReconciliationFailedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
 
