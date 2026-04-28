@@ -59,4 +59,7 @@ describe('QUEUE_NAMES', () => {
     }
   });
 
+  it('puts invoice.issued on the billing topic', () => {
+    expect(topicForEventType('invoice.issued')).toBe('payzeno-billing-events');
+  });
 });

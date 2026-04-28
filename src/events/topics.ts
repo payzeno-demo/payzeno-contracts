@@ -49,3 +49,10 @@ export const EVENT_TOPICS = {
   /** The only topic payzeno-billing-legacy publishes on — its single EMITS surface. */
   'payzeno-billing-events': ['invoice.issued'],
 } as const satisfies Record<string, readonly EventType[]>;
+
+export type TopicName = keyof typeof EVENT_TOPICS;
+
+/**
+ * The redrive target. Not in `EVENT_TOPICS` because it carries no event type of
+ * its own — anything can land on it, which is the point.
+ */

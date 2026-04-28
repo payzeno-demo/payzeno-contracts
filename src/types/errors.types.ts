@@ -49,3 +49,9 @@ export const ERROR_CODES = [
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
 export interface FieldError {
+  /**
+   * Dotted path into the request body, e.g. `payment_method.exp_month`.
+   *
+   * dhotfix: redaction applies to this too. A path is a path, but the
+   * validator used to interpolate the offending VALUE into `message` and
+   * the path pointed straight at it. PAY-1874.

@@ -22,6 +22,27 @@ const DISPUTE_ID = 'dp_01HQ8Z3K9X4M2N7P6R5T1V0W9A';
 const OCCURRED_AT = '2026-04-29T02:14:07.412Z';
 const VALUE_DATE = '2026-04-29';
 
+function sourceFor(type: EventType): EventEnvelope<string, unknown>['source'] {
+  if (type === 'invoice.issued') {
+    return 'payzeno-billing-legacy';
+  }
+  if (
+    type.startsWith('settlement.') ||
+    type.startsWith('payout.') ||
+    type.startsWith('ledger.')
+  ) {
+    return 'payzeno-ledger';
+  }
+  return 'payzeno-api';
+}
+
+/**
+ * One valid envelope per member of `EVENT_TYPES`, in `EVENT_TYPES` order.
+ *
+ * The payloads are minimal-but-real: every required field is present with a
+ * plausible value, because a consumer test that deserialises these is testing
+ * its own parser, not ours.
+ */
 function buildEvent(type: EventType): PayzenoEvent {
   switch (type) {
     case 'payment.authorized':
