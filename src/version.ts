@@ -19,3 +19,4 @@
  * services deserialise these and two of them deploy on their own
  * schedule, so "obviously nobody" is not a fact anyone here can check.
  *
+ * `API_VERSION` is a DIFFERENT axis. It is the public, date-stamped

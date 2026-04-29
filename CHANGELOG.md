@@ -75,3 +75,7 @@ together; the release was coordinated on the day.
 
 - `PaymentMethodToken` (`pmt_`) as the only card handle.
 - `pmt_` and `bat_` in `ID_PREFIXES`, flagged as vault-owned — they resolve to no Payzeno entity.
+- `FieldError.path` and `ApiError.details` carry explicit "never contains cardholder data" notes.
+
+## [2.6.0] — 2026-01-15
+

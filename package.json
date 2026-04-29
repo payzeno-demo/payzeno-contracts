@@ -11,6 +11,9 @@
   },
   "repository": {
     "type": "git",
+    "url": "git+ssh://git@github.com/payzeno/payzeno-contracts.git"
+  },
+  "engines": {
     "node": ">=20.11.0",
     "pnpm": ">=8.15.0"
   },
@@ -69,6 +72,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "test:watch": "vitest",
     "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
+    "codegen:check": "tsx src/codegen/cli.ts --target python --out python --check",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {},
