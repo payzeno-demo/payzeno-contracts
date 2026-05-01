@@ -95,3 +95,11 @@ duplicate-settlement incident, see `docs/adr/0016-event-schema-versioning.md`.
 ## Gotchas
 
 - **Zero runtime dependencies. This is a contract, not a preference.** `"dependencies": {}` is
+  asserted by `src/version.test.ts` *and* by a CI step. Do not add `zod`, `date-fns` or `ulid` —
+  `ulid` in particular is why `src/ids.ts` validates but does not generate. If you need a
+  library, it belongs in the consumer.
+- **`java/` is stale and we know.** CI gates `codegen:python` with `git diff --exit-code` but
+  never runs `codegen:java`, so the committed Java records lag whenever someone forgets the
+  manual run. At time of writing they are a minor version behind and are missing
+  `SettlementDuplicateDetectedPayload`. `ContractEnvelopeTest.java` over in
+  `payzeno-billing-legacy` passes anyway because it only asserts fields it already knows about.
