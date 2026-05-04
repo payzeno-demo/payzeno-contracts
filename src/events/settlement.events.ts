@@ -74,3 +74,13 @@ export interface SettlementCompletedPayload {
    * Charges the API side should mark `settled`. Chunked at 1000 per event.
    *
    * This is the SOLE driver of `charge captured -> settled`, over an at-least-once,
+   * explicitly unordered bus. A chunk lost to the DLQ therefore strands those charges
+   * `captured` with a null `settlement_batch_id` forever. payzeno-api records arrivals in
+   * `settlement_completion (batch_id, run_id, chunk_count, chunks_seen)` and marks the batch
+   * complete only when every index 0..chunk_count-1 is present; `UnsettledChargeSweepJob`
+   * reads `pix_charge_unsettled` and self-heals the rest via
+   * `LedgerHttpClient.listTransactions(reference_type='charge')`. PAY-2058.
+   */
+  settled_charge_ids: ChargeId[];
+  chunk_index: number;
+  chunk_count: number;

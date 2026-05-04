@@ -70,3 +70,10 @@ describe('EVENT_SCHEMA_VERSIONS', () => {
     expect(EVENT_SCHEMA_VERSIONS['settlement.completed']).toBe(2);
     const bumped = EVENT_TYPES.filter((type) => EVENT_SCHEMA_VERSIONS[type] !== 1);
     expect(bumped).toEqual(['settlement.completed']);
+  });
+});
+
+describe('PUBLIC_EVENT_TYPES', () => {
+  it('is a strict subset of EVENT_TYPES', () => {
+    const all = new Set<string>(EVENT_TYPES);
+    for (const type of PUBLIC_EVENT_TYPES) {
