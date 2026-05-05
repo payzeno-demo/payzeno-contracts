@@ -81,3 +81,9 @@ export type PayzenoEvent =
   | DisputeClosedEvent
   | SettlementBatchClosedEvent
   | SettlementItemSettledEvent
+  | SettlementCompletedEvent
+  | SettlementReconciliationFailedEvent
+  | SettlementDuplicateDetectedEvent
+  | SettlementVarianceDetectedEvent
+  | SettlementFundedEvent
+  | PayoutScheduledEvent

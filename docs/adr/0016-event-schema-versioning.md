@@ -30,6 +30,19 @@ one chunk of five. It would not have errored. It would have marked 4,000 charges
 The bus is at-least-once and explicitly unordered. Neither of those helps here —
 this is not a delivery problem, it is a comprehension problem.
 
+## Consequences
+
+- `EVENT_SCHEMA_VERSIONS` is now a coordination artefact, not a constant. Changing
+  a value in it is a two-repo change and the PR must say which consumers were
+  deployed first.
+- The DLQ will receive real traffic during a rollout window. That is the design
+  working. `DeadLetterConsumer` redrives once the consumer is out.
+- Every consumer needs a version check it did not have. `BaseEventConsumer` in
+  payzeno-api and `BaseConsumer` in payzeno-ledger both do it in the base class, so
+  no individual handler has to remember.
+- We accepted the cost that a new event type is invisible to consumers until they
+  deploy. That was already true. The change is that it is now LOUD.
+
 ## What this does not fix
 
 Ordering. An older event can still overwrite a newer one in a projection, and the

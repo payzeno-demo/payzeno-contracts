@@ -77,3 +77,9 @@ describe('PUBLIC_EVENT_TYPES', () => {
   it('is a strict subset of EVENT_TYPES', () => {
     const all = new Set<string>(EVENT_TYPES);
     for (const type of PUBLIC_EVENT_TYPES) {
+      expect(all.has(type), `${type} is not an EventType`).toBe(true);
+    }
+    expect(PUBLIC_EVENT_TYPES.length).toBeLessThan(EVENT_TYPES.length);
+  });
+
+  it('never exposes an internal event to a merchant', () => {
