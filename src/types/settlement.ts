@@ -66,3 +66,43 @@ export const RECONCILIATION_LINE_TYPES = [
 ] as const;
 export type ReconciliationLineType = (typeof RECONCILIATION_LINE_TYPES)[number];
 
+export type MatchMethod = (typeof MATCH_METHODS)[number];
+
+export interface ReconciliationItem {
+  id: ReconciliationItemId;
+  object: 'reconciliation_item';
+  batch_id: SettlementBatchId;
+  charge_id: ChargeId | null;
+  merchant_id: MerchantId | null;
+  line_type: ReconciliationLineType;
+  gross_minor: MinorUnits;
+  /** What the acquirer kept. An expense, not revenue. = interchange + scheme + acquirer markup. */
+  fee_minor: MinorUnits;
+  interchange_minor: MinorUnits;
+  scheme_fee_minor: MinorUnits;
+  net_minor: MinorUnits;
+  /** From `settlement_charge.amount_minor` at match time. Null on unmatched lines. */
+  expected_gross_minor: MinorUnits | null;
+  variance_minor: MinorUnits;
+  currency: CurrencyCode;
+  livemode: boolean;
+  acquirer_reference: string;
+  match_method: MatchMethod;
+  matched_at: IsoTimestamp | null;
+  status: ReconciliationItemStatus;
+  attempt_count: number;
+  last_error_code: string | null;
+  last_attempt_at: IsoTimestamp | null;
+  /**
+   * Exponential backoff with jitter. The retry drain filters on this, not on
+   * `last_attempt_at` — that is the observation behind
+   * `ix_reconciliation_item_next_attempt` (PAY-2071, arc PERF). Filtering on
+   * `last_attempt_at` and computing the backoff in the application makes the
+   * index unusable and the drain scans the whole table.
+   */
+  next_attempt_at: IsoTimestamp;
+  settled_transaction_id: LedgerTransactionId | null;
+  created_at: IsoTimestamp;
+  updated_at: IsoTimestamp;
+}
+

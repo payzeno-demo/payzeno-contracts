@@ -54,6 +54,41 @@ export abstract class PayzenoError extends Error {
    * `ValidationError`; declared on the base so `toApiError` has
    * one code path instead of an instanceof check.
    */
+  readonly fieldErrors: FieldError[];
+
+  constructor(
+    message: string,
+    details: Record<string, unknown> = {},
+    fieldErrors: FieldError[] = [],
+  ) {
+    super(message);
+    // Without this, `err.name` is 'Error' for every subclass and
+    // every log line in three services says 'Error'. Target is
+    // ES2022 so the prototype chain is already correct; the name
+    // is not.
+    this.name = new.target.name;
+    this.details = details;
+    this.fieldErrors = fieldErrors;
+
+    // V8 only. Trims this constructor out of the stack so the
+    // top frame is the thrower, not the base class.
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, new.target);
+    }
+  }
+
+  /**
+   * Render the frozen `ApiError` envelope.
+   *
+   * `requestId` is the `X-Request-Id` the caller will see in the
+   * response header. Passing anything else makes support
+   * escalations unanswerable, so it is required rather than
+   * optional.
+   *
+   * `field_errors` and `details` are omitted rather than emitted
+   * empty: `exactOptionalPropertyTypes` is on and three
+   * deserialisers distinguish absent from empty.
+   */
   toApiError(requestId: string): ApiError {
     const error: ApiError['error'] = {
       code: this.code,
@@ -83,6 +118,30 @@ export abstract class PayzenoError extends Error {
 function toSafeDetails(
   details: Record<string, unknown>,
 ): Record<string, string | number | boolean | null> | undefined {
+  let count = 0;
+
+  for (const key of Object.keys(details)) {
+    const value = details[key];
+    if (value === null) {
+      out[key] = null;
+      count += 1;
+      continue;
+    }
+    const kind = typeof value;
+    if (kind === 'string' || kind === 'boolean') {
+      out[key] = value as string | boolean;
+      count += 1;
+    } else if (kind === 'number' && Number.isFinite(value)) {
+      out[key] = value as number;
+      count += 1;
+    }
+  }
+
+  return count > 0 ? out : undefined;
+}
+
+/** 422. The request was well-formed and wrong. */
+export class ValidationError extends PayzenoError {
   readonly code: ErrorCode = 'validation_failed';
   readonly httpStatus = 422;
 }

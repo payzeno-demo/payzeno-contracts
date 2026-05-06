@@ -66,3 +66,9 @@ export interface FieldError {
  * payzeno-api's `HttpExceptionFilter` produces exactly this; payzeno-ledger's
  * `problem_handler` produces exactly this; payzeno-console's `ApiClient` parses
  * exactly this.
+ */
+export interface ApiError {
+  error: {
+    code: ErrorCode;
+    message: string;
+    /** Present when `code` is `validation_failed`. */

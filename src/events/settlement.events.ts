@@ -84,3 +84,14 @@ export interface SettlementCompletedPayload {
   settled_charge_ids: ChargeId[];
   chunk_index: number;
   chunk_count: number;
+  completed_at: IsoTimestamp;
+}
+export type SettlementCompletedEvent = EventEnvelope<
+  'settlement.completed',
+  SettlementCompletedPayload
+>;
+
+export interface SettlementReconciliationFailedPayload {
+  batch_id: SettlementBatchId;
+  run_id: ReconciliationRunId;
+  items_failed: number;
