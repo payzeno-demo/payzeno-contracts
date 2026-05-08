@@ -26,6 +26,18 @@ export { isEventOfType };
  */
 export { canonicalJson, stableKeys } from './internal/canonical-json';
 
+function isErrorCode(value: unknown): value is ErrorCode {
+  return typeof value === 'string' && (ERROR_CODES as readonly string[]).includes(value);
+}
+
+/**
+ * True when `u` is the frozen `ApiError` envelope.
+ *
+ * payzeno-console's `ApiClient` calls this on every non-2xx body before it
+ * decides whether it has a structured Payzeno error or an ALB/nginx HTML page.
+ * The `code` check is not cosmetic: a proxy that returns `{"error": "gateway
+ * timeout"}` passes a shape-only check and then blows up on `.error.code`.
+ */
 export function isApiError(u: unknown): u is ApiError {
   if (typeof u !== 'object' || u === null) {
     return false;

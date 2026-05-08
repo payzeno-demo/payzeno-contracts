@@ -36,6 +36,8 @@ export const ACCOUNT_TYPES = [
 ] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
 
+export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
+
 export interface Account {
   id: AccountId;
   object: 'account';
@@ -78,6 +80,11 @@ export interface LedgerTransaction {
   created_by: LedgerActor;
   entries: LedgerEntry[];
   posted_at: IsoTimestamp;
+}
+
+export interface BalanceBucket {
+  type: AccountType;
+  amount_minor: MinorUnits;
 }
 
 export interface Balance {
