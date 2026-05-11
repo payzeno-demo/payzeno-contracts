@@ -79,3 +79,8 @@ together; the release was coordinated on the day.
 
 ## [2.6.0] — 2026-01-15
 
+### Added
+
+- `API_VERSION = '2026-01-15'`. The public API date-version is now declared here rather than in
+  `payzeno-api`'s config, so the console and the SDK read the same constant.
+

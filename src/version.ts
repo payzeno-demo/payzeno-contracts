@@ -20,3 +20,5 @@
  * schedule, so "obviously nobody" is not a fact anyone here can check.
  *
  * `API_VERSION` is a DIFFERENT axis. It is the public, date-stamped
+ * version of the HTTP surface, sent as `Payzeno-Version` and echoed in
+ * every response. It moves when the wire format the outside world sees

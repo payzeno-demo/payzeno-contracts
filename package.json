@@ -71,6 +71,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "test:watch": "vitest",
+    "codegen:python": "tsx src/codegen/cli.ts --target python --out python",
     "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
     "codegen:check": "tsx src/codegen/cli.ts --target python --out python --check",
     "prepublishOnly": "pnpm run build"
@@ -83,6 +84,9 @@
     "@vitest/coverage-v8": "1.6.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
+    "prettier": "3.2.5",
+    "ts-to-java": "0.4.1",
+    "ts-to-pydantic": "0.9.3",
     "tsup": "8.0.2",
     "tsx": "4.10.2",
     "vitest": "1.6.0"

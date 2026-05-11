@@ -31,12 +31,18 @@ API_KEY_MODES: tuple[str, ...] = ("test", "live")
 API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "payment_intents:write", "charges:read", "refunds:read", "refunds:write", "disputes:read", "disputes:write", "balance:read", "payouts:read", "payouts:write", "settlements:read", "invoices:read", "webhooks:read", "webhooks:write")
 
 
+AUDIT_ACTOR_TYPES: tuple[str, ...] = ("user", "api_key", "staff", "internal_service", "system")
+
+
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CANCELLATION_REASONS: tuple[str, ...] = ("requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired")
 
 
 CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
 CAPTURE_METHODS: tuple[str, ...] = ("automatic", "manual")
+
+
+CARD_BRANDS: tuple[str, ...] = ("visa", "mastercard", "amex", "discover")
 
 
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
@@ -68,6 +74,7 @@ IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
 IDEMPOTENCY_STATES: tuple[str, ...] = ("in_progress", "completed", "failed")
 
 
+INVOICE_STATUSES_VALUES = Literal["draft", "open", "paid", "uncollectible", "void"]
 INVOICE_STATUSES: tuple[str, ...] = ("draft", "open", "paid", "uncollectible", "void")
 
 
@@ -76,6 +83,9 @@ LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "
 
 
 LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment"]
+LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold")
+
+
 PAYMENT_INTENT_STATUSES_VALUES = Literal["requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
 
@@ -103,8 +113,12 @@ RECONCILIATION_TRIGGERS_VALUES = Literal["scheduled", "manual", "retry"]
 RECONCILIATION_TRIGGERS: tuple[str, ...] = ("scheduled", "manual", "retry")
 
 
+REFUND_REASONS_VALUES = Literal["duplicate", "fraudulent", "requested_by_customer", "expired_uncaptured_auth"]
 REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
 REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
+
+
+RISK_TIERS: tuple[str, ...] = ("standard", "elevated", "high")
 
 
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
@@ -118,12 +132,21 @@ TIMESERIES_INTERVALS: tuple[str, ...] = ("hour", "day")
 
 
 USER_ROLES_VALUES = Literal["owner", "admin", "developer", "viewer"]
+USER_ROLES: tuple[str, ...] = ("owner", "admin", "developer", "viewer")
+
+
 WEBHOOK_ENDPOINT_STATUSES_VALUES = Literal["enabled", "disabled"]
 WEBHOOK_ENDPOINT_STATUSES: tuple[str, ...] = ("enabled", "disabled")
 
 
 WEBHOOK_EVENT_STATUSES_VALUES = Literal["pending", "delivering", "delivered", "dead"]
 WEBHOOK_EVENT_STATUSES: tuple[str, ...] = ("pending", "delivering", "delivered", "dead")
+
+
+class ApiError(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    error: dict[str, Any]
 
 
 class BalanceHistoryResponse(BaseModel):
@@ -372,6 +395,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class LoginResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["login"]
+    user: User
+    merchant: Merchant
+
+
 class Merchant(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -458,6 +489,14 @@ class PaymentIntentListQuery(ListQuery):
 
     status: PAYMENT_INTENT_STATUSES_VALUES | None = None
     customer_reference: str | None = None
+
+
+class PostTransactionLine(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    account_type: ACCOUNT_TYPES_VALUES
+    direction: ENTRY_DIRECTIONS_VALUES
+    amount_minor: int
 
 
 class ReadinessResponse(BaseModel):
@@ -596,6 +635,7 @@ CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
 ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
+DisputeId = str
 DisputeListResponse = Paginated[Dispute]
 DisputeStatus = DISPUTE_STATUSES_VALUES
 ErrorCode = ERROR_CODES_VALUES

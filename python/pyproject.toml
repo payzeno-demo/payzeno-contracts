@@ -11,8 +11,10 @@ build-backend = "hatchling.build"
 name = "payzeno-contracts"
 version = "3.4.0"
 description = "Generated Pydantic models for the Payzeno shared contracts. Source of truth is @payzeno/contracts (TypeScript)."
+readme = "README.md"
 license = { text = "UNLICENSED" }
 authors = [{ name = "Payzeno Platform", email = "platform@payzeno.com" }]
+[project.urls]
 Source = "https://github.com/payzeno/payzeno-contracts"
 
 packages = ["payzeno_contracts"]
