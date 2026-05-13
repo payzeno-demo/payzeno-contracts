@@ -22,11 +22,34 @@ import type {
 } from './scalars';
 
 export const INVOICE_STATUSES = ['draft', 'open', 'paid', 'uncollectible', 'void'] as const;
+export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
+
 export interface InvoiceLine {
   description: string;
   quantity: number;
   unit_amount_minor: MinorUnits;
   amount_minor: MinorUnits;
+}
+
+export interface Invoice {
+  id: InvoiceId;
+  object: 'invoice';
+  merchant_id: MerchantId;
+  subscription_id: string | null;
+  number: string;
+  status: InvoiceStatus;
+  currency: CurrencyCode;
+  subtotal_minor: MinorUnits;
+  tax_minor: MinorUnits;
+  total_minor: MinorUnits;
+  amount_paid_minor: MinorUnits;
+  lines: InvoiceLine[];
+  period_start: IsoDate;
+  period_end: IsoDate;
+  due_at: IsoTimestamp | null;
+  /** True once ledger owns generation for this merchant (arc MIG, step 4). */
+  migrated_to_ledger: boolean;
+  created_at: IsoTimestamp;
 }
 
 export type InvoiceListResponse = Paginated<Invoice>;
