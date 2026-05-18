@@ -32,6 +32,30 @@ export const SETTLEMENT_BATCH_STATUSES = [
 export const ACQUIRERS = ['worldflow', 'nordpay'] as const;
 export type Acquirer = (typeof ACQUIRERS)[number];
 
+/** The acquirer-level object. NEVER returned on a merchant-facing route — see MerchantSettlementBatch. */
+export interface SettlementBatch {
+  id: SettlementBatchId;
+  object: 'settlement_batch';
+  currency: CurrencyCode;
+  processing_date: IsoDate;
+  acquirer: Acquirer;
+  file_reference: string;
+  expected_total_minor: MinorUnits;
+  posted_total_minor: MinorUnits;
+  item_count: number;
+  status: SettlementBatchStatus;
+  opened_at: IsoTimestamp;
+  closed_at: IsoTimestamp | null;
+  reconciled_at: IsoTimestamp | null;
+  funded_at: IsoTimestamp | null;
+}
+
+/**
+ * The merchant-scoped view returned by `GET /v1/settlements*`. A SettlementBatch has no
+ * merchant_id, so MerchantScopeGuard cannot scope it; returning the raw object to a merchant
+ * session exposes every other merchant's acquirer totals. Acquirer-level money
+ * (`expected_total_minor` / `posted_total_minor`) is deliberately absent.
+ */
 export interface MerchantSettlementBatch {
   id: SettlementBatchId;
   object: 'merchant_settlement_batch';
@@ -66,6 +90,13 @@ export const RECONCILIATION_LINE_TYPES = [
 ] as const;
 export type ReconciliationLineType = (typeof RECONCILIATION_LINE_TYPES)[number];
 
+export const MATCH_METHODS = [
+  'exact_reference',
+  'network_txn',
+  'heuristic',
+  'manual',
+  'unmatched',
+] as const;
 export type MatchMethod = (typeof MATCH_METHODS)[number];
 
 export interface ReconciliationItem {

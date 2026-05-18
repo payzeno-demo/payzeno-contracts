@@ -95,3 +95,14 @@ export interface SettlementReconciliationFailedPayload {
   batch_id: SettlementBatchId;
   run_id: ReconciliationRunId;
   items_failed: number;
+  items_orphaned: number;
+  error_summary: string;
+  failed_at: IsoTimestamp;
+}
+export type SettlementReconciliationFailedEvent = EventEnvelope<
+  'settlement.reconciliation_failed',
+  SettlementReconciliationFailedPayload
+>;
+
+/**
+ * Emitted when the settlement poster refuses a posting because an equivalent

@@ -25,6 +25,8 @@ function interfaceBody(name: string): string {
 }
 
 describe('MerchantSettlementBatch', () => {
+  const body = interfaceBody('MerchantSettlementBatch');
+
   it('carries no acquirer-level money key', () => {
     expect(body).not.toContain('expected_total_minor');
     expect(body).not.toContain('posted_total_minor');
@@ -33,6 +35,8 @@ describe('MerchantSettlementBatch', () => {
   it('carries merchant_id so the scope guard can filter it', () => {
     expect(body).toContain('merchant_id: MerchantId;');
   });
+
+  const body = interfaceBody('SettlementBatch');
 
   it('does keep the acquirer totals — it is the internal object', () => {
     expect(body).toContain('expected_total_minor: MinorUnits;');
