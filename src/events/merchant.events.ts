@@ -46,3 +46,23 @@ export interface MerchantCreatedPayload {
 }
 export type MerchantUpdatedEvent = EventEnvelope<'merchant.updated', MerchantUpdatedPayload>;
 
+export interface MerchantStatusChangedPayload {
+  merchant_id: MerchantId;
+  previous_status: MerchantStatus;
+  status: MerchantStatus;
+  reason: string;
+  changed_by: string;
+  changed_at: IsoTimestamp;
+}
+export type MerchantStatusChangedEvent = EventEnvelope<
+  'merchant.status_changed',
+  MerchantStatusChangedPayload
+>;
+
+/**
+ * Feeds `bank_account_projection` in the ledger (data-model.md §3.11). `payout` carries
+ * `bank_account_id not null` and `PayoutInitiator.initiate` must produce an ACH/SEPA/FPS
+ * instruction — but BankAccount is owned by payzeno-api and there is no ledger→api route on
+ * the payout path. Without the fields below the ledger holds an id it cannot resolve, and
+ * `CreatePayoutRequest.bank_account_id` being optional means it also cannot find the default.
+ */
