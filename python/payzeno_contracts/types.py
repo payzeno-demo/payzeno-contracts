@@ -34,6 +34,7 @@ API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "pa
 AUDIT_ACTOR_TYPES: tuple[str, ...] = ("user", "api_key", "staff", "internal_service", "system")
 
 
+BANK_ACCOUNT_STATUSES_VALUES = Literal["new", "validated", "verification_failed", "errored"]
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CANCELLATION_REASONS: tuple[str, ...] = ("requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired")
 
@@ -94,6 +95,9 @@ PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invali
 
 
 PAYOUT_METHODS_VALUES = Literal["standard_ach", "same_day_ach", "sepa", "faster_payments", "debit_ach"]
+PAYOUT_SCHEDULES: tuple[str, ...] = ("daily", "weekly", "monthly", "manual")
+
+
 PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed", "returned", "canceled")
 
 
@@ -147,6 +151,21 @@ class ApiError(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     error: dict[str, Any]
+
+
+class ApiKey(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["api_key"]
+    merchant_id: str
+    name: str
+    mode: API_KEY_MODES_VALUES
+    prefix: str
+    last_four: str
+    scopes: list[API_KEY_SCOPES_VALUES]
+    created_at: str
+    revoked_at: str | None
 
 
 class BalanceHistoryResponse(BaseModel):
@@ -388,6 +407,15 @@ class LedgerTransaction(BaseModel):
     posted_at: str
 
 
+class ListQuery(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    limit: int | None = None
+    cursor: str | None = None
+    created_after: str | None = None
+    created_before: str | None = None
+
+
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -604,6 +632,16 @@ class UpdateMerchantRequest(BaseModel):
     metadata: dict[str, str] | None = None
 
 
+class VolumeTimeseries(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["volume_timeseries"]
+    merchant_id: str
+    currency: CURRENCIES_VALUES
+    interval: TIMESERIES_INTERVALS_VALUES
+    points: list[TimeseriesPoint]
+
+
 class WebhookEvent(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -633,11 +671,14 @@ AuthPrincipal = dict[str, Any]
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
 CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
+ChargeId = str
+ChargeListResponse = Paginated[Charge]
 ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
 DisputeId = str
 DisputeListResponse = Paginated[Dispute]
 DisputeStatus = DISPUTE_STATUSES_VALUES
+EntryDirection = ENTRY_DIRECTIONS_VALUES
 ErrorCode = ERROR_CODES_VALUES
 InvoiceId = str
 InvoiceListResponse = Paginated[Invoice]
@@ -650,6 +691,7 @@ LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
 MatchMethod = MATCH_METHODS_VALUES
+MerchantListResponse = Paginated[Merchant]
 Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
@@ -658,6 +700,8 @@ PaymentMethodToken = str
 PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
 PayoutId = str
 PayoutListResponse = Paginated[Payout]
+PayoutSchedule = PAYOUT_SCHEDULES_VALUES
+PayoutStatus = PAYOUT_STATUSES_VALUES
 ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES
 ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES

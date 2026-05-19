@@ -15,6 +15,38 @@ from pydantic import BaseModel, ConfigDict
 T = TypeVar("T")
 
 
+EVENT_SCHEMA_VERSIONS: dict[str, int] = {
+    "payment.authorized": 1,
+    "payment.captured": 1,
+    "payment.failed": 1,
+    "payment.canceled": 1,
+    "refund.created": 1,
+    "refund.succeeded": 1,
+    "refund.failed": 1,
+    "dispute.opened": 1,
+    "dispute.evidence_submitted": 1,
+    "dispute.closed": 1,
+    "settlement.batch_closed": 1,
+    "settlement.item_settled": 1,
+    "settlement.completed": 2,
+    "settlement.reconciliation_failed": 1,
+    "settlement.duplicate_detected": 1,
+    "settlement.variance_detected": 1,
+    "settlement.funded": 1,
+    "payout.scheduled": 1,
+    "payout.paid": 1,
+    "payout.failed": 1,
+    "payout.returned": 1,
+    "ledger.transaction_posted": 1,
+    "ledger.imbalance_detected": 1,
+    "merchant.created": 1,
+    "merchant.updated": 1,
+    "merchant.status_changed": 1,
+    "merchant.bank_account_verified": 1,
+    "invoice.issued": 1,
+}
+
+
 EVENT_TOPICS: dict[str, tuple[str, ...]] = {
     "payzeno-payments-events": (
         "payment.authorized",
@@ -178,6 +210,20 @@ class PaymentCapturedPayload(BaseModel):
     captured_at: str
 
 
+class PaymentFailedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    charge_id: str | None
+    payment_intent_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    failure_code: str
+    failure_message: str
+    retryable: bool
+    failed_at: str
+
+
 class PayoutFailedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -204,6 +250,19 @@ class PayoutReturnedPayload(BaseModel):
     return_code: str
     reversal_transaction_id: str
     returned_at: str
+
+
+class PayoutScheduledPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payout_id: str
+    merchant_id: str
+    bank_account_id: str
+    amount_minor: int
+    currency: str
+    method: str
+    available_on: str
+    scheduled_at: str
 
 
 class RefundCreatedPayload(BaseModel):
@@ -274,12 +333,14 @@ class SettlementVarianceDetectedPayload(BaseModel):
     detected_at: str
 
 
+DisputeClosedEvent = EventEnvelope
 DisputeOpenedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope
 PayoutScheduledEvent = EventEnvelope
+PayzenoEvent = EventEnvelope
 RefundCreatedEvent = EventEnvelope
 RefundFailedEvent = EventEnvelope
 RefundSucceededEvent = EventEnvelope
