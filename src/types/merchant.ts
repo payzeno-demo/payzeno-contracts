@@ -29,6 +29,39 @@ export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
 export const RISK_TIERS = ['standard', 'elevated', 'high'] as const;
 export type RiskTier = (typeof RISK_TIERS)[number];
 
+export interface Merchant {
+  id: MerchantId;
+  object: 'merchant';
+  legal_name: string;
+  display_name: string;
+  country: string;
+  default_currency: CurrencyCode;
+  status: MerchantStatus;
+  mcc: string;
+  risk_tier: RiskTier;
+  payout_schedule: PayoutSchedule;
+  reserve_bps: BasisPoints;
+  /** Days a rolling-reserve hold is retained before `reserve_release` frees it. 0 = no reserve. */
+  reserve_hold_days: number;
+  pricing_model: PricingModel;
+  platform_fee_bps: BasisPoints;
+  platform_fee_fixed_minor: MinorUnits;
+  /** Funds-availability delay in banking days. T+2 standard, T+7 for `high` risk_tier. */
+  payout_delay_days: number;
+  /** Per-item acquirer-vs-authorised variance tolerated before `variance_exceeded`. */
+  settlement_tolerance_minor: MinorUnits;
+  /**
+   * Deferred capture. This is a COLUMN, not a feature flag — payzeno-api reads
+   * `merchant.capture_at_settlement`, payzeno-ledger reads
+   * `merchant_projection.capture_at_settlement`. See interfaces.md §8.
+   */
+  capture_at_settlement: boolean;
+  livemode: boolean;
+  metadata: Metadata;
+  created_at: IsoTimestamp;
+  updated_at: IsoTimestamp;
+}
+
 export interface CreateMerchantRequest {
   legal_name: string;
   display_name: string;
@@ -73,6 +106,8 @@ export const API_KEY_SCOPES = [
   'webhooks:read',
   'webhooks:write',
 ] as const;
+export type ApiKeyScope = (typeof API_KEY_SCOPES)[number];
+
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
