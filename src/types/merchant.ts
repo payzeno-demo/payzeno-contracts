@@ -73,6 +73,8 @@ export interface CreateMerchantRequest {
 }
 
 export type MerchantResponse = Merchant;
+export type MerchantListResponse = Paginated<Merchant>;
+
 export interface User {
   id: UserId;
   object: 'user';
@@ -131,6 +133,34 @@ export type BankAccountStatus = (typeof BANK_ACCOUNT_STATUSES)[number];
 
 /** Which rail's coordinates a bank account carries. Drives validation and payout method. */
 export const BANK_ACCOUNT_SCHEMES = ['aba', 'iban', 'uk_sort_code'] as const;
+export interface BankAccount {
+  id: BankAccountId;
+  object: 'bank_account';
+  merchant_id: MerchantId;
+  country: string;
+  currency: CurrencyCode;
+  bank_name: string;
+  scheme: BankAccountScheme;
+  last_four: string;
+  /** ABA only. Null for `iban` / `uk_sort_code`. */
+  routing_last_four: string | null;
+  /** IBAN only. */
+  iban_last_four: string | null;
+  bic: string | null;
+  /** UK only. */
+  sort_code_last_four: string | null;
+  status: BankAccountStatus;
+  is_default: boolean;
+  livemode: boolean;
+  created_at: IsoTimestamp;
+}
+
+/**
+ * Bank credentials are tokenised at the vault before they reach payzeno-api, exactly like
+ * card data — see domain-model.md §11.3. A 9-digit ABA routing number is not Luhn-valid and
+ * is not in the 13-19 digit band, so the PAN redaction rule never caught it: raw numbers
+ * went into structured request logs, into `field_errors[].path`, and into APM traces.
+ */
 export interface CreateBankAccountRequest {
   country: string;
   currency: CurrencyCode;
