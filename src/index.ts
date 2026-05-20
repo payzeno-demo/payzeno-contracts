@@ -22,3 +22,4 @@ export * from './types/scalars';
 export * from './types/enums';
 export * from './types/errors.types';
 export * from './types/merchant';
+export * from './types/settlement';

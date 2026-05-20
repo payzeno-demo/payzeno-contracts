@@ -87,3 +87,10 @@ export type PayzenoEvent =
   | SettlementVarianceDetectedEvent
   | SettlementFundedEvent
   | PayoutScheduledEvent
+  | PayoutPaidEvent
+  | PayoutFailedEvent
+  | PayoutReturnedEvent
+  | LedgerTransactionPostedEvent
+  | LedgerImbalanceDetectedEvent
+  | MerchantCreatedEvent
+  | MerchantUpdatedEvent

@@ -83,3 +83,9 @@ describe('PUBLIC_EVENT_TYPES', () => {
   });
 
   it('never exposes an internal event to a merchant', () => {
+    const publicTypes = new Set<string>(PUBLIC_EVENT_TYPES);
+    for (const internal of [
+      'settlement.batch_closed',
+      'settlement.duplicate_detected',
+      'settlement.variance_detected',
+      'settlement.funded',

@@ -29,6 +29,39 @@ export type MerchantStatus = (typeof MERCHANT_STATUSES)[number];
 export const RISK_TIERS = ['standard', 'elevated', 'high'] as const;
 export type RiskTier = (typeof RISK_TIERS)[number];
 
+export interface Merchant {
+  id: MerchantId;
+  object: 'merchant';
+  legal_name: string;
+  display_name: string;
+  country: string;
+  default_currency: CurrencyCode;
+  status: MerchantStatus;
+  mcc: string;
+  risk_tier: RiskTier;
+  payout_schedule: PayoutSchedule;
+  reserve_bps: BasisPoints;
+  /** Days a rolling-reserve hold is retained before `reserve_release` frees it. 0 = no reserve. */
+  reserve_hold_days: number;
+  pricing_model: PricingModel;
+  platform_fee_bps: BasisPoints;
+  platform_fee_fixed_minor: MinorUnits;
+  /** Funds-availability delay in banking days. T+2 standard, T+7 for `high` risk_tier. */
+  payout_delay_days: number;
+  /** Per-item acquirer-vs-authorised variance tolerated before `variance_exceeded`. */
+  settlement_tolerance_minor: MinorUnits;
+  /**
+   * Deferred capture. This is a COLUMN, not a feature flag — payzeno-api reads
+   * `merchant.capture_at_settlement`, payzeno-ledger reads
+   * `merchant_projection.capture_at_settlement`. See interfaces.md §8.
+   */
+  capture_at_settlement: boolean;
+  livemode: boolean;
+  metadata: Metadata;
+  created_at: IsoTimestamp;
+  updated_at: IsoTimestamp;
+}
+
 export interface CreateMerchantRequest {
   legal_name: string;
   display_name: string;
@@ -40,6 +73,8 @@ export interface CreateMerchantRequest {
 }
 
 export type MerchantResponse = Merchant;
+export type MerchantListResponse = Paginated<Merchant>;
+
 export interface User {
   id: UserId;
   object: 'user';
@@ -73,6 +108,8 @@ export const API_KEY_SCOPES = [
   'webhooks:read',
   'webhooks:write',
 ] as const;
+export type ApiKeyScope = (typeof API_KEY_SCOPES)[number];
+
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
@@ -96,6 +133,34 @@ export type BankAccountStatus = (typeof BANK_ACCOUNT_STATUSES)[number];
 
 /** Which rail's coordinates a bank account carries. Drives validation and payout method. */
 export const BANK_ACCOUNT_SCHEMES = ['aba', 'iban', 'uk_sort_code'] as const;
+export interface BankAccount {
+  id: BankAccountId;
+  object: 'bank_account';
+  merchant_id: MerchantId;
+  country: string;
+  currency: CurrencyCode;
+  bank_name: string;
+  scheme: BankAccountScheme;
+  last_four: string;
+  /** ABA only. Null for `iban` / `uk_sort_code`. */
+  routing_last_four: string | null;
+  /** IBAN only. */
+  iban_last_four: string | null;
+  bic: string | null;
+  /** UK only. */
+  sort_code_last_four: string | null;
+  status: BankAccountStatus;
+  is_default: boolean;
+  livemode: boolean;
+  created_at: IsoTimestamp;
+}
+
+/**
+ * Bank credentials are tokenised at the vault before they reach payzeno-api, exactly like
+ * card data — see domain-model.md §11.3. A 9-digit ABA routing number is not Luhn-valid and
+ * is not in the 13-19 digit band, so the PAN redaction rule never caught it: raw numbers
+ * went into structured request logs, into `field_errors[].path`, and into APM traces.
+ */
 export interface CreateBankAccountRequest {
   country: string;
   currency: CurrencyCode;

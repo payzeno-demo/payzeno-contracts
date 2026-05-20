@@ -56,3 +56,9 @@ export type TopicName = keyof typeof EVENT_TOPICS;
  * The redrive target. Not in `EVENT_TOPICS` because it carries no event type of
  * its own — anything can land on it, which is the point.
  */
+export const DLQ_TOPIC_NAME = 'payzeno-dlq';
+
+/**
+ * Every SQS queue subscribed to the topics above, keyed by the consumer class
+ * that drains it. The values are the literal queue names.
+ *
