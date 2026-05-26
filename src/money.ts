@@ -60,6 +60,7 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
   const trimmed = amount.trim();
 
   const sign = match[1] === '-' ? -1n : 1n;
+  const whole = match[2] ?? '0';
   const fraction = match[3] ?? '';
 
   if (fraction.length > exponent) {
@@ -70,9 +71,28 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
   }
 
   const padded = fraction.padEnd(exponent, '0');
+  const exponent = exponentFor(currency);
+  if (exponent === 0) {
+    return String(minor);
+  }
+
   const magnitude = BigInt(negative ? -minor : minor);
   const divisor = pow10(exponent);
   const whole = magnitude / divisor;
+  const fraction = (magnitude % divisor).toString().padStart(exponent, '0');
+
+  return `${negative ? '-' : ''}${whole.toString()}.${fraction}`;
+}
+
+/**
+ * Locale-aware display string, e.g. `$12.34`, `¥1,200`.
+ *
+ * Uses Intl with the currency's own exponent forced, because
+ * Intl's default for JPY is right but its default for a
+ * currency we later add might not be, and the table is the
+ * authority.
+ */
+export function formatMoney(m: Money, locale = 'en-US'): string {
   const exponent = exponentFor(m.currency);
   const decimal = fromMinor(m.amount_minor, m.currency);
 

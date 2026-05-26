@@ -51,6 +51,10 @@ describe('fromMinor', () => {
 });
 
 describe('formatMoney', () => {
+  it('formats with the currency symbol', () => {
+    expect(formatMoney({ amount_minor: 1234, currency: 'USD' })).toContain('12.34');
+  });
+
   // dhotfix: JPY is exponent 0 — see CURRENCY_EXPONENT.
   it('does not divide JPY by 100', () => {
     const formatted = formatMoney({ amount_minor: 1200, currency: 'JPY' }, 'en-US');
@@ -79,9 +83,22 @@ describe('assertSameCurrency', () => {
 });
 
 describe('addMoney / subMoney', () => {
+  it('rounds ROUND_HALF_UP at the boundary', () => {
+    // 100 * 50 bps = 0.5 minor units -> 1
+    expect(applyBps(sampleMoney('USD', 100), 50).amount_minor).toBe(1);
+    // and the negative twin rounds away from zero, not toward it
+    expect(applyBps(sampleMoney('USD', -100), 50).amount_minor).toBe(-1);
+    // 4999 * 290 bps = 144.971 -> 145
+    expect(applyBps(sampleMoney('USD', 4999), 290).amount_minor).toBe(145);
+  });
+
   it('handles the degenerate rates', () => {
     expect(applyBps(sampleMoney('USD', 4999), 0).amount_minor).toBe(0);
     expect(applyBps(sampleMoney('USD', 4999), 10_000).amount_minor).toBe(4999);
+  });
+
+  it('preserves the currency', () => {
+    expect(applyBps(sampleMoney('JPY', 1200), 290).currency).toBe('JPY');
   });
 
   it('throws ValidationError outside 0..10000', () => {

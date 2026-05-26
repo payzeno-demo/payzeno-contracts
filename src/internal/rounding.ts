@@ -70,7 +70,11 @@ export function roundHalfUp(numerator: bigint, denominator: bigint): bigint {
   }
 
   const negative = num < 0n;
+  const magnitude = negative ? -num : num;
+
   const quotient = magnitude / den;
+  const remainder = magnitude % den;
+
   // remainder * 2 >= den  ⟺  remainder / den >= 0.5
   const rounded = remainder * 2n >= den ? quotient + 1n : quotient;
 
