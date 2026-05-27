@@ -70,6 +70,18 @@ export interface MerchantSettlementBatch {
   funded_at: IsoTimestamp | null;
 }
 
+export const RECONCILIATION_ITEM_STATUSES = [
+  'pending',
+  'settling',
+  'settled',
+  'retryable',
+  'failed',
+  'orphaned',
+  /** Matched only heuristically — a human decides. Never auto-settles. */
+  'needs_review',
+  /** Acquirer amount differs from the authorised amount beyond the merchant's tolerance. */
+  'variance_exceeded',
+] as const;
 export type ReconciliationItemStatus = (typeof RECONCILIATION_ITEM_STATUSES)[number];
 
 /**
@@ -135,5 +147,12 @@ export interface ReconciliationItem {
   settled_transaction_id: LedgerTransactionId | null;
   created_at: IsoTimestamp;
   updated_at: IsoTimestamp;
+}
+
+export interface RetryReconciliationItemRequest {
+  /** The item id is bound by the path (`/items/:itemId/retry`) and is not repeated here. */
+  /** Set by the retry worker; manual retries from the admin console omit it. */
+  requested_by?: string;
+  reason?: string;
 }
 
