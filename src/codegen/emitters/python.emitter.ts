@@ -77,6 +77,35 @@ export class PythonEmitter extends ContractEmitter {
 
   emitModule(m: IrModule): EmittedFile {
     const symbols: string[] = [];
+    const body: string[] = [];
+
+    // Constants, then models, then aliases. `from __future__ import
+    // annotations` makes ANNOTATIONS lazy, but a base class and an alias
+    // right-hand side are evaluated at import time — `ChargeListResponse =
+    // Paginated[Charge]` sorted alphabetically ahead of `Paginated` is a
+    // NameError on import, in the ledger, at boot.
+    const order: Record<string, number> = { enum: 0, 'const-map': 0, model: 1, alias: 2 };
+    const declarations = [...m.declarations].sort((a, b) => {
+      const rank = (order[a.kind] ?? 3) - (order[b.kind] ?? 3);
+      return rank !== 0 ? rank : a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+
+    for (const decl of declarations) {
+      if (decl.kind === 'enum') {
+        body.push(this.renderEnum(decl));
+        symbols.push(decl.name);
+      } else if (decl.kind === 'model') {
+        body.push(this.renderModel(decl));
+        symbols.push(decl.name);
+      } else if (decl.kind === 'const-map') {
+        body.push(this.renderConstMap(decl));
+        symbols.push(decl.name);
+      } else {
+        body.push(`${decl.name} = ${this.renderType(decl.target)}`);
+        symbols.push(decl.name);
+      }
+    }
+
     const doc = this.renderDoc(decl.doc);
     const members = decl.values.map((value) => `"${value}"`).join(', ');
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
@@ -131,8 +160,10 @@ export class PythonEmitter extends ContractEmitter {
     // Fields with defaults must follow fields without them, or the generated
     // module raises at import time.
     const required = model.fields.filter((f) => !f.optional);
+    const doc = this.renderDoc(field.doc, '    ');
     const name = this.quoteIdentifier(field.name);
     const rendered = this.renderType(field.type);
+    const annotation = field.nullable || field.optional ? `${rendered} | None` : rendered;
     const assignment = field.optional ? ' = None' : '';
     return `${doc}    ${name}: ${annotation}${assignment}`;
   }
@@ -157,6 +188,61 @@ export class PythonEmitter extends ContractEmitter {
   }
 
   private renderGeneric(name: string, args: IrType[]): string {
+    const rendered = args.map((arg) => this.renderType(arg));
+    switch (name) {
+      case 'Array':
+        return `list[${rendered[0] ?? 'Any'}]`;
+      case 'Record':
+        return `dict[${rendered[0] ?? 'str'}, ${rendered[1] ?? 'Any'}]`;
+      case 'Paginated':
+        return `Paginated[${rendered[0] ?? 'Any'}]`;
+      case 'EventEnvelope':
+        // Parameters erased — see the normaliser.
+        return 'EventEnvelope';
+      default:
+        throw new UnsupportedTypeError(`generic ${name}`, 'python.emitter');
+    }
+  }
+
+  /**
+   * A tuple constant and its derived union share a TypeScript name only by
+   * convention (`CURRENCIES` / `CurrencyCode`). In Python both live in one
+   * namespace, so the Literal alias gets a distinct, predictable name.
+   */
+  private typeAliasNameFor(name: string): string {
+    if (name === name.toUpperCase() && name.includes('_')) {
+      return `${name}_VALUES`;
+    }
+    return name;
+  }
+
+  protected mapScalar(s: IrScalar): string {
+    switch (s.name) {
+      case 'string':
+        return 'str';
+      case 'integer':
+        return 'int';
+      case 'number':
+        return 'int';
+      case 'boolean':
+        return 'bool';
+      case 'timestamp':
+        return 'str';
+      case 'date':
+        return 'str';
+      case 'unknown':
+        return 'Any';
+      default:
+        throw new UnsupportedTypeError(`scalar ${String(s.name)}`, 'python.emitter');
+    }
+  }
+
+  protected quoteIdentifier(n: string): string {
+    return PYTHON_RESERVED.has(n) ? `${n}_` : n;
+  }
+
+  /** `Model.model_rebuild()` for every model that references another model. */
+  private renderRebuilds(declarations: readonly { kind: string; name: string }[]): string {
     const models = new Set(declarations.filter((d) => d.kind === 'model').map((d) => d.name));
     const needsRebuild: string[] = [];
 
@@ -176,5 +262,7 @@ export class PythonEmitter extends ContractEmitter {
 
   private renderAll(symbols: string[]): string {
     const sorted = [...symbols].sort();
+    const entries = sorted.map((symbol) => `    "${symbol}",`).join('\n');
+    return `__all__ = [\n${entries}\n]`;
   }
 }
