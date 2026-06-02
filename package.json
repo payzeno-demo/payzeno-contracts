@@ -82,6 +82,7 @@
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@typescript-eslint/parser": "7.8.0",
     "@vitest/coverage-v8": "1.6.0",
+    "eslint-config-prettier": "9.1.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.1",
     "prettier": "3.2.5",
@@ -89,6 +90,7 @@
     "ts-to-pydantic": "0.9.3",
     "tsup": "8.0.2",
     "tsx": "4.10.2",
+    "typescript": "5.4.5",
     "vitest": "1.6.0"
   }
 }

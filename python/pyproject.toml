@@ -14,9 +14,14 @@ description = "Generated Pydantic models for the Payzeno shared contracts. Sourc
 readme = "README.md"
 license = { text = "UNLICENSED" }
 authors = [{ name = "Payzeno Platform", email = "platform@payzeno.com" }]
+dependencies = [
+  "pydantic>=2.7,<3",
+]
+
 [project.urls]
 Source = "https://github.com/payzeno/payzeno-contracts"
 
+[tool.hatch.build.targets.wheel]
 packages = ["payzeno_contracts"]
 
 [tool.hatch.build.targets.sdist]

@@ -84,3 +84,8 @@ together; the release was coordinated on the day.
 - `API_VERSION = '2026-01-15'`. The public API date-version is now declared here rather than in
   `payzeno-api`'s config, so the console and the SDK read the same constant.
 
+## [2.4.0] — 2025-12-02
+
+### Added
+
+- `Invoice.migrated_to_ledger` (PAY-1611). Arc MIG. The rest of `Invoice` keeps its legacy shape
