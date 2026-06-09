@@ -38,3 +38,9 @@ export interface PayoutPaidPayload {
   merchant_id: MerchantId;
   amount_minor: MinorUnits;
   currency: CurrencyCode;
+  ledger_transaction_id: LedgerTransactionId;
+  paid_at: IsoTimestamp;
+}
+export type PayoutPaidEvent = EventEnvelope<'payout.paid', PayoutPaidPayload>;
+
+/** Consumed by payzeno-console (via the notification relay) and payzeno-api. */
