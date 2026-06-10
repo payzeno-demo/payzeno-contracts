@@ -94,3 +94,9 @@ export type PayzenoEvent =
   | LedgerImbalanceDetectedEvent
   | MerchantCreatedEvent
   | MerchantUpdatedEvent
+  | MerchantStatusChangedEvent
+  | MerchantBankAccountVerifiedEvent
+  | InvoiceIssuedEvent;
+
+/** Narrow a `PayzenoEvent` to one member by its `type`. */
+export type EventOfType<T extends EventType> = Extract<PayzenoEvent, { type: T }>;

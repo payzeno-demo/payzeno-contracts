@@ -30,6 +30,16 @@ export const PAYOUT_METHODS = [
 ] as const;
 export type PayoutMethod = (typeof PAYOUT_METHODS)[number];
 
+export const PAYOUT_FAILURE_CODES = [
+  'account_closed',
+  'no_account',
+  'invalid_details',
+  'debit_not_authorized',
+  'insufficient_funds',
+  'bank_rejected',
+] as const;
+export type PayoutFailureCode = (typeof PAYOUT_FAILURE_CODES)[number];
+
 export interface Payout {
   id: PayoutId;
   object: 'payout';

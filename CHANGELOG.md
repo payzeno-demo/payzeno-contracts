@@ -89,3 +89,8 @@ together; the release was coordinated on the day.
 ### Added
 
 - `Invoice.migrated_to_ledger` (PAY-1611). Arc MIG. The rest of `Invoice` keeps its legacy shape
+  on purpose; splitting the type before the cutover would strand `payzeno-billing-legacy`.
+- `InvoiceResponse` deprecated alias. Removal blocked on the console migration.
+
+## [2.2.0] — 2025-11-04
+
