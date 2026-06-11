@@ -38,3 +38,18 @@ export type LedgerTransactionPostedEvent = EventEnvelope<
  * transactions is still one event, and an unbounded array here would exceed the
  * SNS 256KB message limit on exactly the event nobody can afford to lose.
  */
+export interface LedgerImbalanceDetectedPayload {
+  /** Which audit produced it. */
+  check: 'trial_balance' | 'merchant_balance' | 'batch_total';
+  merchant_id: MerchantId | null;
+  currency: CurrencyCode;
+  expected_minor: MinorUnits;
+  actual_minor: MinorUnits;
+  delta_minor: MinorUnits;
+  sample_transaction_ids: LedgerTransactionId[];
+  detected_at: IsoTimestamp;
+}
+export type LedgerImbalanceDetectedEvent = EventEnvelope<
+  'ledger.imbalance_detected',
+  LedgerImbalanceDetectedPayload
+>;

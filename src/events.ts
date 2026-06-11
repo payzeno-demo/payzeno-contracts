@@ -100,3 +100,9 @@ export type PayzenoEvent =
 
 /** Narrow a `PayzenoEvent` to one member by its `type`. */
 export type EventOfType<T extends EventType> = Extract<PayzenoEvent, { type: T }>;
+
+/** The payload of a given event type. */
+export type PayloadOfType<T extends EventType> = EventOfType<T>['payload'];
+
+/** Handler signature every consumer implements. See `interfaces.md`. */
+export type EventHandler<T extends EventType> = (event: EventOfType<T>) => Promise<void>;

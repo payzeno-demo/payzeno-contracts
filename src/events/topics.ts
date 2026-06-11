@@ -62,3 +62,9 @@ export const DLQ_TOPIC_NAME = 'payzeno-dlq';
  * Every SQS queue subscribed to the topics above, keyed by the consumer class
  * that drains it. The values are the literal queue names.
  *
+ * `payzeno-console-notifications` is consumed by payzeno-API's
+ * NotificationRelayConsumer, which fans out over `/ws/notifications`. The
+ * console is a socket client, not a queue consumer — it has no AWS credentials
+ * and never will. That queue subscribes to TWO topics (payments for
+ * `dispute.opened`, ledger for `payout.failed` / `settlement.completed`).
+ */

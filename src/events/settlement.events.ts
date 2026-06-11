@@ -106,3 +106,14 @@ export type SettlementReconciliationFailedEvent = EventEnvelope<
 
 /**
  * Emitted when the settlement poster refuses a posting because an equivalent
+ * transaction already exists for the same idempotency key.
+ *
+ * ADDED BY THE INC HOTFIX (arc INC, PAY-2043). It does not exist before that commit —
+ * generation agents must not emit it from earlier code. Its arrival rate is the metric
+ * the CloudWatch alarm `payzeno-ledger-duplicate-settlement` watches.
+ */
+export interface SettlementDuplicateDetectedPayload {
+  batch_id: SettlementBatchId;
+  item_id: ReconciliationItemId;
+  /** Nullable, because `reconciliation_item.charge_id` / `.merchant_id` are (data-model §3.5). */
+  charge_id: ChargeId | null;

@@ -95,3 +95,9 @@ describe('PUBLIC_EVENT_TYPES', () => {
       'merchant.created',
       'merchant.updated',
       'merchant.status_changed',
+      'merchant.bank_account_verified',
+      'invoice.issued',
+    ]) {
+      expect(publicTypes.has(internal), `${internal} must stay internal`).toBe(false);
+    }
+  });
