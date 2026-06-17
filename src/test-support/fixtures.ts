@@ -16,6 +16,7 @@ import type { EventEnvelope, EventType, PayzenoEvent } from '../events';
 const MERCHANT_ID = 'mch_01HQ8Z3K9X4M2N7P6R5T1V0W8Y';
 const CHARGE_ID = 'ch_01HQ8Z3K9X4M2N7P6R5T1V0W91';
 const PAYMENT_INTENT_ID = 'pi_01HQ8Z3K9X4M2N7P6R5T1V0W92';
+const BATCH_ID = 'sb_01HQ8Z3K9X4M2N7P6R5T1V0W93';
 const ITEM_ID = 'ri_01HQ8Z3K9X4M2N7P6R5T1V0W94';
 const TRANSACTION_ID = 'txn_01HQ8Z3K9X4M2N7P6R5T1V0W96';
 const BANK_ACCOUNT_ID = 'ba_01HQ8Z3K9X4M2N7P6R5T1V0W98';
@@ -55,6 +56,16 @@ function sourceFor(type: EventType): EventEnvelope<string, unknown>['source'] {
  * plausible value, because a consumer test that deserialises these is testing
  * its own parser, not ours.
  */
+export function everyEventType(): PayzenoEvent[] {
+  const events: PayzenoEvent[] = [];
+
+  for (const type of EVENT_TYPES) {
+    events.push(buildEvent(type));
+  }
+
+  return events;
+}
+
 function buildEvent(type: EventType): PayzenoEvent {
   switch (type) {
     case 'payment.authorized':
