@@ -20,6 +20,8 @@ export const PAYOUT_STATUSES = [
   'returned',
   'canceled',
 ] as const;
+export type PayoutStatus = (typeof PAYOUT_STATUSES)[number];
+
 export const PAYOUT_METHODS = [
   'standard_ach',
   'same_day_ach',
