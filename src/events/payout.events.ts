@@ -51,3 +51,9 @@ export interface PayoutFailedPayload {
   amount_minor: MinorUnits;
   currency: CurrencyCode;
   failure_code: PayoutFailureCode;
+  failure_message: string;
+  /**
+   * The `payout_reversal` transaction that restored the merchant's balance. Required, not
+   * nullable: `failed` is terminal, and without a reversal an ACH failure permanently
+   * destroys the merchant's money. Mirrors `PayoutReturnedPayload.reversal_transaction_id`.
+   */
