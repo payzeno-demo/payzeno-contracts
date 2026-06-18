@@ -75,3 +75,9 @@ export const QUEUE_NAMES = {
   WebhookFanoutConsumer: 'payzeno-api-webhooks',
   NotificationRelayConsumer: 'payzeno-console-notifications',
   InvoiceProjectionConsumer: 'payzeno-api-billing',
+  MerchantEventListener: 'payzeno-billing-merchants',
+  DeadLetterConsumer: 'payzeno-dlq-monitor',
+} as const;
+
+export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
+

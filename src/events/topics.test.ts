@@ -39,6 +39,10 @@ describe('EVENT_TOPICS', () => {
     expect([...routed].sort()).toEqual([...EVENT_TYPES].sort());
   });
 
+  it('gives payzeno-billing-legacy exactly one publish surface', () => {
+    expect([...EVENT_TOPICS['payzeno-billing-events']]).toEqual(['invoice.issued']);
+  });
+
   it('carries the INC additions on the ledger topic', () => {
     const ledger = EVENT_TOPICS['payzeno-ledger-events'] as readonly string[];
     expect(ledger).toContain('settlement.duplicate_detected');
@@ -48,6 +52,12 @@ describe('EVENT_TOPICS', () => {
 });
 
 describe('QUEUE_NAMES', () => {
+  it('is keyed by the consumer class that drains it', () => {
+    expect(QUEUE_NAMES.NotificationRelayConsumer).toBe('payzeno-console-notifications');
+    expect(QUEUE_NAMES.WebhookFanoutConsumer).toBe('payzeno-api-webhooks');
+    expect(QUEUE_NAMES.MerchantEventListener).toBe('payzeno-billing-merchants');
+  });
+
   it('has no duplicate queue name', () => {
     const values = Object.values(QUEUE_NAMES);
     expect(new Set(values).size).toBe(values.length);
