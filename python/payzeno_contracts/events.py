@@ -118,6 +118,19 @@ class InvoiceIssuedPayload(BaseModel):
     issued_at: str
 
 
+class LedgerImbalanceDetectedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    check: Literal["trial_balance"] | Literal["merchant_balance"] | Literal["batch_total"]
+    merchant_id: str | None
+    currency: str
+    expected_minor: int
+    actual_minor: int
+    delta_minor: int
+    sample_transaction_ids: list[str]
+    detected_at: str
+
+
 class LedgerTransactionPostedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -131,6 +144,24 @@ class LedgerTransactionPostedPayload(BaseModel):
     total_minor: int
     entry_count: int
     posted_at: str
+
+
+class MerchantBankAccountVerifiedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    merchant_id: str
+    bank_account_id: str
+    country: str
+    currency: str
+    scheme: str
+    account_number_token: str
+    routing_last_four: str | None
+    iban_last_four: str | None
+    bic: str | None
+    sort_code_last_four: str | None
+    status: str
+    is_default: bool
+    verified_at: str
 
 
 class MerchantCreatedPayload(BaseModel):
@@ -154,6 +185,17 @@ class MerchantCreatedPayload(BaseModel):
     platform_fee_bps: int
     platform_fee_fixed_minor: int
     created_at: str
+
+
+class MerchantStatusChangedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    merchant_id: str
+    previous_status: str
+    status: str
+    reason: str
+    changed_by: str
+    changed_at: str
 
 
 class MerchantUpdatedPayload(BaseModel):
@@ -347,6 +389,7 @@ RefundSucceededEvent = EventEnvelope
 SettlementBatchClosedEvent = EventEnvelope
 SettlementCompletedEvent = EventEnvelope
 SettlementFundedEvent = EventEnvelope
+SettlementItemSettledEvent = EventEnvelope
 SettlementReconciliationFailedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
