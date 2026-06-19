@@ -106,3 +106,10 @@ export type PayloadOfType<T extends EventType> = EventOfType<T>['payload'];
 
 /** Handler signature every consumer implements. See `interfaces.md`. */
 export type EventHandler<T extends EventType> = (event: EventOfType<T>) => Promise<void>;
+
+export function isEventOfType<T extends EventType>(
+  event: PayzenoEvent,
+  type: T,
+): event is EventOfType<T> {
+  return event.type === type;
+}

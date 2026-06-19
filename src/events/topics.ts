@@ -68,3 +68,16 @@ export const DLQ_TOPIC_NAME = 'payzeno-dlq';
  * and never will. That queue subscribes to TWO topics (payments for
  * `dispute.opened`, ledger for `payout.failed` / `settlement.completed`).
  */
+export const QUEUE_NAMES = {
+  PaymentEventConsumer: 'payzeno-ledger-payments',
+  MerchantEventConsumer: 'payzeno-ledger-merchants',
+  LedgerEventsConsumer: 'payzeno-api-ledger',
+  WebhookFanoutConsumer: 'payzeno-api-webhooks',
+  NotificationRelayConsumer: 'payzeno-console-notifications',
+  InvoiceProjectionConsumer: 'payzeno-api-billing',
+  MerchantEventListener: 'payzeno-billing-merchants',
+  DeadLetterConsumer: 'payzeno-dlq-monitor',
+} as const;
+
+export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
+

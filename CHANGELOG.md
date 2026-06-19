@@ -94,3 +94,7 @@ together; the release was coordinated on the day.
 
 ## [2.2.0] — 2025-11-04
 
+### Added
+
+- `src/events/billing.events.ts` — `invoice.issued`, `payzeno-billing-legacy`'s only publish.
+- `EventEnvelope.source` widened to admit `'payzeno-billing-legacy'`.

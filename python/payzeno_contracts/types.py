@@ -43,11 +43,13 @@ CAPTURE_METHODS_VALUES = Literal["automatic", "manual"]
 CAPTURE_METHODS: tuple[str, ...] = ("automatic", "manual")
 
 
+CARD_BRANDS_VALUES = Literal["visa", "mastercard", "amex", "discover"]
 CARD_BRANDS: tuple[str, ...] = ("visa", "mastercard", "amex", "discover")
 
 
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
 CHARGE_STATUSES_VALUES = Literal["pending", "authorized", "captured", "settled", "failed", "voided", "expired", "reversed"]
+CURRENCIES_VALUES = Literal["USD", "EUR", "GBP", "ILS", "JPY"]
 CURRENCY_EXPONENT: dict[str, int] = {
     "USD": 2,
     "EUR": 2,
@@ -87,10 +89,12 @@ LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "s
 LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold")
 
 
+MERCHANT_STATUSES_VALUES = Literal["pending_review", "active", "restricted", "suspended", "rejected", "closed"]
 PAYMENT_INTENT_STATUSES_VALUES = Literal["requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
 
 
+PAYOUT_FAILURE_CODES_VALUES = Literal["account_closed", "no_account", "invalid_details", "debit_not_authorized", "insufficient_funds", "bank_rejected"]
 PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invalid_details", "debit_not_authorized", "insufficient_funds", "bank_rejected")
 
 
@@ -110,6 +114,7 @@ RECONCILIATION_ITEM_STATUSES: tuple[str, ...] = ("pending", "settling", "settled
 
 
 RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "chargeback_reversal", "scheme_fee", "adjustment", "reserve_hold", "reserve_release"]
+RECONCILIATION_RUN_STATUSES_VALUES = Literal["running", "succeeded", "failed"]
 RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
 
 
@@ -122,6 +127,7 @@ REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
 REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
 
 
+RISK_TIERS_VALUES = Literal["standard", "elevated", "high"]
 RISK_TIERS: tuple[str, ...] = ("standard", "elevated", "high")
 
 
@@ -254,6 +260,14 @@ class ChargeListQuery(ListQuery):
     status: CHARGE_STATUSES_VALUES | None = None
     payment_intent_id: str | None = None
     settlement_batch_id: str | None = None
+
+
+class CreateApiKeyRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    name: str
+    mode: API_KEY_MODES_VALUES
+    scopes: list[API_KEY_SCOPES_VALUES] | None = None
 
 
 class CreateApiKeyResponse(ApiKey):
@@ -642,6 +656,22 @@ class VolumeTimeseries(BaseModel):
     points: list[TimeseriesPoint]
 
 
+class WebhookEndpoint(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["webhook_endpoint"]
+    merchant_id: str
+    url: str
+    enabled_events: list[PUBLIC_EVENT_TYPES_VALUES]
+    status: WEBHOOK_ENDPOINT_STATUSES_VALUES
+    signing_secret_last_four: str
+    rotated_at: str | None
+    livemode: bool
+    created_at: str
+    signing_secret: str | None = None
+
+
 class WebhookEvent(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -663,12 +693,15 @@ class WebhookEvent(BaseModel):
     delivered_at: str | None
 
 
+AccountStatus = ACCOUNT_STATUSES_VALUES
 Acquirer = ACQUIRERS_VALUES
 ApiKeyId = str
 ApiKeyMode = API_KEY_MODES_VALUES
 ApiKeyScope = API_KEY_SCOPES_VALUES
+AuditActorType = AUDIT_ACTOR_TYPES_VALUES
 AuthPrincipal = dict[str, Any]
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+BasisPoints = int
 CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
 ChargeId = str

@@ -101,3 +101,9 @@ describe('PUBLIC_EVENT_TYPES', () => {
       expect(publicTypes.has(internal), `${internal} must stay internal`).toBe(false);
     }
   });
+});
+
+describe('the PayzenoEvent union', () => {
+  const events = everyEventType();
+
+  it('has one fixture per EventType, in order', () => {
