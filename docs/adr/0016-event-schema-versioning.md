@@ -30,6 +30,32 @@ one chunk of five. It would not have errored. It would have marked 4,000 charges
 The bus is at-least-once and explicitly unordered. Neither of those helps here —
 this is not a delivery problem, it is a comprehension problem.
 
+## Decision
+
+**1. Every envelope carries an integer `version`, and producers stamp it from
+`EVENT_SCHEMA_VERSIONS`.** Not from a literal at the call site. The map is in
+`src/events.ts` and it has a key for every member of `EVENT_TYPES`;
+`src/events.test.ts` asserts that, so a new event type cannot be added without a
+version.
+
+**2. Consumers switch on `(type, version)`, never on `type` alone.**
+
+**3. An unknown `type`, or a `version` higher than the consumer knows how to read,
+goes to the DLQ. It is never acknowledged and never silently dropped.** The DLQ has
+an alarm and a human. A `debug` log does not.
+
+**4. `version` bumps only on a BREAKING payload change.** Adding an optional field
+is not breaking and does not bump — a consumer that ignores it is still correct.
+Adding a REQUIRED field is breaking. Changing the meaning of an existing field is
+breaking even when the type is unchanged, and that is the case people miss:
+`settled_charge_ids` went from "all of them" to "up to 1000 of them" without its
+type changing at all. That is why `settlement.completed` is at 2 and everything
+else is at 1.
+
+**5. A version bump ships with the consumer change, in that order.** Consumers
+first, producers second. A consumer that understands v2 handles v1 fine; a producer
+emitting v2 into a v1-only fleet is the incident above.
+
 ## Consequences
 
 - `EVENT_SCHEMA_VERSIONS` is now a coordination artefact, not a constant. Changing
