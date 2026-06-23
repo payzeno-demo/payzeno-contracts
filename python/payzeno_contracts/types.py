@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict
 T = TypeVar("T")
 
 
+ACCOUNT_STATUSES_VALUES = Literal["active", "frozen", "closed"]
 ACCOUNT_STATUSES: tuple[str, ...] = ("active", "frozen", "closed")
 
 
@@ -32,6 +33,10 @@ API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "pa
 
 
 AUDIT_ACTOR_TYPES: tuple[str, ...] = ("user", "api_key", "staff", "internal_service", "system")
+
+
+BANK_ACCOUNT_SCHEMES_VALUES = Literal["aba", "iban", "uk_sort_code"]
+BANK_ACCOUNT_SCHEMES: tuple[str, ...] = ("aba", "iban", "uk_sort_code")
 
 
 BANK_ACCOUNT_STATUSES_VALUES = Literal["new", "validated", "verification_failed", "errored"]
@@ -70,6 +75,7 @@ ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
 ENTRY_DIRECTIONS: tuple[str, ...] = ("debit", "credit")
 
 
+ERROR_CODES_VALUES = Literal["invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error"]
 ERROR_CODES: tuple[str, ...] = ("invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error")
 
 
@@ -89,6 +95,7 @@ LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "s
 LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold")
 
 
+MATCH_METHODS_VALUES = Literal["exact_reference", "network_txn", "heuristic", "manual", "unmatched"]
 MERCHANT_STATUSES_VALUES = Literal["pending_review", "active", "restricted", "suspended", "rejected", "closed"]
 PAYMENT_INTENT_STATUSES_VALUES = Literal["requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
@@ -99,6 +106,9 @@ PAYOUT_FAILURE_CODES: tuple[str, ...] = ("account_closed", "no_account", "invali
 
 
 PAYOUT_METHODS_VALUES = Literal["standard_ach", "same_day_ach", "sepa", "faster_payments", "debit_ach"]
+PAYOUT_METHODS: tuple[str, ...] = ("standard_ach", "same_day_ach", "sepa", "faster_payments", "debit_ach")
+
+
 PAYOUT_SCHEDULES: tuple[str, ...] = ("daily", "weekly", "monthly", "manual")
 
 
@@ -123,6 +133,9 @@ RECONCILIATION_TRIGGERS: tuple[str, ...] = ("scheduled", "manual", "retry")
 
 
 REFUND_REASONS_VALUES = Literal["duplicate", "fraudulent", "requested_by_customer", "expired_uncaptured_auth"]
+REFUND_REASONS: tuple[str, ...] = ("duplicate", "fraudulent", "requested_by_customer", "expired_uncaptured_auth")
+
+
 REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
 REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
 
@@ -400,6 +413,20 @@ class LedgerAdjustmentRequest(BaseModel):
     approved_at: str | None
     posted_transaction_id: str | None
     status: Literal["pending"] | Literal["approved"] | Literal["rejected"] | Literal["posted"]
+
+
+class LedgerEntry(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["ledger_entry"]
+    transaction_id: str
+    account_id: str
+    direction: ENTRY_DIRECTIONS_VALUES
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+    sequence: int
+    created_at: str
 
 
 class LedgerTransaction(BaseModel):
@@ -725,6 +752,7 @@ LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
 MatchMethod = MATCH_METHODS_VALUES
 MerchantListResponse = Paginated[Merchant]
+MerchantStatus = MERCHANT_STATUSES_VALUES
 Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
@@ -733,8 +761,10 @@ PaymentMethodToken = str
 PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
 PayoutId = str
 PayoutListResponse = Paginated[Payout]
+PayoutMethod = PAYOUT_METHODS_VALUES
 PayoutSchedule = PAYOUT_SCHEDULES_VALUES
 PayoutStatus = PAYOUT_STATUSES_VALUES
+PricingModel = PRICING_MODELS_VALUES
 ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES
 ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES

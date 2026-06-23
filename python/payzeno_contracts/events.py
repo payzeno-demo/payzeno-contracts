@@ -85,6 +85,9 @@ EVENT_TOPICS: dict[str, tuple[str, ...]] = {
 }
 
 
+DLQ_TOPIC_NAME: str = "payzeno-dlq"
+
+
 EVENT_TYPES_VALUES = Literal["payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.batch_closed", "settlement.item_settled", "settlement.completed", "settlement.reconciliation_failed", "settlement.duplicate_detected", "settlement.variance_detected", "settlement.funded", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned", "ledger.transaction_posted", "ledger.imbalance_detected", "merchant.created", "merchant.updated", "merchant.status_changed", "merchant.bank_account_verified", "invoice.issued"]
 class DisputeClosedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
@@ -320,6 +323,18 @@ class RefundCreatedPayload(BaseModel):
     created_at: str
 
 
+class RefundFailedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    refund_id: str
+    charge_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    failure_reason: str
+    failed_at: str
+
+
 class RefundSucceededPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -378,8 +393,10 @@ class SettlementVarianceDetectedPayload(BaseModel):
 DisputeClosedEvent = EventEnvelope
 DisputeOpenedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
+MerchantBankAccountVerifiedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
+PaymentFailedEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope
 PayoutScheduledEvent = EventEnvelope
 PayzenoEvent = EventEnvelope
