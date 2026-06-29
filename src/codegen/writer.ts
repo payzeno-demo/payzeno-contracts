@@ -53,6 +53,7 @@ export class DeterministicWriter {
    * hand rather than by an emitter.
    */
   writeFile(file: EmittedFile, outDir: string, mode: WriteMode, report: WriteReport): void {
+    const absolute = path.join(outDir, file.path);
     const normalized = this.normalize(file.contents);
 
     const existing = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : null;

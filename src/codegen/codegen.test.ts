@@ -112,6 +112,21 @@ describe('TypeNormalizer', () => {
     }
   });
 
+  it('separates optional from nullable', () => {
+    const module = normalize();
+    const model = module.declarations.find((d) => d.name === 'SampleCharge');
+    expect(model?.kind).toBe('model');
+    if (model?.kind === 'model') {
+      const settled = model.fields.find((f) => f.name === 'settled_at');
+      expect(settled?.nullable).toBe(true);
+      expect(settled?.optional).toBe(false);
+
+      const metadata = model.fields.find((f) => f.name === 'metadata');
+      expect(metadata?.optional).toBe(true);
+      expect(metadata?.nullable).toBe(false);
+    }
+  });
+
   it('throws UnsupportedTypeError on an un-normalisable generic', () => {
     const normalizer = new TypeNormalizer();
     expect(() =>
@@ -230,4 +245,16 @@ describe('JavaEmitter', () => {
 });
 
 describe('cli.parseArgs', () => {
+  it('parses target, out and check', () => {
+    expect(parseArgs(['--target', 'python', '--out', 'python', '--check'])).toEqual({
+      target: 'python',
+      outDir: 'python',
+      check: true,
+    });
+  });
+
+  it('rejects an unknown target', () => {
+    expect(() => parseArgs(['--target', 'rust', '--out', 'rust'])).toThrow(RangeError);
+  });
+
 });
