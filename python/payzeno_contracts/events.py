@@ -89,6 +89,9 @@ DLQ_TOPIC_NAME: str = "payzeno-dlq"
 
 
 EVENT_TYPES_VALUES = Literal["payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.batch_closed", "settlement.item_settled", "settlement.completed", "settlement.reconciliation_failed", "settlement.duplicate_detected", "settlement.variance_detected", "settlement.funded", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned", "ledger.transaction_posted", "ledger.imbalance_detected", "merchant.created", "merchant.updated", "merchant.status_changed", "merchant.bank_account_verified", "invoice.issued"]
+EVENT_TYPES: tuple[str, ...] = ("payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.batch_closed", "settlement.item_settled", "settlement.completed", "settlement.reconciliation_failed", "settlement.duplicate_detected", "settlement.variance_detected", "settlement.funded", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned", "ledger.transaction_posted", "ledger.imbalance_detected", "merchant.created", "merchant.updated", "merchant.status_changed", "merchant.bank_account_verified", "invoice.issued")
+
+
 class DisputeClosedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -374,6 +377,17 @@ class SettlementFundedPayload(BaseModel):
     funded_at: str
 
 
+class SettlementReconciliationFailedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    run_id: str
+    items_failed: int
+    items_orphaned: int
+    error_summary: str
+    failed_at: str
+
+
 class SettlementVarianceDetectedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -393,8 +407,11 @@ class SettlementVarianceDetectedPayload(BaseModel):
 DisputeClosedEvent = EventEnvelope
 DisputeOpenedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
+LedgerTransactionPostedEvent = EventEnvelope
 MerchantBankAccountVerifiedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
+MerchantUpdatedEvent = EventEnvelope
+PaymentCanceledEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PaymentFailedEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope

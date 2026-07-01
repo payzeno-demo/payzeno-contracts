@@ -97,6 +97,9 @@ LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund",
 
 MATCH_METHODS_VALUES = Literal["exact_reference", "network_txn", "heuristic", "manual", "unmatched"]
 MERCHANT_STATUSES_VALUES = Literal["pending_review", "active", "restricted", "suspended", "rejected", "closed"]
+MERCHANT_STATUSES: tuple[str, ...] = ("pending_review", "active", "restricted", "suspended", "rejected", "closed")
+
+
 PAYMENT_INTENT_STATUSES_VALUES = Literal["requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled"]
 PAYMENT_INTENT_STATUSES: tuple[str, ...] = ("requires_payment_method", "requires_confirmation", "processing", "requires_action", "requires_capture", "succeeded", "failed", "canceled")
 
@@ -147,9 +150,11 @@ RISK_TIERS: tuple[str, ...] = ("standard", "elevated", "high")
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
+SETTLEMENT_BATCH_STATUSES_VALUES = Literal["open", "closed", "reconciling", "reconciled", "partially_reconciled", "funded", "failed"]
 SETTLEMENT_BATCH_STATUSES: tuple[str, ...] = ("open", "closed", "reconciling", "reconciled", "partially_reconciled", "funded", "failed")
 
 
+STAFF_ROLES_VALUES = Literal["support", "risk", "finance", "admin"]
 TIMESERIES_INTERVALS_VALUES = Literal["hour", "day"]
 TIMESERIES_INTERVALS: tuple[str, ...] = ("hour", "day")
 
@@ -298,6 +303,32 @@ class CreateBankAccountRequest(BaseModel):
     bank_account_token: str
     account_holder_name: str
     is_default: bool | None = None
+
+
+class CreateMerchantRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    legal_name: str
+    display_name: str
+    country: str
+    default_currency: CURRENCIES_VALUES
+    mcc: str
+    payout_schedule: PAYOUT_SCHEDULES_VALUES | None = None
+    metadata: dict[str, str] | None = None
+
+
+class CreatePaymentIntentRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+    capture_method: CAPTURE_METHODS_VALUES | None = None
+    payment_method_token: str | None = None
+    customer_reference: str | None = None
+    description: str | None = None
+    statement_descriptor: str | None = None
+    confirm: bool | None = None
+    metadata: dict[str, str] | None = None
 
 
 class CreatePayoutRequest(BaseModel):
@@ -648,6 +679,13 @@ class StartReconciliationRequest(BaseModel):
     max_items: int | None = None
 
 
+class SubmitDisputeEvidenceRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    evidence: DisputeEvidence
+    submit: bool | None = None
+
+
 class TimeseriesPoint(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -720,6 +758,7 @@ class WebhookEvent(BaseModel):
     delivered_at: str | None
 
 
+AccountId = str
 AccountStatus = ACCOUNT_STATUSES_VALUES
 Acquirer = ACQUIRERS_VALUES
 ApiKeyId = str
@@ -740,6 +779,7 @@ DisputeListResponse = Paginated[Dispute]
 DisputeStatus = DISPUTE_STATUSES_VALUES
 EntryDirection = ENTRY_DIRECTIONS_VALUES
 ErrorCode = ERROR_CODES_VALUES
+IdempotencyState = IDEMPOTENCY_STATES_VALUES
 InvoiceId = str
 InvoiceListResponse = Paginated[Invoice]
 InvoiceResponse = Invoice
@@ -756,6 +796,7 @@ MerchantStatus = MERCHANT_STATUSES_VALUES
 Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
+PaymentIntentResponse = PaymentIntent
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
 PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
@@ -768,7 +809,9 @@ PricingModel = PRICING_MODELS_VALUES
 ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES
 ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES
+ReconciliationTrigger = RECONCILIATION_TRIGGERS_VALUES
 RefundId = str
+RefundReason = REFUND_REASONS_VALUES
 RefundResponse = Refund
 RefundStatus = REFUND_STATUSES_VALUES
 RiskTier = RISK_TIERS_VALUES
