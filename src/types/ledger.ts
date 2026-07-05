@@ -36,6 +36,7 @@ export const ACCOUNT_TYPES = [
 ] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
 
+export const ACCOUNT_STATUSES = ['active', 'frozen', 'closed'] as const;
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
 export interface Account {
@@ -50,6 +51,27 @@ export interface Account {
   created_at: IsoTimestamp;
 }
 
+export const LEDGER_PURPOSES = [
+  'auth',
+  'auth_release',
+  'capture',
+  'settle',
+  /** Batch-level funding: cash actually arrived. Posted only against a matched funding_event. */
+  'settlement_funding',
+  /**
+   * NON-transactional fees only — dispute fees, monthly minimums, account fees. The per-charge
+   * processing fee is booked by `capture` and never here; booking it twice double-counts both
+   * Payzeno's revenue and the merchant's payable deduction. See domain-model.md §7.
+   */
+  'fee',
+  'refund',
+  'dispute',
+  'reserve_release',
+  'payout',
+  'payout_reversal',
+  'reversal',
+  'adjustment',
+] as const;
 export type LedgerPurpose = (typeof LEDGER_PURPOSES)[number];
 
 export interface LedgerEntry {
