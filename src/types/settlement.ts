@@ -149,6 +149,7 @@ export interface ReconciliationItem {
   updated_at: IsoTimestamp;
 }
 
+export const RECONCILIATION_TRIGGERS = ['scheduled', 'manual', 'retry'] as const;
 export interface RetryReconciliationItemRequest {
   /** The item id is bound by the path (`/items/:itemId/retry`) and is not repeated here. */
   /** Set by the retry worker; manual retries from the admin console omit it. */

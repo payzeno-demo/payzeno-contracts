@@ -36,6 +36,13 @@ describe('MerchantSettlementBatch', () => {
     expect(body).toContain('merchant_id: MerchantId;');
   });
 
+  it('exposes only this merchant’s item count and net', () => {
+    expect(body).toContain('item_count: number;');
+    expect(body).toContain('net_minor: MinorUnits;');
+  });
+});
+
+describe('SettlementBatch', () => {
   const body = interfaceBody('SettlementBatch');
 
   it('does keep the acquirer totals — it is the internal object', () => {
@@ -80,6 +87,15 @@ describe('MATCH_METHODS', () => {
     );
   });
 
+  it('crosses with every line type — 8 × 5 is the reconciler’s state space', () => {
+    const combinations = RECONCILIATION_LINE_TYPES.flatMap((line) =>
+      MATCH_METHODS.map((method) => `${line}:${method}`),
+    );
+    expect(new Set(combinations).size).toBe(40);
+  });
+});
+
+describe('ReconciliationItem', () => {
   const body = interfaceBody('ReconciliationItem');
 
   // PAY-2059 promoted these from optional to required. A nullable

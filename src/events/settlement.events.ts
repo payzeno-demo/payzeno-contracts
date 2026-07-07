@@ -117,3 +117,14 @@ export interface SettlementDuplicateDetectedPayload {
   item_id: ReconciliationItemId;
   /** Nullable, because `reconciliation_item.charge_id` / `.merchant_id` are (data-model §3.5). */
   charge_id: ChargeId | null;
+  merchant_id: MerchantId | null;
+  idempotency_key: string;
+  existing_transaction_id: LedgerTransactionId;
+  /** `batch_pass` or `retry_scheduler` — which path lost the race. */
+  detected_by: 'batch_pass' | 'retry_scheduler';
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  detected_at: IsoTimestamp;
+}
+export type SettlementDuplicateDetectedEvent = EventEnvelope<
+  'settlement.duplicate_detected',
