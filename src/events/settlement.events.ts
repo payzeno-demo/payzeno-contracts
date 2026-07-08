@@ -128,3 +128,14 @@ export interface SettlementDuplicateDetectedPayload {
 }
 export type SettlementDuplicateDetectedEvent = EventEnvelope<
   'settlement.duplicate_detected',
+  SettlementDuplicateDetectedPayload
+>;
+
+/**
+ * The acquirer settled a different amount than we authorised — partial capture, interchange
+ * downgrade, DCC, or a file error. Beyond `merchant.settlement_tolerance_minor` the item goes
+ * to `variance_exceeded` and NOTHING is posted. Without this branch a wrong acquirer file
+ * silently credits the merchant the wrong amount and the ledger stays internally balanced,
+ * which is the exact failure mode the PAY-2041 postmortem calls undetectable.
+ */
+export interface SettlementVarianceDetectedPayload {

@@ -113,3 +113,9 @@ export function isEventOfType<T extends EventType>(
 ): event is EventOfType<T> {
   return event.type === type;
 }
+
+/**
+ * Current schema version per event type. Producers stamp `envelope.version` from this map;
+ * consumers reject anything higher than they know how to read.
+ *
+ * `settlement.completed` is at 2 because the INC hardening added `chunk_index`/`chunk_count`

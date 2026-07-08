@@ -150,6 +150,15 @@ export interface ReconciliationItem {
 }
 
 export const RECONCILIATION_TRIGGERS = ['scheduled', 'manual', 'retry'] as const;
+export type ReconciliationTrigger = (typeof RECONCILIATION_TRIGGERS)[number];
+
+export interface StartReconciliationRequest {
+  batch_id: SettlementBatchId;
+  trigger?: ReconciliationTrigger;
+  /** Cap on items processed in this run. Defaults to 5000. */
+  max_items?: number;
+}
+
 export interface RetryReconciliationItemRequest {
   /** The item id is bound by the path (`/items/:itemId/retry`) and is not repeated here. */
   /** Set by the retry worker; manual retries from the admin console omit it. */

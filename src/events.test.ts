@@ -107,3 +107,9 @@ describe('the PayzenoEvent union', () => {
   const events = everyEventType();
 
   it('has one fixture per EventType, in order', () => {
+    expect(events.map((e) => e.type)).toEqual([...EVENT_TYPES]);
+  });
+
+  it('stamps every envelope from EVENT_SCHEMA_VERSIONS', () => {
+    for (const event of events) {
+      expect(event.version).toBe(EVENT_SCHEMA_VERSIONS[event.type as EventType]);

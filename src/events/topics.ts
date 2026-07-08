@@ -81,3 +81,10 @@ export const QUEUE_NAMES = {
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
 
+/**
+ * Which topic publishes `type`. Returns `undefined` only if the routing table
+ * has drifted from `EVENT_TYPES`, which the test suite makes impossible.
+ */
+export function topicForEventType(type: EventType): TopicName | undefined {
+  for (const topic of Object.keys(EVENT_TOPICS) as TopicName[]) {
+    const types: readonly EventType[] = EVENT_TOPICS[topic];
