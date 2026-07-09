@@ -32,6 +32,7 @@ API_KEY_MODES: tuple[str, ...] = ("test", "live")
 API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "payment_intents:write", "charges:read", "refunds:read", "refunds:write", "disputes:read", "disputes:write", "balance:read", "payouts:read", "payouts:write", "settlements:read", "invoices:read", "webhooks:read", "webhooks:write")
 
 
+AUDIT_ACTOR_TYPES_VALUES = Literal["user", "api_key", "staff", "internal_service", "system"]
 AUDIT_ACTOR_TYPES: tuple[str, ...] = ("user", "api_key", "staff", "internal_service", "system")
 
 
@@ -92,6 +93,9 @@ LEDGER_ACTORS: tuple[str, ...] = ("system", "reconciliation", "payout_worker", "
 
 
 LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment"]
+LEDGER_PURPOSES: tuple[str, ...] = ("auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment")
+
+
 LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold")
 
 
@@ -115,6 +119,7 @@ PAYOUT_METHODS: tuple[str, ...] = ("standard_ach", "same_day_ach", "sepa", "fast
 PAYOUT_SCHEDULES: tuple[str, ...] = ("daily", "weekly", "monthly", "manual")
 
 
+PAYOUT_STATUSES_VALUES = Literal["scheduled", "in_transit", "paid", "failed", "returned", "canceled"]
 PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed", "returned", "canceled")
 
 
@@ -407,6 +412,29 @@ class DisputeEvidence(BaseModel):
     uncategorized_text: str | None = None
 
 
+class FundingEvent(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["funding_event"]
+    acquirer: ACQUIRERS_VALUES
+    currency: CURRENCIES_VALUES
+    amount_minor: int
+    value_date: str
+    bank_reference: str
+    status: Literal["unmatched"] | Literal["matched"] | Literal["short_paid"] | Literal["disputed"]
+    matched_batch_id: str | None
+    received_at: str
+
+
+class HealthResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    status: Literal["ok"]
+    service: str
+    version: str
+
+
 class Invoice(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -427,6 +455,15 @@ class Invoice(BaseModel):
     due_at: str | None
     migrated_to_ledger: bool
     created_at: str
+
+
+class InvoiceLine(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    description: str
+    quantity: int
+    unit_amount_minor: int
+    amount_minor: int
 
 
 class LedgerAdjustmentRequest(BaseModel):
@@ -552,6 +589,14 @@ class Money(BaseModel):
     currency: CURRENCIES_VALUES
 
 
+class NextAction(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    type: Literal["redirect_to_url"] | Literal["use_sdk"]
+    url: str | None = None
+    sdk_payload: dict[str, str] | None = None
+
+
 class Paginated(BaseModel, Generic[T]):
     model_config = ConfigDict(extra='forbid')
 
@@ -616,6 +661,37 @@ class ReconciliationBacklog(BaseModel):
     needs_review: int
     variance_exceeded: int
     oldest_retryable_at: str | None
+
+
+class ReconciliationItem(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["reconciliation_item"]
+    batch_id: str
+    charge_id: str | None
+    merchant_id: str | None
+    line_type: RECONCILIATION_LINE_TYPES_VALUES
+    gross_minor: int
+    fee_minor: int
+    interchange_minor: int
+    scheme_fee_minor: int
+    net_minor: int
+    expected_gross_minor: int | None
+    variance_minor: int
+    currency: CURRENCIES_VALUES
+    livemode: bool
+    acquirer_reference: str
+    match_method: MATCH_METHODS_VALUES
+    matched_at: str | None
+    status: RECONCILIATION_ITEM_STATUSES_VALUES
+    attempt_count: int
+    last_error_code: str | None
+    last_attempt_at: str | None
+    next_attempt_at: str
+    settled_transaction_id: str | None
+    created_at: str
+    updated_at: str
 
 
 class ReconciliationRun(BaseModel):
@@ -803,6 +879,7 @@ PayoutFailureCode = PAYOUT_FAILURE_CODES_VALUES
 PayoutId = str
 PayoutListResponse = Paginated[Payout]
 PayoutMethod = PAYOUT_METHODS_VALUES
+PayoutResponse = Payout
 PayoutSchedule = PAYOUT_SCHEDULES_VALUES
 PayoutStatus = PAYOUT_STATUSES_VALUES
 PricingModel = PRICING_MODELS_VALUES
@@ -811,6 +888,7 @@ ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES
 ReconciliationTrigger = RECONCILIATION_TRIGGERS_VALUES
 RefundId = str
+RefundListResponse = Paginated[Refund]
 RefundReason = REFUND_REASONS_VALUES
 RefundResponse = Refund
 RefundStatus = REFUND_STATUSES_VALUES
@@ -824,3 +902,272 @@ WebhookEventId = str
 WebhookEventStatus = WEBHOOK_EVENT_STATUSES_VALUES
 
 
+__all__ = [
+    "ACCOUNT_STATUSES",
+    "ACCOUNT_STATUSES_VALUES",
+    "ACCOUNT_TYPES",
+    "ACCOUNT_TYPES_VALUES",
+    "ACQUIRERS",
+    "ACQUIRERS_VALUES",
+    "API_KEY_MODES",
+    "API_KEY_MODES_VALUES",
+    "API_KEY_SCOPES",
+    "API_KEY_SCOPES_VALUES",
+    "AUDIT_ACTOR_TYPES",
+    "AUDIT_ACTOR_TYPES_VALUES",
+    "Account",
+    "AccountId",
+    "AccountStatus",
+    "AccountType",
+    "Acquirer",
+    "ApiError",
+    "ApiKey",
+    "ApiKeyId",
+    "ApiKeyMode",
+    "ApiKeyScope",
+    "AuditActorType",
+    "AuthPrincipal",
+    "BANK_ACCOUNT_SCHEMES",
+    "BANK_ACCOUNT_SCHEMES_VALUES",
+    "BANK_ACCOUNT_STATUSES",
+    "BANK_ACCOUNT_STATUSES_VALUES",
+    "Balance",
+    "BalanceBucket",
+    "BalanceHistoryResponse",
+    "BankAccount",
+    "BankAccountId",
+    "BankAccountScheme",
+    "BankAccountStatus",
+    "BasisPoints",
+    "BootstrapAccountsResponse",
+    "CANCELLATION_REASONS",
+    "CANCELLATION_REASONS_VALUES",
+    "CAPTURE_METHODS",
+    "CAPTURE_METHODS_VALUES",
+    "CARD_BRANDS",
+    "CARD_BRANDS_VALUES",
+    "CARD_FUNDINGS",
+    "CARD_FUNDINGS_VALUES",
+    "CHARGE_STATUSES",
+    "CHARGE_STATUSES_VALUES",
+    "CURRENCIES",
+    "CURRENCIES_VALUES",
+    "CURRENCY_EXPONENT",
+    "CancelPaymentIntentRequest",
+    "CancellationReason",
+    "CaptureMethod",
+    "CapturePaymentIntentRequest",
+    "CardBrand",
+    "CardFunding",
+    "CardSummary",
+    "Charge",
+    "ChargeId",
+    "ChargeLedgerResponse",
+    "ChargeListQuery",
+    "ChargeListResponse",
+    "ChargeResponse",
+    "ChargeStatus",
+    "ConfirmPaymentIntentRequest",
+    "CreateApiKeyRequest",
+    "CreateApiKeyResponse",
+    "CreateBankAccountRequest",
+    "CreateMerchantRequest",
+    "CreatePaymentIntentRequest",
+    "CreatePayoutRequest",
+    "CreateRefundRequest",
+    "CreateWebhookEndpointRequest",
+    "CurrenciesResponse",
+    "CurrencyCode",
+    "DECLINE_CODES",
+    "DECLINE_CODES_VALUES",
+    "DISPUTE_REASONS",
+    "DISPUTE_REASONS_VALUES",
+    "DISPUTE_STATUSES",
+    "DISPUTE_STATUSES_VALUES",
+    "DashboardSummary",
+    "DeclineCode",
+    "Dispute",
+    "DisputeEvidence",
+    "DisputeId",
+    "DisputeListResponse",
+    "DisputeReason",
+    "DisputeResponse",
+    "DisputeStatus",
+    "ENTRY_DIRECTIONS",
+    "ENTRY_DIRECTIONS_VALUES",
+    "ERROR_CODES",
+    "ERROR_CODES_VALUES",
+    "EntryDirection",
+    "ErrorCode",
+    "FieldError",
+    "FundingEvent",
+    "HealthResponse",
+    "IDEMPOTENCY_STATES",
+    "IDEMPOTENCY_STATES_VALUES",
+    "INVOICE_STATUSES",
+    "INVOICE_STATUSES_VALUES",
+    "IdempotencyState",
+    "Invoice",
+    "InvoiceId",
+    "InvoiceLine",
+    "InvoiceListResponse",
+    "InvoiceResponse",
+    "InvoiceStatus",
+    "IsoDate",
+    "IsoTimestamp",
+    "LEDGER_ACTORS",
+    "LEDGER_ACTORS_VALUES",
+    "LEDGER_PURPOSES",
+    "LEDGER_PURPOSES_VALUES",
+    "LEDGER_REFERENCE_TYPES",
+    "LEDGER_REFERENCE_TYPES_VALUES",
+    "LedgerActor",
+    "LedgerAdjustmentRequest",
+    "LedgerEntry",
+    "LedgerEntryId",
+    "LedgerPurpose",
+    "LedgerReferenceType",
+    "LedgerTransaction",
+    "LedgerTransactionId",
+    "ListQuery",
+    "LoginRequest",
+    "LoginResponse",
+    "MATCH_METHODS",
+    "MATCH_METHODS_VALUES",
+    "MERCHANT_STATUSES",
+    "MERCHANT_STATUSES_VALUES",
+    "MatchMethod",
+    "Merchant",
+    "MerchantId",
+    "MerchantListResponse",
+    "MerchantResponse",
+    "MerchantSettlementBatch",
+    "MerchantStatus",
+    "Metadata",
+    "MinorUnits",
+    "Money",
+    "NextAction",
+    "PAYMENT_INTENT_STATUSES",
+    "PAYMENT_INTENT_STATUSES_VALUES",
+    "PAYOUT_FAILURE_CODES",
+    "PAYOUT_FAILURE_CODES_VALUES",
+    "PAYOUT_METHODS",
+    "PAYOUT_METHODS_VALUES",
+    "PAYOUT_SCHEDULES",
+    "PAYOUT_SCHEDULES_VALUES",
+    "PAYOUT_STATUSES",
+    "PAYOUT_STATUSES_VALUES",
+    "PRICING_MODELS",
+    "PRICING_MODELS_VALUES",
+    "PUBLIC_EVENT_TYPES",
+    "PUBLIC_EVENT_TYPES_VALUES",
+    "Paginated",
+    "PaymentIntent",
+    "PaymentIntentId",
+    "PaymentIntentListQuery",
+    "PaymentIntentListResponse",
+    "PaymentIntentResponse",
+    "PaymentIntentStatus",
+    "PaymentMethodToken",
+    "Payout",
+    "PayoutFailureCode",
+    "PayoutId",
+    "PayoutListResponse",
+    "PayoutMethod",
+    "PayoutResponse",
+    "PayoutSchedule",
+    "PayoutStatus",
+    "PostTransactionLine",
+    "PostTransactionRequest",
+    "PricingModel",
+    "PublicEventType",
+    "RECONCILIATION_ITEM_STATUSES",
+    "RECONCILIATION_ITEM_STATUSES_VALUES",
+    "RECONCILIATION_LINE_TYPES",
+    "RECONCILIATION_LINE_TYPES_VALUES",
+    "RECONCILIATION_RUN_STATUSES",
+    "RECONCILIATION_RUN_STATUSES_VALUES",
+    "RECONCILIATION_TRIGGERS",
+    "RECONCILIATION_TRIGGERS_VALUES",
+    "REFUND_REASONS",
+    "REFUND_REASONS_VALUES",
+    "REFUND_STATUSES",
+    "REFUND_STATUSES_VALUES",
+    "REPORTING_WINDOWS",
+    "REPORTING_WINDOWS_VALUES",
+    "RISK_TIERS",
+    "RISK_TIERS_VALUES",
+    "ReadinessResponse",
+    "ReconciliationBacklog",
+    "ReconciliationItem",
+    "ReconciliationItemId",
+    "ReconciliationItemStatus",
+    "ReconciliationLineType",
+    "ReconciliationRun",
+    "ReconciliationRunId",
+    "ReconciliationRunStatus",
+    "ReconciliationTrigger",
+    "Refund",
+    "RefundId",
+    "RefundListResponse",
+    "RefundReason",
+    "RefundResponse",
+    "RefundStatus",
+    "ReportingWindow",
+    "RetryReconciliationItemRequest",
+    "RiskTier",
+    "SCA_EXEMPTIONS",
+    "SCA_EXEMPTIONS_VALUES",
+    "SETTLEMENT_BATCH_STATUSES",
+    "SETTLEMENT_BATCH_STATUSES_VALUES",
+    "STAFF_ROLES",
+    "STAFF_ROLES_VALUES",
+    "ScaExemption",
+    "SessionResponse",
+    "SettlementBatch",
+    "SettlementBatchId",
+    "SettlementBatchStatus",
+    "StaffRole",
+    "StartReconciliationRequest",
+    "SubmitDisputeEvidenceRequest",
+    "TIMESERIES_INTERVALS",
+    "TIMESERIES_INTERVALS_VALUES",
+    "ThreeDSecureResult",
+    "TimeseriesInterval",
+    "TimeseriesPoint",
+    "TrialBalanceResult",
+    "USER_ROLES",
+    "USER_ROLES_VALUES",
+    "UpdateMerchantRequest",
+    "User",
+    "UserId",
+    "UserRole",
+    "VolumeTimeseries",
+    "WEBHOOK_ENDPOINT_STATUSES",
+    "WEBHOOK_ENDPOINT_STATUSES_VALUES",
+    "WEBHOOK_EVENT_STATUSES",
+    "WEBHOOK_EVENT_STATUSES_VALUES",
+    "WebhookEndpoint",
+    "WebhookEndpointStatus",
+    "WebhookEvent",
+    "WebhookEventId",
+    "WebhookEventStatus",
+]
+
+
+Balance.model_rebuild()
+BalanceHistoryResponse.model_rebuild()
+BootstrapAccountsResponse.model_rebuild()
+Charge.model_rebuild()
+ChargeLedgerResponse.model_rebuild()
+DashboardSummary.model_rebuild()
+Dispute.model_rebuild()
+Invoice.model_rebuild()
+LedgerAdjustmentRequest.model_rebuild()
+LedgerTransaction.model_rebuild()
+LoginResponse.model_rebuild()
+PaymentIntent.model_rebuild()
+PostTransactionRequest.model_rebuild()
+SessionResponse.model_rebuild()
+SubmitDisputeEvidenceRequest.model_rebuild()
+VolumeTimeseries.model_rebuild()

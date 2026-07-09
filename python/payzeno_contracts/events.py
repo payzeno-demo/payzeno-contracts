@@ -361,6 +361,21 @@ class SettlementBatchClosedPayload(BaseModel):
     closed_at: str
 
 
+class SettlementDuplicateDetectedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    item_id: str
+    charge_id: str | None
+    merchant_id: str | None
+    idempotency_key: str
+    existing_transaction_id: str
+    detected_by: Literal["batch_pass"] | Literal["retry_scheduler"]
+    amount_minor: int
+    currency: str
+    detected_at: str
+
+
 class SettlementFundedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -375,6 +390,22 @@ class SettlementFundedPayload(BaseModel):
     value_date: str
     transaction_id: str
     funded_at: str
+
+
+class SettlementItemSettledPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    item_id: str
+    batch_id: str
+    charge_id: str
+    merchant_id: str
+    gross_minor: int
+    fee_minor: int
+    net_minor: int
+    currency: str
+    transaction_id: str
+    attempt_count: int
+    settled_at: str
 
 
 class SettlementReconciliationFailedPayload(BaseModel):
@@ -406,11 +437,13 @@ class SettlementVarianceDetectedPayload(BaseModel):
 
 DisputeClosedEvent = EventEnvelope
 DisputeOpenedEvent = EventEnvelope
+EventType = EVENT_TYPES_VALUES
 LedgerImbalanceDetectedEvent = EventEnvelope
 LedgerTransactionPostedEvent = EventEnvelope
 MerchantBankAccountVerifiedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 MerchantUpdatedEvent = EventEnvelope
+PaymentAuthorizedEvent = EventEnvelope
 PaymentCanceledEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PaymentFailedEvent = EventEnvelope
