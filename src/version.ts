@@ -24,3 +24,5 @@
  * every response. It moves when the wire format the outside world sees
  * moves, which is much less often than this package moves.
  */
+
+export const CONTRACTS_VERSION = '3.4.0';

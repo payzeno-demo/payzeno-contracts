@@ -62,4 +62,7 @@ describe('zero runtime dependencies', () => {
 });
 
 describe('CHANGELOG', () => {
+  it('has an entry for the current version', () => {
+    expect(read('CHANGELOG.md')).toContain(`## [${CONTRACTS_VERSION}]`);
+  });
 });
