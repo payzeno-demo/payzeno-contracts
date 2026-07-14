@@ -85,6 +85,63 @@ export class PythonEmitter extends ContractEmitter {
     // Paginated[Charge]` sorted alphabetically ahead of `Paginated` is a
     // NameError on import, in the ledger, at boot.
     const order: Record<string, number> = { enum: 0, 'const-map': 0, model: 1, alias: 2 };
+    const declarations = [...m.declarations].sort((a, b) => {
+      const rank = (order[a.kind] ?? 3) - (order[b.kind] ?? 3);
+      return rank !== 0 ? rank : a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+
+    for (const decl of declarations) {
+      if (decl.kind === 'enum') {
+        body.push(this.renderEnum(decl));
+        symbols.push(decl.name);
+      } else if (decl.kind === 'model') {
+        body.push(this.renderModel(decl));
+        symbols.push(decl.name);
+      } else if (decl.kind === 'const-map') {
+        body.push(this.renderConstMap(decl));
+        symbols.push(decl.name);
+      } else {
+        body.push(`${decl.name} = ${this.renderType(decl.target)}`);
+        symbols.push(decl.name);
+      }
+    }
+
+    const contents = [
+      this.header(),
+      '',
+      'from __future__ import annotations',
+      '',
+      'from typing import Any, Generic, Literal, TypeVar',
+      '',
+      'from pydantic import BaseModel, ConfigDict',
+      '',
+      'T = TypeVar("T")',
+      '',
+      '',
+      body.join('\n\n\n'),
+      '',
+      '',
+      this.renderAll(symbols),
+      '',
+      '',
+      // Forward references are strings because of `from __future__ import
+      // annotations`, so Pydantic cannot resolve a model-to-model field until
+      // every class exists. Rebuilding at the bottom of the module is what
+      // makes declaration order irrelevant.
+      this.renderRebuilds(declarations),
+      '',
+    ].join('\n');
+
+    return { path: this.fileNameFor(m), contents, symbols };
+  }
+
+  /**
+   * `as const` tuples become `Literal[...]` aliases rather than `enum.Enum`
+   * subclasses. Two reasons: Pydantic validates a Literal against the raw
+   * string with no coercion step, and the ledger's SQLAlchemy columns are
+   * native pg enums whose values are exactly these strings.
+   */
+  private renderEnum(decl: IrEnum): string {
     const doc = this.renderDoc(decl.doc);
     const members = decl.values.map((value) => `"${value}"`).join(', ');
     const literal = decl.values.length === 0 ? 'str' : `Literal[${members}]`;
@@ -139,6 +196,16 @@ export class PythonEmitter extends ContractEmitter {
     // Fields with defaults must follow fields without them, or the generated
     // module raises at import time.
     const required = model.fields.filter((f) => !f.optional);
+    const optional = model.fields.filter((f) => f.optional);
+    for (const field of [...required, ...optional]) {
+      lines.push(this.renderField(field));
+    }
+
+    return lines.join('\n');
+  }
+
+  private renderField(field: IrField): string {
+    const doc = this.renderDoc(field.doc, '    ');
     const name = this.quoteIdentifier(field.name);
     const rendered = this.renderType(field.type);
     const annotation = field.nullable || field.optional ? `${rendered} | None` : rendered;

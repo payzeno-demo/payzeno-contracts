@@ -49,6 +49,23 @@ const SCALAR_ALIASES: Record<string, IrScalarName> = {
 export class TypeNormalizer {
   private currentModule = '<unknown>';
 
+  normalizeModule(m: SourceModule): IrModule {
+    this.currentModule = m.moduleName;
+
+    const declarations: IrDeclaration[] = [];
+    for (const decl of m.declarations) {
+      if (!decl.exported) {
+        continue;
+      }
+      const normalized = this.normalizeDeclaration(decl);
+      if (normalized !== null) {
+        declarations.push(normalized);
+      }
+    }
+
+    return { name: m.moduleName, sourcePath: m.filePath, declarations };
+  }
+
   private normalizeDeclaration(decl: SourceDeclaration): IrDeclaration | null {
     switch (decl.kind) {
       case 'interface':
@@ -224,6 +241,18 @@ export class TypeNormalizer {
       kind: 'enum',
       name: decl.name,
       values: decl.values ?? [],
+      doc: decl.doc,
+    };
+  }
+
+  private normalizeConstRecord(decl: SourceDeclaration): IrConstMap | null {
+    if (decl.entries === undefined || decl.entries.length === 0) {
+      return null;
+    }
+    return {
+      kind: 'const-map',
+      name: decl.name,
+      entries: decl.entries,
       doc: decl.doc,
     };
   }

@@ -29,6 +29,7 @@ ACQUIRERS: tuple[str, ...] = ("worldflow", "nordpay")
 API_KEY_MODES: tuple[str, ...] = ("test", "live")
 
 
+API_KEY_SCOPES_VALUES = Literal["merchants:read", "payment_intents:read", "payment_intents:write", "charges:read", "refunds:read", "refunds:write", "disputes:read", "disputes:write", "balance:read", "payouts:read", "payouts:write", "settlements:read", "invoices:read", "webhooks:read", "webhooks:write"]
 API_KEY_SCOPES: tuple[str, ...] = ("merchants:read", "payment_intents:read", "payment_intents:write", "charges:read", "refunds:read", "refunds:write", "disputes:read", "disputes:write", "balance:read", "payouts:read", "payouts:write", "settlements:read", "invoices:read", "webhooks:read", "webhooks:write")
 
 
@@ -145,6 +146,7 @@ REFUND_REASONS: tuple[str, ...] = ("duplicate", "fraudulent", "requested_by_cust
 
 
 REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
+REPORTING_WINDOWS_VALUES = Literal["24h", "7d", "30d"]
 REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
 
 
@@ -176,6 +178,20 @@ WEBHOOK_EVENT_STATUSES_VALUES = Literal["pending", "delivering", "delivered", "d
 WEBHOOK_EVENT_STATUSES: tuple[str, ...] = ("pending", "delivering", "delivered", "dead")
 
 
+class Account(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["account"]
+    merchant_id: str | None
+    type: ACCOUNT_TYPES_VALUES
+    currency: CURRENCIES_VALUES
+    normal_balance: ENTRY_DIRECTIONS_VALUES
+    status: ACCOUNT_STATUSES_VALUES
+    livemode: bool
+    created_at: str
+
+
 class ApiError(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -195,6 +211,21 @@ class ApiKey(BaseModel):
     scopes: list[API_KEY_SCOPES_VALUES]
     created_at: str
     revoked_at: str | None
+
+
+class Balance(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["balance"]
+    merchant_id: str
+    currency: CURRENCIES_VALUES
+    available_minor: int
+    pending_minor: int
+    reserved_minor: int
+    disputed_minor: int
+    negative_balance_minor: int
+    buckets: list[BalanceBucket]
+    as_of: str
 
 
 class BalanceHistoryResponse(BaseModel):
@@ -285,6 +316,13 @@ class ChargeListQuery(ListQuery):
     settlement_batch_id: str | None = None
 
 
+class ConfirmPaymentIntentRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payment_method_token: str | None = None
+    return_url: str | None = None
+
+
 class CreateApiKeyRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -353,6 +391,13 @@ class CreateRefundRequest(BaseModel):
     amount_minor: int | None = None
     reason: REFUND_REASONS_VALUES | None = None
     metadata: dict[str, str] | None = None
+
+
+class CreateWebhookEndpointRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    url: str
+    enabled_events: list[PUBLIC_EVENT_TYPES_VALUES]
 
 
 class CurrenciesResponse(BaseModel):
@@ -728,6 +773,13 @@ class Refund(BaseModel):
     succeeded_at: str | None
 
 
+class RetryReconciliationItemRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    requested_by: str | None = None
+    reason: str | None = None
+
+
 class SettlementBatch(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -768,6 +820,18 @@ class TimeseriesPoint(BaseModel):
     bucket_start: str
     amount_minor: int
     count: int
+
+
+class TrialBalanceResult(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["trial_balance"]
+    currency: CURRENCIES_VALUES
+    balanced: bool
+    delta_minor: int
+    debit_total_minor: int
+    credit_total_minor: int
+    as_of: str
 
 
 class UpdateMerchantRequest(BaseModel):
@@ -848,10 +912,12 @@ CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
 ChargeId = str
 ChargeListResponse = Paginated[Charge]
+ChargeResponse = Charge
 ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
 DisputeId = str
 DisputeListResponse = Paginated[Dispute]
+DisputeReason = DISPUTE_REASONS_VALUES
 DisputeStatus = DISPUTE_STATUSES_VALUES
 EntryDirection = ENTRY_DIRECTIONS_VALUES
 ErrorCode = ERROR_CODES_VALUES
@@ -893,6 +959,7 @@ RefundReason = REFUND_REASONS_VALUES
 RefundResponse = Refund
 RefundStatus = REFUND_STATUSES_VALUES
 RiskTier = RISK_TIERS_VALUES
+ScaExemption = SCA_EXEMPTIONS_VALUES
 SettlementBatchId = str
 SettlementBatchStatus = SETTLEMENT_BATCH_STATUSES_VALUES
 StaffRole = STAFF_ROLES_VALUES

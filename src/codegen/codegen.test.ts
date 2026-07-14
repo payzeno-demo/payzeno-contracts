@@ -127,6 +127,15 @@ describe('TypeNormalizer', () => {
     }
   });
 
+  it('maps MinorUnits to an integer scalar, never a float', () => {
+    const module = normalize();
+    const model = module.declarations.find((d) => d.name === 'SampleCharge');
+    if (model?.kind === 'model') {
+      const amount = model.fields.find((f) => f.name === 'amount_minor');
+      expect(amount?.type).toEqual({ kind: 'scalar', name: 'integer' });
+    }
+  });
+
   it('throws UnsupportedTypeError on an un-normalisable generic', () => {
     const normalizer = new TypeNormalizer();
     expect(() =>
@@ -197,6 +206,8 @@ describe('JavaEmitter', () => {
     target: { kind: 'ref', name: 'CHARGE_STATUSES' },
     doc: null,
   });
+  const files = new JavaEmitter().emitAll(module);
+
   it('names the enum after the derived union, not the tuple', () => {
     expect(files.map((f) => path.basename(f.path)).sort()).toEqual([
       'ChargeStatus.java',
@@ -210,6 +221,14 @@ describe('JavaEmitter', () => {
     expect(record?.contents).toContain('long amount_minor');
   });
 
+  it('emits a value-carrying enum with fromValue', () => {
+    const enumFile = files.find((f) => f.path.endsWith('ChargeStatus.java'));
+    expect(enumFile?.contents).toContain('PENDING("pending")');
+    expect(enumFile?.contents).toContain('public static ChargeStatus fromValue(String raw)');
+  });
+});
+
+describe('DeterministicWriter', () => {
   it('is byte-stable across two runs', () => {
     const dir = tempDir();
     const writer = new DeterministicWriter();
