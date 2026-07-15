@@ -113,3 +113,9 @@ describe('the PayzenoEvent union', () => {
   it('stamps every envelope from EVENT_SCHEMA_VERSIONS', () => {
     for (const event of events) {
       expect(event.version).toBe(EVENT_SCHEMA_VERSIONS[event.type as EventType]);
+    }
+  });
+
+  it('attributes every event to a legal publisher', () => {
+    for (const event of events) {
+      expect(['payzeno-api', 'payzeno-ledger', 'payzeno-billing-legacy']).toContain(event.source);

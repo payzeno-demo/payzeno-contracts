@@ -52,6 +52,19 @@ describe('EVENT_TOPICS', () => {
 });
 
 describe('QUEUE_NAMES', () => {
+  it('is the eight frozen queue names', () => {
+    expect(Object.values(QUEUE_NAMES).sort()).toEqual([
+      'payzeno-api-billing',
+      'payzeno-api-ledger',
+      'payzeno-api-webhooks',
+      'payzeno-billing-merchants',
+      'payzeno-console-notifications',
+      'payzeno-dlq-monitor',
+      'payzeno-ledger-merchants',
+      'payzeno-ledger-payments',
+    ]);
+  });
+
   it('is keyed by the consumer class that drains it', () => {
     expect(QUEUE_NAMES.NotificationRelayConsumer).toBe('payzeno-console-notifications');
     expect(QUEUE_NAMES.WebhookFanoutConsumer).toBe('payzeno-api-webhooks');
@@ -67,6 +80,10 @@ describe('QUEUE_NAMES', () => {
     for (const type of EVENT_TYPES) {
       expect(topicForEventType(type), `${type} has no topic`).toBeDefined();
     }
+  });
+
+  it('puts merchant events on the merchant topic', () => {
+    expect(topicForEventType('merchant.bank_account_verified')).toBe('payzeno-merchant-events');
   });
 
   it('puts invoice.issued on the billing topic', () => {
