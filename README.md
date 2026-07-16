@@ -103,3 +103,11 @@ duplicate-settlement incident, see `docs/adr/0016-event-schema-versioning.md`.
   manual run. At time of writing they are a minor version behind and are missing
   `SettlementDuplicateDetectedPayload`. `ContractEnvelopeTest.java` over in
   `payzeno-billing-legacy` passes anyway because it only asserts fields it already knows about.
+  Tracked as PAY-1996. If you change an event payload, run `pnpm run codegen:java` by hand.
+- **`src/types/errors.types.ts`** is the only file in `types/` with a `.types.ts` suffix. It got
+  extracted out of the barrel late and nobody renamed it. Not a pattern — don't copy it.
+- **`applyBps` rounds per call.** Do not use it to split a fee across
+  interchange/scheme/markup; that needs largest-remainder apportionment, which lives in
+  `payzeno-ledger` (`app/domain/fees.py::apportion_fee`) and deliberately has no TypeScript twin.
+- **The strings in `src/events/topics.ts` are load-bearing.** `EVENT_TOPICS` keys and
+  `QUEUE_NAMES` must match the SNS/SQS names in `payzeno-infrastructure` exactly, and no test

@@ -103,3 +103,8 @@ together; the release was coordinated on the day.
 
 **Breaking.** `src/index.ts` split into `src/types/**`; `errors.types.ts` extracted out of the
 barrel. No symbol changed shape, but subpath imports moved. Consumers should import from the
+package root.
+
+## [1.0.0] — 2025-08-19
+
+First tagged release. `money`, `ids`, `errors`, the type surface, and the Python codegen.
