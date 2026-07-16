@@ -26,3 +26,5 @@
  */
 
 export const CONTRACTS_VERSION = '3.4.0';
+
+export const API_VERSION = '2026-01-15';

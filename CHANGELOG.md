@@ -98,3 +98,8 @@ together; the release was coordinated on the day.
 
 - `src/events/billing.events.ts` — `invoice.issued`, `payzeno-billing-legacy`'s only publish.
 - `EventEnvelope.source` widened to admit `'payzeno-billing-legacy'`.
+
+## [2.0.0] — 2025-10-07
+
+**Breaking.** `src/index.ts` split into `src/types/**`; `errors.types.ts` extracted out of the
+barrel. No symbol changed shape, but subpath imports moved. Consumers should import from the
