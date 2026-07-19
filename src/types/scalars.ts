@@ -9,22 +9,30 @@ export type IsoTimestamp = string;
 /** ISO 8601 calendar date, e.g. `2026-03-14`. Banking-calendar day, not an instant. */
 export type IsoDate = string;
 
+/** Integer amount in the currency's minor unit. Never a float. */
+export type MinorUnits = number;
+
 /** Basis points. 100 bps = 1%. */
 export type BasisPoints = number;
 
+export type MerchantId = string;
 export type UserId = string;
+export type ApiKeyId = string;
 export type BankAccountId = string;
 export type PaymentIntentId = string;
 export type ChargeId = string;
 export type RefundId = string;
 export type DisputeId = string;
 export type WebhookEventId = string;
+export type AccountId = string;
 export type LedgerTransactionId = string;
 export type LedgerEntryId = string;
 export type SettlementBatchId = string;
 export type ReconciliationRunId = string;
 export type ReconciliationItemId = string;
 export type PayoutId = string;
+export type InvoiceId = string;
+
 export const CURRENCIES = ['USD', 'EUR', 'GBP', 'ILS', 'JPY'] as const;
 export type CurrencyCode = (typeof CURRENCIES)[number];
 
@@ -32,8 +40,18 @@ export type CurrencyCode = (typeof CURRENCIES)[number];
  * ISO-4217 minor-unit exponent. JPY is 0 — anything that hardcodes 100 is a bug.
  * Consumed by `formatMoney` in payzeno-console and `format_money` in payzeno-ledger.
  */
+export const CURRENCY_EXPONENT: Record<CurrencyCode, number> = {
+  USD: 2,
+  EUR: 2,
+  GBP: 2,
+  ILS: 2,
+  // dhotfix: JPY is exponent 0. If you are dividing by 100 you have a bug.
+  JPY: 0,
+};
+
 export interface Money {
   amount_minor: MinorUnits;
   currency: CurrencyCode;
 }
 
+export type Metadata = Record<string, string>;

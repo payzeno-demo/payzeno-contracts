@@ -54,9 +54,26 @@ export interface HealthResponse {
   version: string;
 }
 
+/** `GET /readyz`. payzeno-ledger omits `ledger` and `vault`. */
+export interface ReadinessResponse {
+  status: 'ok' | 'degraded';
+  checks: {
+    db: boolean;
+    bus: boolean;
+    ledger?: boolean;
+    vault?: boolean;
+  };
+}
+
 /** `GET /v1/meta/currencies` */
 export interface CurrenciesResponse {
   currencies: CurrencyCode[];
+}
+
+/** `GET /v1/charges/:chargeId/ledger` */
+export interface ChargeLedgerResponse {
+  charge_id: ChargeId;
+  transactions: LedgerTransaction[];
 }
 
 /** `POST /internal/v1/accounts/bootstrap` */
@@ -77,6 +94,17 @@ export interface BalanceHistoryResponse {
   currency: CurrencyCode;
   interval: TimeseriesInterval;
   points: TimeseriesPoint[];
+}
+
+/** `GET /internal/v1/reconciliation/backlog` */
+export interface ReconciliationBacklog {
+  object: 'reconciliation_backlog';
+  retryable: number;
+  failed: number;
+  orphaned: number;
+  needs_review: number;
+  variance_exceeded: number;
+  oldest_retryable_at: IsoTimestamp | null;
 }
 
 /** `POST /internal/v1/ops/audit/trial-balance` */
