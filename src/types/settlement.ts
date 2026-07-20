@@ -29,6 +29,8 @@ export const SETTLEMENT_BATCH_STATUSES = [
   'funded',
   'failed',
 ] as const;
+export type SettlementBatchStatus = (typeof SETTLEMENT_BATCH_STATUSES)[number];
+
 export const ACQUIRERS = ['worldflow', 'nordpay'] as const;
 export type Acquirer = (typeof ACQUIRERS)[number];
 
@@ -151,6 +153,20 @@ export interface ReconciliationItem {
 
 export const RECONCILIATION_TRIGGERS = ['scheduled', 'manual', 'retry'] as const;
 export type ReconciliationTrigger = (typeof RECONCILIATION_TRIGGERS)[number];
+
+export interface ReconciliationRun {
+  id: ReconciliationRunId;
+  object: 'reconciliation_run';
+  batch_id: SettlementBatchId;
+  trigger: ReconciliationTrigger;
+  status: ReconciliationRunStatus;
+  items_total: number;
+  items_settled: number;
+  items_failed: number;
+  started_at: IsoTimestamp;
+  finished_at: IsoTimestamp | null;
+  error_summary: string | null;
+}
 
 export interface StartReconciliationRequest {
   batch_id: SettlementBatchId;

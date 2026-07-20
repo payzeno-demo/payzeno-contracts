@@ -55,8 +55,14 @@ CARD_BRANDS: tuple[str, ...] = ("visa", "mastercard", "amex", "discover")
 
 
 CARD_FUNDINGS_VALUES = Literal["credit", "debit", "prepaid", "unknown"]
+CARD_FUNDINGS: tuple[str, ...] = ("credit", "debit", "prepaid", "unknown")
+
+
 CHARGE_STATUSES_VALUES = Literal["pending", "authorized", "captured", "settled", "failed", "voided", "expired", "reversed"]
 CURRENCIES_VALUES = Literal["USD", "EUR", "GBP", "ILS", "JPY"]
+CURRENCIES: tuple[str, ...] = ("USD", "EUR", "GBP", "ILS", "JPY")
+
+
 CURRENCY_EXPONENT: dict[str, int] = {
     "USD": 2,
     "EUR": 2,
@@ -117,6 +123,7 @@ PAYOUT_METHODS_VALUES = Literal["standard_ach", "same_day_ach", "sepa", "faster_
 PAYOUT_METHODS: tuple[str, ...] = ("standard_ach", "same_day_ach", "sepa", "faster_payments", "debit_ach")
 
 
+PAYOUT_SCHEDULES_VALUES = Literal["daily", "weekly", "monthly", "manual"]
 PAYOUT_SCHEDULES: tuple[str, ...] = ("daily", "weekly", "monthly", "manual")
 
 
@@ -133,6 +140,9 @@ RECONCILIATION_ITEM_STATUSES: tuple[str, ...] = ("pending", "settling", "settled
 
 
 RECONCILIATION_LINE_TYPES_VALUES = Literal["sale", "refund", "chargeback", "chargeback_reversal", "scheme_fee", "adjustment", "reserve_hold", "reserve_release"]
+RECONCILIATION_LINE_TYPES: tuple[str, ...] = ("sale", "refund", "chargeback", "chargeback_reversal", "scheme_fee", "adjustment", "reserve_hold", "reserve_release")
+
+
 RECONCILIATION_RUN_STATUSES_VALUES = Literal["running", "succeeded", "failed"]
 RECONCILIATION_RUN_STATUSES: tuple[str, ...] = ("running", "succeeded", "failed")
 
@@ -154,6 +164,7 @@ RISK_TIERS_VALUES = Literal["standard", "elevated", "high"]
 RISK_TIERS: tuple[str, ...] = ("standard", "elevated", "high")
 
 
+SCA_EXEMPTIONS_VALUES = Literal["low_value", "tra", "moto", "recurring"]
 SCA_EXEMPTIONS: tuple[str, ...] = ("low_value", "tra", "moto", "recurring")
 
 
@@ -455,6 +466,14 @@ class DisputeEvidence(BaseModel):
     receipt_file_id: str | None = None
     service_documentation_file_id: str | None = None
     uncategorized_text: str | None = None
+
+
+class FieldError(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    path: str
+    code: str
+    message: str
 
 
 class FundingEvent(BaseModel):
@@ -814,6 +833,16 @@ class SubmitDisputeEvidenceRequest(BaseModel):
     submit: bool | None = None
 
 
+class ThreeDSecureResult(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    version: str
+    authentication_flow: Literal["frictionless"] | Literal["challenge"]
+    result: Literal["authenticated"] | Literal["attempted"] | Literal["failed"] | Literal["unavailable"]
+    eci: str
+    liability_shifted: bool
+
+
 class TimeseriesPoint(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -906,8 +935,10 @@ ApiKeyMode = API_KEY_MODES_VALUES
 ApiKeyScope = API_KEY_SCOPES_VALUES
 AuditActorType = AUDIT_ACTOR_TYPES_VALUES
 AuthPrincipal = dict[str, Any]
+BankAccountId = str
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
 BasisPoints = int
+CaptureMethod = CAPTURE_METHODS_VALUES
 CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
 ChargeId = str
@@ -949,6 +980,8 @@ PayoutResponse = Payout
 PayoutSchedule = PAYOUT_SCHEDULES_VALUES
 PayoutStatus = PAYOUT_STATUSES_VALUES
 PricingModel = PRICING_MODELS_VALUES
+ReconciliationItemId = str
+ReconciliationItemStatus = RECONCILIATION_ITEM_STATUSES_VALUES
 ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES
 ReconciliationRunId = str
 ReconciliationRunStatus = RECONCILIATION_RUN_STATUSES_VALUES

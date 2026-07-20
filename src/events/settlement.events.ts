@@ -139,3 +139,13 @@ export type SettlementDuplicateDetectedEvent = EventEnvelope<
  * which is the exact failure mode the PAY-2041 postmortem calls undetectable.
  */
 export interface SettlementVarianceDetectedPayload {
+  batch_id: SettlementBatchId;
+  item_id: ReconciliationItemId;
+  charge_id: ChargeId | null;
+  merchant_id: MerchantId | null;
+  line_type: string;
+  expected_gross_minor: MinorUnits;
+  actual_gross_minor: MinorUnits;
+  variance_minor: MinorUnits;
+  tolerance_minor: MinorUnits;
+  currency: CurrencyCode;

@@ -109,4 +109,8 @@ describe('ReconciliationItem', () => {
     expect(body).not.toContain('next_attempt_at?');
   });
 
+  it('records that the drain filters on next_attempt_at, not last_attempt_at', () => {
+    expect(body).toContain('last_attempt_at');
+    expect(source).toContain('ix_reconciliation_item_next_attempt');
+  });
 });
