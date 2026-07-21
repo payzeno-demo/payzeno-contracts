@@ -72,9 +72,26 @@ export interface CreateMerchantRequest {
   metadata?: Metadata;
 }
 
+export interface UpdateMerchantRequest {
+  display_name?: string;
+  payout_schedule?: PayoutSchedule;
+  statement_descriptor?: string;
+  /** staff-only fields. A merchant-session PATCH carrying any of these is 403. */
+  risk_tier?: RiskTier;
+  reserve_bps?: BasisPoints;
+  reserve_hold_days?: number;
+  payout_delay_days?: number;
+  platform_fee_bps?: BasisPoints;
+  platform_fee_fixed_minor?: MinorUnits;
+  settlement_tolerance_minor?: MinorUnits;
+  capture_at_settlement?: boolean;
+  metadata?: Metadata;
+}
+
 export type MerchantResponse = Merchant;
 export type MerchantListResponse = Paginated<Merchant>;
 
+export const USER_ROLES = ['owner', 'admin', 'developer', 'viewer'] as const;
 export interface User {
   id: UserId;
   object: 'user';

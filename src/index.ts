@@ -25,3 +25,5 @@ export * from './types/merchant';
 export * from './types/settlement';
 export * from './types/payment';
 export * from './types/refund';
+export * from './types/dispute';
+export * from './types/ledger';
