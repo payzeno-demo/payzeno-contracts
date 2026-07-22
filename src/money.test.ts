@@ -64,6 +64,10 @@ describe('formatMoney', () => {
 });
 
 describe('assertSameCurrency', () => {
+  it('passes for matching currencies', () => {
+    expect(() => assertSameCurrency(sampleMoney('USD'), sampleMoney('USD'))).not.toThrow();
+  });
+
   it('throws CurrencyMismatchError, never converts', () => {
     expect(() => assertSameCurrency(sampleMoney('USD'), sampleMoney('EUR'))).toThrow(
       CurrencyMismatchError,
@@ -83,6 +87,24 @@ describe('assertSameCurrency', () => {
 });
 
 describe('addMoney / subMoney', () => {
+  it('adds and subtracts within a currency', () => {
+    expect(addMoney(sampleMoney('USD', 100), sampleMoney('USD', 23))).toEqual({
+      amount_minor: 123,
+      currency: 'USD',
+    });
+    expect(subMoney(sampleMoney('USD', 100), sampleMoney('USD', 123))).toEqual({
+      amount_minor: -23,
+      currency: 'USD',
+    });
+  });
+
+  it('throws on a currency mismatch', () => {
+    expect(() => addMoney(sampleMoney('USD'), sampleMoney('GBP'))).toThrow(CurrencyMismatchError);
+    expect(() => subMoney(sampleMoney('USD'), sampleMoney('GBP'))).toThrow(CurrencyMismatchError);
+  });
+});
+
+describe('applyBps', () => {
   it('rounds ROUND_HALF_UP at the boundary', () => {
     // 100 * 50 bps = 0.5 minor units -> 1
     expect(applyBps(sampleMoney('USD', 100), 50).amount_minor).toBe(1);

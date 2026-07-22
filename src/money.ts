@@ -59,6 +59,11 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
   const exponent = exponentFor(currency);
   const trimmed = amount.trim();
 
+  const match = /^(-)?(\d+)(?:\.(\d+))?$/.exec(trimmed);
+  if (match === null) {
+    throw new ValidationError(`not a decimal amount: ${amount}`, { amount, currency });
+  }
+
   const sign = match[1] === '-' ? -1n : 1n;
   const whole = match[2] ?? '0';
   const fraction = match[3] ?? '';
@@ -71,11 +76,22 @@ export function toMinor(amount: string, currency: CurrencyCode): MinorUnits {
   }
 
   const padded = fraction.padEnd(exponent, '0');
+  const minor = BigInt(whole) * pow10(exponent) + BigInt(padded === '' ? '0' : padded);
+  return Number(sign * minor);
+}
+
+/**
+ * Render minor units as a plain decimal string. No grouping, no
+ * symbol, no locale — this is the machine-readable direction.
+ * `formatMoney` is the human one.
+ */
+export function fromMinor(minor: MinorUnits, currency: CurrencyCode): string {
   const exponent = exponentFor(currency);
   if (exponent === 0) {
     return String(minor);
   }
 
+  const negative = minor < 0;
   const magnitude = BigInt(negative ? -minor : minor);
   const divisor = pow10(exponent);
   const whole = magnitude / divisor;

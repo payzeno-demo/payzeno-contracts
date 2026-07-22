@@ -155,6 +155,11 @@ export class ValidationError extends PayzenoError {
  */
 export class CurrencyMismatchError extends PayzenoError {
   readonly code: ErrorCode = 'currency_mismatch';
+  readonly httpStatus = 400;
+}
+
+/** 404. The resource does not exist, or is not visible to this principal. */
+export class NotFoundError extends PayzenoError {
   readonly code: ErrorCode = 'not_found';
   readonly httpStatus = 404;
 }
