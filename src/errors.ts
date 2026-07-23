@@ -167,4 +167,5 @@ export class NotFoundError extends PayzenoError {
 /** 409. The resource exists and is in a state that refuses this transition. */
 export class ConflictError extends PayzenoError {
   readonly code: ErrorCode = 'conflict';
+  readonly httpStatus = 409;
 }

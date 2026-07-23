@@ -40,6 +40,19 @@ describe('the four concrete subclasses', () => {
 describe('toApiError', () => {
   it('produces the exact envelope both other repos parse', () => {
     const error = new NotFoundError('merchant not found');
+    const envelope = error.toApiError(REQUEST_ID);
+
+    expect(envelope).toEqual({
+      error: {
+        code: 'not_found',
+        message: 'merchant not found',
+        request_id: REQUEST_ID,
+      },
+    });
+    expect(isApiError(envelope)).toBe(true);
+  });
+
+  it('omits field_errors and details rather than emitting them empty', () => {
     const envelope = new ConflictError('already settled').toApiError(REQUEST_ID);
     expect('field_errors' in envelope.error).toBe(false);
     expect('details' in envelope.error).toBe(false);
@@ -49,6 +62,12 @@ describe('toApiError', () => {
     const error = new ValidationError('invalid body', {}, [
       { path: 'payment_method.exp_month', code: 'out_of_range', message: 'must be 1-12' },
     ]);
+    const envelope = error.toApiError(REQUEST_ID);
+    expect(envelope.error.field_errors).toHaveLength(1);
+    expect(envelope.error.field_errors?.[0]?.path).toBe('payment_method.exp_month');
+  });
+
+  it('drops non-scalar details rather than stringifying them', () => {
     const error = new ValidationError('nope', {
       merchant_id: 'mch_1',
       attempt: 3,
@@ -76,6 +95,9 @@ describe('toApiError', () => {
 
 describe('serialisation', () => {
   it('survives JSON.stringify of the envelope, not of the error', () => {
+    const error = new CurrencyMismatchError('USD vs EUR', { left: 'USD', right: 'EUR' });
     const json = JSON.stringify(error.toApiError(REQUEST_ID));
+    const parsed: unknown = JSON.parse(json);
+    expect(isApiError(parsed)).toBe(true);
   });
 });

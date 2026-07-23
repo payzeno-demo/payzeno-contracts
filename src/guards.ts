@@ -54,3 +54,6 @@ export function isApiError(u: unknown): u is ApiError {
   );
 }
 
+export function assertNever(x: never): never {
+  throw new Error(`unreachable: ${JSON.stringify(x)}`);
+}

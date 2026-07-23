@@ -72,3 +72,9 @@ export interface ApiError {
     code: ErrorCode;
     message: string;
     /** Present when `code` is `validation_failed`. */
+    field_errors?: FieldError[];
+    /** Correlation id — matches the `X-Request-Id` response header. */
+    request_id: string;
+    /** Present on `rate_limited`. Seconds. */
+    retry_after?: number;
+    /** Free-form, safe to log, never contains cardholder data. */
