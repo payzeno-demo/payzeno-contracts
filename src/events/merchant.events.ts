@@ -66,3 +66,19 @@ export type MerchantStatusChangedEvent = EventEnvelope<
  * the payout path. Without the fields below the ledger holds an id it cannot resolve, and
  * `CreatePayoutRequest.bank_account_id` being optional means it also cannot find the default.
  */
+export interface MerchantBankAccountVerifiedPayload {
+  merchant_id: MerchantId;
+  bank_account_id: BankAccountId;
+  country: string;
+  currency: CurrencyCode;
+  scheme: string;
+  /** Vault token, not the number. The rail resolves it; Payzeno never holds the digits. */
+  account_number_token: string;
+  routing_last_four: string | null;
+  iban_last_four: string | null;
+  bic: string | null;
+  sort_code_last_four: string | null;
+  status: string;
+  is_default: boolean;
+  verified_at: IsoTimestamp;
+}

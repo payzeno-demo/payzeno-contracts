@@ -119,3 +119,10 @@ export function isEventOfType<T extends EventType>(
  * consumers reject anything higher than they know how to read.
  *
  * `settlement.completed` is at 2 because the INC hardening added `chunk_index`/`chunk_count`
+ * and made `settled_charge_ids` bounded (PAY-2052).
+ */
+export const EVENT_SCHEMA_VERSIONS: Record<EventType, number> = {
+  'payment.authorized': 1,
+  'payment.captured': 1,
+  'payment.failed': 1,
+  'payment.canceled': 1,
