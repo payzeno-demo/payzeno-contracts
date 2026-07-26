@@ -59,6 +59,9 @@ CARD_FUNDINGS: tuple[str, ...] = ("credit", "debit", "prepaid", "unknown")
 
 
 CHARGE_STATUSES_VALUES = Literal["pending", "authorized", "captured", "settled", "failed", "voided", "expired", "reversed"]
+CHARGE_STATUSES: tuple[str, ...] = ("pending", "authorized", "captured", "settled", "failed", "voided", "expired", "reversed")
+
+
 CURRENCIES_VALUES = Literal["USD", "EUR", "GBP", "ILS", "JPY"]
 CURRENCIES: tuple[str, ...] = ("USD", "EUR", "GBP", "ILS", "JPY")
 
@@ -73,6 +76,7 @@ CURRENCY_EXPONENT: dict[str, int] = {
 
 
 DECLINE_CODES_VALUES = Literal["do_not_honor", "insufficient_funds", "lost_card", "stolen_card", "expired_card", "incorrect_cvc", "processing_error", "issuer_unavailable", "velocity_exceeded", "fraud_suspected"]
+DISPUTE_REASONS_VALUES = Literal["fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general"]
 DISPUTE_REASONS: tuple[str, ...] = ("fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general")
 
 
@@ -107,6 +111,9 @@ LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund",
 
 
 MATCH_METHODS_VALUES = Literal["exact_reference", "network_txn", "heuristic", "manual", "unmatched"]
+MATCH_METHODS: tuple[str, ...] = ("exact_reference", "network_txn", "heuristic", "manual", "unmatched")
+
+
 MERCHANT_STATUSES_VALUES = Literal["pending_review", "active", "restricted", "suspended", "rejected", "closed"]
 MERCHANT_STATUSES: tuple[str, ...] = ("pending_review", "active", "restricted", "suspended", "rejected", "closed")
 
@@ -173,6 +180,9 @@ SETTLEMENT_BATCH_STATUSES: tuple[str, ...] = ("open", "closed", "reconciling", "
 
 
 STAFF_ROLES_VALUES = Literal["support", "risk", "finance", "admin"]
+STAFF_ROLES: tuple[str, ...] = ("support", "risk", "finance", "admin")
+
+
 TIMESERIES_INTERVALS_VALUES = Literal["hour", "day"]
 TIMESERIES_INTERVALS: tuple[str, ...] = ("hour", "day")
 
@@ -246,6 +256,27 @@ class BalanceHistoryResponse(BaseModel):
     currency: CURRENCIES_VALUES
     interval: TIMESERIES_INTERVALS_VALUES
     points: list[TimeseriesPoint]
+
+
+class BankAccount(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["bank_account"]
+    merchant_id: str
+    country: str
+    currency: CURRENCIES_VALUES
+    bank_name: str
+    scheme: BANK_ACCOUNT_SCHEMES_VALUES
+    last_four: str
+    routing_last_four: str | None
+    iban_last_four: str | None
+    bic: str | None
+    sort_code_last_four: str | None
+    status: BANK_ACCOUNT_STATUSES_VALUES
+    is_default: bool
+    livemode: bool
+    created_at: str
 
 
 class BootstrapAccountsResponse(BaseModel):
@@ -700,12 +731,50 @@ class PaymentIntentListQuery(ListQuery):
     customer_reference: str | None = None
 
 
+class Payout(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["payout"]
+    merchant_id: str
+    bank_account_id: str
+    amount_minor: int
+    currency: CURRENCIES_VALUES
+    status: PAYOUT_STATUSES_VALUES
+    method: PAYOUT_METHODS_VALUES
+    available_on: str
+    arrival_estimate: str | None
+    statement_descriptor: str
+    failure_code: PAYOUT_FAILURE_CODES_VALUES | None
+    ledger_transaction_id: str | None
+    reversal_transaction_id: str | None
+    livemode: bool
+    initiated_at: str | None
+    paid_at: str | None
+    failed_at: str | None
+    returned_at: str | None
+    created_at: str
+
+
 class PostTransactionLine(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     account_type: ACCOUNT_TYPES_VALUES
     direction: ENTRY_DIRECTIONS_VALUES
     amount_minor: int
+
+
+class PostTransactionRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    idempotency_key: str
+    purpose: LEDGER_PURPOSES_VALUES
+    merchant_id: str | None
+    currency: CURRENCIES_VALUES
+    livemode: bool
+    reference_type: LEDGER_REFERENCE_TYPES_VALUES
+    reference_id: str
+    lines: list[PostTransactionLine]
 
 
 class ReadinessResponse(BaseModel):
@@ -799,6 +868,15 @@ class RetryReconciliationItemRequest(BaseModel):
     reason: str | None = None
 
 
+class SessionResponse(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    object_: Literal["session"]
+    user: User
+    merchant: Merchant
+    permissions: list[str]
+
+
 class SettlementBatch(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -878,6 +956,19 @@ class UpdateMerchantRequest(BaseModel):
     settlement_tolerance_minor: int | None = None
     capture_at_settlement: bool | None = None
     metadata: dict[str, str] | None = None
+
+
+class User(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    object_: Literal["user"]
+    merchant_id: str
+    email: str
+    full_name: str
+    role: USER_ROLES_VALUES
+    last_login_at: str | None
+    created_at: str
 
 
 class VolumeTimeseries(BaseModel):
@@ -969,6 +1060,7 @@ MerchantStatus = MERCHANT_STATUSES_VALUES
 Metadata = dict[str, str]
 MinorUnits = int
 PaymentIntentId = str
+PaymentIntentListResponse = Paginated[PaymentIntent]
 PaymentIntentResponse = PaymentIntent
 PaymentIntentStatus = PAYMENT_INTENT_STATUSES_VALUES
 PaymentMethodToken = str
@@ -980,6 +1072,7 @@ PayoutResponse = Payout
 PayoutSchedule = PAYOUT_SCHEDULES_VALUES
 PayoutStatus = PAYOUT_STATUSES_VALUES
 PricingModel = PRICING_MODELS_VALUES
+PublicEventType = PUBLIC_EVENT_TYPES_VALUES
 ReconciliationItemId = str
 ReconciliationItemStatus = RECONCILIATION_ITEM_STATUSES_VALUES
 ReconciliationLineType = RECONCILIATION_LINE_TYPES_VALUES

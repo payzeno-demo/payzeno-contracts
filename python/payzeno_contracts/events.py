@@ -361,6 +361,26 @@ class SettlementBatchClosedPayload(BaseModel):
     closed_at: str
 
 
+class SettlementCompletedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    batch_id: str
+    run_id: str
+    acquirer: str
+    currency: str
+    processing_date: str
+    items_total: int
+    items_settled: int
+    items_failed: int
+    posted_total_minor: int
+    fee_total_minor: int
+    net_total_minor: int
+    settled_charge_ids: list[str]
+    chunk_index: int
+    chunk_count: int
+    completed_at: str
+
+
 class SettlementDuplicateDetectedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -436,8 +456,10 @@ class SettlementVarianceDetectedPayload(BaseModel):
 
 
 DisputeClosedEvent = EventEnvelope
+DisputeEvidenceSubmittedEvent = EventEnvelope
 DisputeOpenedEvent = EventEnvelope
 EventType = EVENT_TYPES_VALUES
+InvoiceIssuedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
 LedgerTransactionPostedEvent = EventEnvelope
 MerchantBankAccountVerifiedEvent = EventEnvelope
@@ -447,6 +469,8 @@ PaymentAuthorizedEvent = EventEnvelope
 PaymentCanceledEvent = EventEnvelope
 PaymentCapturedEvent = EventEnvelope
 PaymentFailedEvent = EventEnvelope
+PayoutFailedEvent = EventEnvelope
+PayoutPaidEvent = EventEnvelope
 PayoutReturnedEvent = EventEnvelope
 PayoutScheduledEvent = EventEnvelope
 PayzenoEvent = EventEnvelope
