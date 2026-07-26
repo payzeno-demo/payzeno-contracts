@@ -78,3 +78,9 @@ export interface ApiError {
     /** Present on `rate_limited`. Seconds. */
     retry_after?: number;
     /** Free-form, safe to log, never contains cardholder data. */
+    details?: Record<string, string | number | boolean | null>;
+  };
+}
+
+export interface Paginated<T> {
+  data: T[];

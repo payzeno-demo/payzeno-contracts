@@ -77,6 +77,8 @@ export const PAYMENT_INTENT_STATUSES = [
   'failed',
   'canceled',
 ] as const;
+export type PaymentIntentStatus = (typeof PAYMENT_INTENT_STATUSES)[number];
+
 export interface PaymentIntent {
   id: PaymentIntentId;
   object: 'payment_intent';
@@ -121,6 +123,11 @@ export interface ConfirmPaymentIntentRequest {
   payment_method_token?: PaymentMethodToken;
   /** 3DS / redirect return target. */
   return_url?: string;
+}
+
+export interface CapturePaymentIntentRequest {
+  /** Defaults to the full authorised amount. Must be ≤ authorised. */
+  amount_minor?: MinorUnits;
 }
 
 export interface CancelPaymentIntentRequest {
