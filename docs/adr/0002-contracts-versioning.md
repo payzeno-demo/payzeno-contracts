@@ -60,3 +60,16 @@ key. The release job reads it.
 - "Just make it required, nobody sends null anyway" stops being a review argument
   and starts being a version number. See the 3.3.0 entry in `CHANGELOG.md`, where
   we shipped a narrowing as a minor with an explicit written justification. That is
+  allowed exactly once per situation and it is not precedent.
+- The version-consistency job is load-bearing. Do not delete it because it went red
+  on a Friday; it went red because the tree is inconsistent.
+
+## Alternatives considered
+
+**Date-versioning the whole package**, the way the public API is versioned. Rejected:
+a date tells a consumer when something changed, not whether it can upgrade without
+reading the diff. The whole point of the number is that it answers that question.
+
+**No versioning at all — everything is `workspace:*`.** This works right up until
+the moment a non-TypeScript consumer appears, which happened in month 2 with the
+ledger. A Python package cannot depend on a workspace.

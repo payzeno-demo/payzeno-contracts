@@ -32,6 +32,12 @@ describe('isApiError', () => {
 describe('isEventOfType', () => {
   const events = everyEventType();
 
+  it('narrows exactly one fixture per type', () => {
+    const authorized = events.filter((e) => isEventOfType(e, 'payment.authorized'));
+    expect(authorized).toHaveLength(1);
+    expect(authorized[0]?.payload.authorization_code).toBe('A31X7Q');
+  });
+
   it('is false for every other type', () => {
     const duplicate = events.find((e) => e.type === 'settlement.duplicate_detected');
     expect(duplicate).toBeDefined();
@@ -41,4 +47,7 @@ describe('isEventOfType', () => {
 });
 
 describe('assertNever', () => {
+  it('throws with the offending value', () => {
+    expect(() => assertNever('unexpected' as never)).toThrow(/unexpected/);
+  });
 });

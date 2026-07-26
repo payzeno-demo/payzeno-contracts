@@ -118,6 +118,7 @@ export abstract class PayzenoError extends Error {
 function toSafeDetails(
   details: Record<string, unknown>,
 ): Record<string, string | number | boolean | null> | undefined {
+  const out: Record<string, string | number | boolean | null> = {};
   let count = 0;
 
   for (const key of Object.keys(details)) {
