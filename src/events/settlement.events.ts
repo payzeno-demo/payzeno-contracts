@@ -149,3 +149,14 @@ export interface SettlementVarianceDetectedPayload {
   variance_minor: MinorUnits;
   tolerance_minor: MinorUnits;
   currency: CurrencyCode;
+  detected_at: IsoTimestamp;
+}
+export type SettlementVarianceDetectedEvent = EventEnvelope<
+  'settlement.variance_detected',
+  SettlementVarianceDetectedPayload
+>;
+
+/** A `funding_event` matched the batch within tolerance; `settlement_funding` posted. */
+export interface SettlementFundedPayload {
+  batch_id: SettlementBatchId;
+  funding_event_id: string;

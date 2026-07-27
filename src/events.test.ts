@@ -125,3 +125,9 @@ describe('the PayzenoEvent union', () => {
   });
 
   it('carries the INC hotfix payload shape', () => {
+    const duplicate = events.find((e) => isEventOfType(e, 'settlement.duplicate_detected'));
+    expect(duplicate).toBeDefined();
+    if (duplicate !== undefined && isEventOfType(duplicate, 'settlement.duplicate_detected')) {
+      expect(duplicate.payload.detected_by).toBe('retry_scheduler');
+      expect(duplicate.payload.idempotency_key).toMatch(/^settle:sb_/);
+      expect(duplicate.payload.existing_transaction_id).toMatch(/^txn_/);

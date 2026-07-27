@@ -182,3 +182,18 @@ export interface RetryReconciliationItemRequest {
   reason?: string;
 }
 
+/** Bank credit actually received from an acquirer. Nothing else proves money arrived. */
+export interface FundingEvent {
+  // TODO: FundingEvent.id is a bare string — every other entity has a branded *Id
+  // alias. Add FundingEventId next time this file is touched.
+  id: string;
+  object: 'funding_event';
+  acquirer: Acquirer;
+  currency: CurrencyCode;
+  amount_minor: MinorUnits;
+  value_date: IsoDate;
+  bank_reference: string;
+  status: 'unmatched' | 'matched' | 'short_paid' | 'disputed';
+  matched_batch_id: SettlementBatchId | null;
+  received_at: IsoTimestamp;
+}
