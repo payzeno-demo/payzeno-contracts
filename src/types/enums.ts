@@ -21,15 +21,27 @@ export const LEDGER_REFERENCE_TYPES = [
   'funding_event',
   'reserve_hold',
 ] as const;
+export type LedgerReferenceType = (typeof LEDGER_REFERENCE_TYPES)[number];
+
+export const LEDGER_ACTORS = ['system', 'reconciliation', 'payout_worker', 'admin'] as const;
 export type LedgerActor = (typeof LEDGER_ACTORS)[number];
 
+export const CARD_FUNDINGS = ['credit', 'debit', 'prepaid', 'unknown'] as const;
+export type CardFunding = (typeof CARD_FUNDINGS)[number];
+
 export const API_KEY_MODES = ['test', 'live'] as const;
+export type ApiKeyMode = (typeof API_KEY_MODES)[number];
+
 export const WEBHOOK_ENDPOINT_STATUSES = ['enabled', 'disabled'] as const;
+export type WebhookEndpointStatus = (typeof WEBHOOK_ENDPOINT_STATUSES)[number];
+
 export const RECONCILIATION_RUN_STATUSES = ['running', 'succeeded', 'failed'] as const;
 export type ReconciliationRunStatus = (typeof RECONCILIATION_RUN_STATUSES)[number];
 
+export const REPORTING_WINDOWS = ['24h', '7d', '30d'] as const;
 export type ReportingWindow = (typeof REPORTING_WINDOWS)[number];
 
+export const TIMESERIES_INTERVALS = ['hour', 'day'] as const;
 export type TimeseriesInterval = (typeof TIMESERIES_INTERVALS)[number];
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

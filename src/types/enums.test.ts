@@ -46,6 +46,27 @@ describe.each(TUPLES)('%s', (name, tuple) => {
     expect(new Set(tuple).size).toBe(tuple.length);
   });
 
+  it('is snake_case — the shape the pg enums require', () => {
+    for (const member of tuple) {
+      // REPORTING_WINDOWS is '24h' / '7d' / '30d'; digits lead there.
+      expect(member, `${name}.${member}`).toMatch(/^[a-z0-9]+(_[a-z0-9]+)*$/);
+    }
+  });
+});
+
+describe('the two tuples with no TypeScript consumer', () => {
+  // They exist only to back pg enums in payzeno-api and are imported by the
+  // Python codegen output. A linter reads them as dead code; they are not.
+  it('AUDIT_ACTOR_TYPES still covers every principal kind', () => {
+    expect([...AUDIT_ACTOR_TYPES]).toEqual([
+      'user',
+      'api_key',
+      'staff',
+      'internal_service',
+      'system',
+    ]);
+  });
+
   it('IDEMPOTENCY_STATES covers the lease state machine', () => {
     expect([...IDEMPOTENCY_STATES]).toEqual(['in_progress', 'completed', 'failed']);
   });

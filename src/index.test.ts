@@ -80,6 +80,7 @@ describe('layering', () => {
   // The cycle rule. types/** is the bottom of the graph and must stay there,
   // or the Python codegen's per-module read stops terminating.
   it.each(moduleFiles())('types/%s imports only other types/ modules', (file) => {
+    const source = fs.readFileSync(path.join(typesDir, file), 'utf8');
     const specifiers = [...source.matchAll(/from '([^']+)'/g)].map((m) => m[1] ?? '');
 
     for (const specifier of specifiers) {
@@ -102,6 +103,7 @@ describe('layering', () => {
   });
 
   it('codegen/ never imports the types it generates', () => {
+    const codegenDir = path.resolve(__dirname, 'codegen');
     const walk = (dir: string): string[] =>
       fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
         const full = path.join(dir, entry.name);
