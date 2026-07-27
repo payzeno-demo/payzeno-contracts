@@ -44,6 +44,15 @@ export interface MerchantCreatedPayload {
   platform_fee_fixed_minor: MinorUnits;
   created_at: IsoTimestamp;
 }
+export type MerchantCreatedEvent = EventEnvelope<'merchant.created', MerchantCreatedPayload>;
+
+/**
+ * Emitted by `PATCH /v1/merchants/:merchantId` and by the `capture_at_settlement` rollout.
+ * Carries the full mutable field set, so the ledger's projection is a straight upsert rather
+ * than a diff. Without this event `merchant_projection.capture_at_settlement` — migration
+ * 0013's column and the literal blast radius of arc INC — can never be set to true by any
+ * specified mechanism.
+ */
 export type MerchantUpdatedEvent = EventEnvelope<'merchant.updated', MerchantUpdatedPayload>;
 
 export interface MerchantStatusChangedPayload {
@@ -66,3 +75,23 @@ export type MerchantStatusChangedEvent = EventEnvelope<
  * the payout path. Without the fields below the ledger holds an id it cannot resolve, and
  * `CreatePayoutRequest.bank_account_id` being optional means it also cannot find the default.
  */
+export interface MerchantBankAccountVerifiedPayload {
+  merchant_id: MerchantId;
+  bank_account_id: BankAccountId;
+  country: string;
+  currency: CurrencyCode;
+  scheme: string;
+  /** Vault token, not the number. The rail resolves it; Payzeno never holds the digits. */
+  account_number_token: string;
+  routing_last_four: string | null;
+  iban_last_four: string | null;
+  bic: string | null;
+  sort_code_last_four: string | null;
+  status: string;
+  is_default: boolean;
+  verified_at: IsoTimestamp;
+}
+export type MerchantBankAccountVerifiedEvent = EventEnvelope<
+  'merchant.bank_account_verified',
+  MerchantBankAccountVerifiedPayload
+>;

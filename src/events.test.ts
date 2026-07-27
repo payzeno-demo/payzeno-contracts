@@ -119,3 +119,9 @@ describe('the PayzenoEvent union', () => {
   it('attributes every event to a legal publisher', () => {
     for (const event of events) {
       expect(['payzeno-api', 'payzeno-ledger', 'payzeno-billing-legacy']).toContain(event.source);
+    }
+    const invoice = events.find((e) => isEventOfType(e, 'invoice.issued'));
+    expect(invoice?.source).toBe('payzeno-billing-legacy');
+  });
+
+  it('carries the INC hotfix payload shape', () => {
