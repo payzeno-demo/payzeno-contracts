@@ -42,3 +42,12 @@ export type AuthPrincipal =
     }
   | {
       kind: 'internal_service';
+      service: 'payzeno-ledger' | 'payzeno-billing-legacy';
+      scopes: string[];
+    }
+  | {
+      /** Browser-side checkout. Scoped to exactly one PaymentIntent. */
+      kind: 'client_secret';
+      merchant_id: MerchantId;
+      payment_intent_id: PaymentIntentId;
+    };
