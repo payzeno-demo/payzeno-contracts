@@ -14,3 +14,8 @@ __version__ = "3.4.0"
 __api_version__ = "2026-01-15"
 
 __all__ = [
+    "__api_version__",
+    "__version__",
+    "events",
+    "types",
+]

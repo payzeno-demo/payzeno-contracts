@@ -42,6 +42,9 @@ BANK_ACCOUNT_SCHEMES: tuple[str, ...] = ("aba", "iban", "uk_sort_code")
 
 
 BANK_ACCOUNT_STATUSES_VALUES = Literal["new", "validated", "verification_failed", "errored"]
+BANK_ACCOUNT_STATUSES: tuple[str, ...] = ("new", "validated", "verification_failed", "errored")
+
+
 CANCELLATION_REASONS_VALUES = Literal["requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired"]
 CANCELLATION_REASONS: tuple[str, ...] = ("requested_by_customer", "duplicate", "fraudulent", "abandoned", "expired")
 
@@ -76,10 +79,14 @@ CURRENCY_EXPONENT: dict[str, int] = {
 
 
 DECLINE_CODES_VALUES = Literal["do_not_honor", "insufficient_funds", "lost_card", "stolen_card", "expired_card", "incorrect_cvc", "processing_error", "issuer_unavailable", "velocity_exceeded", "fraud_suspected"]
+DECLINE_CODES: tuple[str, ...] = ("do_not_honor", "insufficient_funds", "lost_card", "stolen_card", "expired_card", "incorrect_cvc", "processing_error", "issuer_unavailable", "velocity_exceeded", "fraud_suspected")
+
+
 DISPUTE_REASONS_VALUES = Literal["fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general"]
 DISPUTE_REASONS: tuple[str, ...] = ("fraudulent", "product_not_received", "product_unacceptable", "duplicate", "subscription_canceled", "credit_not_processed", "general")
 
 
+DISPUTE_STATUSES_VALUES = Literal["needs_response", "under_review", "won", "lost", "warning_needs_response", "warning_closed"]
 DISPUTE_STATUSES: tuple[str, ...] = ("needs_response", "under_review", "won", "lost", "warning_needs_response", "warning_closed")
 
 
@@ -107,6 +114,7 @@ LEDGER_PURPOSES_VALUES = Literal["auth", "auth_release", "capture", "settle", "s
 LEDGER_PURPOSES: tuple[str, ...] = ("auth", "auth_release", "capture", "settle", "settlement_funding", "fee", "refund", "dispute", "reserve_release", "payout", "payout_reversal", "reversal", "adjustment")
 
 
+LEDGER_REFERENCE_TYPES_VALUES = Literal["payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold"]
 LEDGER_REFERENCE_TYPES: tuple[str, ...] = ("payment_intent", "charge", "refund", "dispute", "payout", "settlement_batch", "reconciliation_item", "funding_event", "reserve_hold")
 
 
@@ -140,6 +148,9 @@ PAYOUT_STATUSES: tuple[str, ...] = ("scheduled", "in_transit", "paid", "failed",
 
 PRICING_MODELS_VALUES = Literal["blended", "interchange_plus"]
 PRICING_MODELS: tuple[str, ...] = ("blended", "interchange_plus")
+
+
+PUBLIC_EVENT_TYPES: tuple[str, ...] = ("payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.item_settled", "settlement.completed", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned")
 
 
 RECONCILIATION_ITEM_STATUSES_VALUES = Literal["pending", "settling", "settled", "retryable", "failed", "orphaned", "needs_review", "variance_exceeded"]
@@ -1020,6 +1031,7 @@ class WebhookEvent(BaseModel):
 
 AccountId = str
 AccountStatus = ACCOUNT_STATUSES_VALUES
+AccountType = ACCOUNT_TYPES_VALUES
 Acquirer = ACQUIRERS_VALUES
 ApiKeyId = str
 ApiKeyMode = API_KEY_MODES_VALUES
@@ -1028,7 +1040,9 @@ AuditActorType = AUDIT_ACTOR_TYPES_VALUES
 AuthPrincipal = dict[str, Any]
 BankAccountId = str
 BankAccountScheme = BANK_ACCOUNT_SCHEMES_VALUES
+BankAccountStatus = BANK_ACCOUNT_STATUSES_VALUES
 BasisPoints = int
+CancellationReason = CANCELLATION_REASONS_VALUES
 CaptureMethod = CAPTURE_METHODS_VALUES
 CardBrand = CARD_BRANDS_VALUES
 CardFunding = CARD_FUNDINGS_VALUES
@@ -1056,6 +1070,7 @@ LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
 MatchMethod = MATCH_METHODS_VALUES
 MerchantListResponse = Paginated[Merchant]
+MerchantResponse = Merchant
 MerchantStatus = MERCHANT_STATUSES_VALUES
 Metadata = dict[str, str]
 MinorUnits = int
@@ -1089,7 +1104,9 @@ ScaExemption = SCA_EXEMPTIONS_VALUES
 SettlementBatchId = str
 SettlementBatchStatus = SETTLEMENT_BATCH_STATUSES_VALUES
 StaffRole = STAFF_ROLES_VALUES
+TimeseriesInterval = TIMESERIES_INTERVALS_VALUES
 UserId = str
+UserRole = USER_ROLES_VALUES
 WebhookEndpointStatus = WEBHOOK_ENDPOINT_STATUSES_VALUES
 WebhookEventId = str
 WebhookEventStatus = WEBHOOK_EVENT_STATUSES_VALUES

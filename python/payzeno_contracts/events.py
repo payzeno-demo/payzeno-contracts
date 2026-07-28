@@ -105,6 +105,15 @@ class DisputeClosedPayload(BaseModel):
     closed_at: str
 
 
+class DisputeEvidenceSubmittedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    dispute_id: str
+    merchant_id: str
+    submitted_at: str
+    evidence_field_count: int
+
+
 class InvoiceIssuedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -288,6 +297,17 @@ class PayoutFailedPayload(BaseModel):
     failed_at: str
 
 
+class PayoutPaidPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payout_id: str
+    merchant_id: str
+    amount_minor: int
+    currency: str
+    ledger_transaction_id: str
+    paid_at: str
+
+
 class PayoutReturnedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -463,6 +483,7 @@ InvoiceIssuedEvent = EventEnvelope
 LedgerImbalanceDetectedEvent = EventEnvelope
 LedgerTransactionPostedEvent = EventEnvelope
 MerchantBankAccountVerifiedEvent = EventEnvelope
+MerchantCreatedEvent = EventEnvelope
 MerchantStatusChangedEvent = EventEnvelope
 MerchantUpdatedEvent = EventEnvelope
 PaymentAuthorizedEvent = EventEnvelope
@@ -485,3 +506,69 @@ SettlementReconciliationFailedEvent = EventEnvelope
 SettlementVarianceDetectedEvent = EventEnvelope
 
 
+__all__ = [
+    "DisputeClosedEvent",
+    "DisputeClosedPayload",
+    "DisputeEvidenceSubmittedEvent",
+    "DisputeEvidenceSubmittedPayload",
+    "DisputeOpenedEvent",
+    "DisputeOpenedPayload",
+    "DLQ_TOPIC_NAME",
+    "EVENT_SCHEMA_VERSIONS",
+    "EVENT_TOPICS",
+    "EVENT_TYPES",
+    "EVENT_TYPES_VALUES",
+    "EventEnvelope",
+    "EventType",
+    "InvoiceIssuedEvent",
+    "InvoiceIssuedPayload",
+    "LedgerImbalanceDetectedEvent",
+    "LedgerImbalanceDetectedPayload",
+    "LedgerTransactionPostedEvent",
+    "LedgerTransactionPostedPayload",
+    "MerchantBankAccountVerifiedEvent",
+    "MerchantBankAccountVerifiedPayload",
+    "MerchantCreatedEvent",
+    "MerchantCreatedPayload",
+    "MerchantStatusChangedEvent",
+    "MerchantStatusChangedPayload",
+    "MerchantUpdatedEvent",
+    "MerchantUpdatedPayload",
+    "PaymentAuthorizedEvent",
+    "PaymentAuthorizedPayload",
+    "PaymentCanceledEvent",
+    "PaymentCanceledPayload",
+    "PaymentCapturedEvent",
+    "PaymentCapturedPayload",
+    "PaymentFailedEvent",
+    "PaymentFailedPayload",
+    "PayoutFailedEvent",
+    "PayoutFailedPayload",
+    "PayoutPaidEvent",
+    "PayoutPaidPayload",
+    "PayoutReturnedEvent",
+    "PayoutReturnedPayload",
+    "PayoutScheduledEvent",
+    "PayoutScheduledPayload",
+    "PayzenoEvent",
+    "RefundCreatedEvent",
+    "RefundCreatedPayload",
+    "RefundFailedEvent",
+    "RefundFailedPayload",
+    "RefundSucceededEvent",
+    "RefundSucceededPayload",
+    "SettlementBatchClosedEvent",
+    "SettlementBatchClosedPayload",
+    "SettlementCompletedEvent",
+    "SettlementCompletedPayload",
+    "SettlementDuplicateDetectedEvent",
+    "SettlementDuplicateDetectedPayload",
+    "SettlementFundedEvent",
+    "SettlementFundedPayload",
+    "SettlementItemSettledEvent",
+    "SettlementItemSettledPayload",
+    "SettlementReconciliationFailedEvent",
+    "SettlementReconciliationFailedPayload",
+    "SettlementVarianceDetectedEvent",
+    "SettlementVarianceDetectedPayload",
+]
