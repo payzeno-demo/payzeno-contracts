@@ -88,3 +88,9 @@ export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
 export function topicForEventType(type: EventType): TopicName | undefined {
   for (const topic of Object.keys(EVENT_TOPICS) as TopicName[]) {
     const types: readonly EventType[] = EVENT_TOPICS[topic];
+    if (types.includes(type)) {
+      return topic;
+    }
+  }
+  return undefined;
+}

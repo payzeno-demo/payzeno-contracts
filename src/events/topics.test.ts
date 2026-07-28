@@ -76,6 +76,13 @@ describe('QUEUE_NAMES', () => {
     expect(new Set(values).size).toBe(values.length);
   });
 
+  it('names the DLQ topic separately from its monitor queue', () => {
+    expect(DLQ_TOPIC_NAME).toBe('payzeno-dlq');
+    expect(QUEUE_NAMES.DeadLetterConsumer).toBe('payzeno-dlq-monitor');
+  });
+});
+
+describe('topicForEventType', () => {
   it('resolves every event type', () => {
     for (const type of EVENT_TYPES) {
       expect(topicForEventType(type), `${type} has no topic`).toBeDefined();

@@ -160,3 +160,14 @@ export type SettlementVarianceDetectedEvent = EventEnvelope<
 export interface SettlementFundedPayload {
   batch_id: SettlementBatchId;
   funding_event_id: string;
+  acquirer: Acquirer;
+  currency: CurrencyCode;
+  expected_total_minor: MinorUnits;
+  funded_amount_minor: MinorUnits;
+  variance_minor: MinorUnits;
+  bank_reference: string;
+  value_date: IsoDate;
+  transaction_id: LedgerTransactionId;
+  funded_at: IsoTimestamp;
+}
+export type SettlementFundedEvent = EventEnvelope<'settlement.funded', SettlementFundedPayload>;
