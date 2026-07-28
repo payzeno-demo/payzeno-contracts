@@ -111,3 +111,11 @@ duplicate-settlement incident, see `docs/adr/0016-event-schema-versioning.md`.
   `payzeno-ledger` (`app/domain/fees.py::apportion_fee`) and deliberately has no TypeScript twin.
 - **The strings in `src/events/topics.ts` are load-bearing.** `EVENT_TOPICS` keys and
   `QUEUE_NAMES` must match the SNS/SQS names in `payzeno-infrastructure` exactly, and no test
+  anywhere checks that across repos. Renaming a topic here is a two-repo change.
+- **`src/types/invoice.ts` is the legacy shape**, straight out of the old biller's JPA model,
+  with `migrated_to_ledger` bolted on. It stays that way until the cutover finishes.
+
+## Owners
+
+Platform. `@osquash` for the type surface and codegen, `@nmigration` for `src/events/**`,
+`@dhotfix` for `errors.ts`, `version.ts`, `internal/**` and the ADRs. See `CODEOWNERS`.

@@ -19,3 +19,14 @@ src/events/                         @nmigration
 src/test-support/                   @nmigration
 
 # --- Type surface. Platform. -----------------------------------------------
+src/types/                          @osquash
+src/codegen/                        @osquash
+
+# --- Generated trees. Regenerated, never hand-edited. Reviewed for drift only.
+python/                             @osquash
+java/                               @osquash @dhotfix
+
+# --- Release plumbing ------------------------------------------------------
+package.json                        @osquash @dhotfix
+CHANGELOG.md                        @osquash @dhotfix
+.github/                            @payzeno/platform
