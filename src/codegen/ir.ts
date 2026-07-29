@@ -26,6 +26,12 @@
 /** Every code-generation target the pipeline knows about. */
 export type Target = 'python' | 'java';
 
+export const TARGETS: readonly Target[] = ['python', 'java'];
+
+// ---------------------------------------------------------------------------
+// Source side — the loader's output
+// ---------------------------------------------------------------------------
+
 export type SourceTypeKind =
   | 'keyword'
   | 'reference'
@@ -35,6 +41,21 @@ export type SourceTypeKind =
   | 'literal'
   | 'object'
   | 'indexed';
+
+/** A type as the loader saw it, printed and lightly structured. */
+export interface SourceTypeNode {
+  kind: SourceTypeKind;
+  /** The printed source text. Kept for error messages — it is what a human recognises. */
+  text: string;
+  /** Set on `reference` and `generic`: `Paginated`, `Money`, `Record`. */
+  typeName?: string;
+  /** Generic arguments, array element type, or union members. */
+  args?: SourceTypeNode[];
+  /** Set on `literal`: the string literal's value, unquoted. */
+  literal?: string;
+  /** Set on `object`: an inline object type, e.g. `ApiError.error`. */
+  members?: SourceMember[];
+}
 
 export interface SourceMember {
   name: string;
@@ -103,6 +124,12 @@ export interface IrRef {
  * `Paginated<T>`, `Record<K, V>`, `Array<T>`, `EventEnvelope<T, P>`.
  * Nothing else is supported and nothing else should be.
  */
+export interface IrGeneric {
+  kind: 'generic';
+  name: 'Paginated' | 'Record' | 'Array' | 'EventEnvelope';
+  args: IrType[];
+}
+
 export interface IrUnion {
   kind: 'union';
   members: IrType[];
@@ -142,6 +169,29 @@ export interface IrEnum {
   doc: string | null;
 }
 
+export interface IrAlias {
+  kind: 'alias';
+  name: string;
+  target: IrType;
+  doc: string | null;
+}
+
+/**
+ * A `Record<K, V>` constant — `CURRENCY_EXPONENT`,
+ * `EVENT_SCHEMA_VERSIONS`. These are VALUES, not shapes: the
+ * ledger reads them at runtime, so dropping them would leave
+ * `app/domain/money.py` with no exponent table and
+ * `app/publishers/*` with no version to stamp.
+ */
+export interface IrConstMap {
+  kind: 'const-map';
+  name: string;
+  entries: Array<[string, string]>;
+  doc: string | null;
+}
+
+export type IrDeclaration = IrModel | IrEnum | IrAlias | IrConstMap;
+
 export interface IrModule {
   name: string;
   sourcePath: string;
@@ -157,3 +207,11 @@ export function isEnum(decl: IrDeclaration): decl is IrEnum {
   return decl.kind === 'enum';
 }
 
+export function isAlias(decl: IrDeclaration): decl is IrAlias {
+  return decl.kind === 'alias';
+}
+
+/** Every declaration name in a module, in declaration order. */
+export function declarationNames(module: IrModule): string[] {
+  return module.declarations.map((decl) => decl.name);
+}

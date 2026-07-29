@@ -72,6 +72,7 @@ function isTarget(value: string): value is Target {
 
 export function parseArgs(argv: string[]): ParsedArgs {
   let target: Target | null = null;
+  let outDir: string | null = null;
   let check = false;
 
   for (let i = 0; i < argv.length; i += 1) {

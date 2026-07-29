@@ -171,6 +171,11 @@ describe('PythonEmitter', () => {
     expect(emitted.contents).toContain('from __future__ import annotations');
   });
 
+  it('renders the tuple as a Literal alias plus the tuple itself', () => {
+    expect(emitted.contents).toContain('CHARGE_STATUSES_VALUES = Literal[');
+    expect(emitted.contents).toContain('CHARGE_STATUSES: tuple[str, ...] = (');
+  });
+
   it('renders optional as `| None = None` and nullable as `| None`', () => {
     expect(emitted.contents).toContain('settled_at: str | None');
     expect(emitted.contents).toContain('metadata: dict[str, str] | None = None');
@@ -253,6 +258,17 @@ describe('DeterministicWriter', () => {
     expect(fs.readFileSync(path.join(dir, 'x.py'), 'utf8')).toBe('a = 1\nb = 2\n');
   });
 
+  it('throws EmitDriftError in check mode when the tree is stale', () => {
+    const dir = tempDir();
+    const writer = new DeterministicWriter();
+    const file = { path: 'x.py', contents: 'a = 1\n', symbols: [] };
+    writer.writeAll([file], dir, 'write');
+
+    expect(() =>
+      writer.writeAll([{ ...file, contents: 'a = 2\n' }], dir, 'check'),
+    ).toThrow(EmitDriftError);
+  });
+
   it('does not write in check mode', () => {
     const dir = tempDir();
     const writer = new DeterministicWriter();
@@ -276,4 +292,8 @@ describe('cli.parseArgs', () => {
     expect(() => parseArgs(['--target', 'rust', '--out', 'rust'])).toThrow(RangeError);
   });
 
+  it('requires both flags', () => {
+    expect(() => parseArgs(['--out', 'python'])).toThrow(RangeError);
+    expect(() => parseArgs(['--target', 'python'])).toThrow(RangeError);
+  });
 });

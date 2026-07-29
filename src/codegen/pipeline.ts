@@ -52,6 +52,9 @@ export class CodegenPipeline {
       this.normalizer.normalizeModule(module),
     );
 
+    const bundles = this.bundle(irModules);
+    const files = await this.emit(bundles, opts.target);
+
     let parity: ParityReport | null = null;
     if (opts.checkParity) {
       parity = diffParity(collectExportedSymbols(sourceModules), collectEmittedSymbols(files));
