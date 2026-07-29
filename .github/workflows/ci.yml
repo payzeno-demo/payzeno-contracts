@@ -43,14 +43,35 @@ jobs:
             exit 1
           fi
 
+      - name: Format check
+        run: pnpm run format:check
+
       - name: Lint
         run: pnpm run lint
 
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Test (coverage gate 95%)
+        run: pnpm test
+
       - name: Build
         run: pnpm run build
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  codegen-parity:
+    name: codegen parity (python)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v3
         with:
@@ -60,6 +81,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
       - run: pnpm install --frozen-lockfile
 

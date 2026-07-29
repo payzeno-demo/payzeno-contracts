@@ -73,6 +73,7 @@
     "lint": "eslint \"src/**/*.ts\" --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"*.{json,md,cjs,ts}\"",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "codegen:python": "tsx src/codegen/cli.ts --target python --out python",
     "codegen:java": "tsx src/codegen/cli.ts --target java --out java",
