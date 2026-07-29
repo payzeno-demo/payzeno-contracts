@@ -28,3 +28,4 @@ export * from './types/refund';
 export * from './types/dispute';
 export * from './types/ledger';
 export * from './types/payout';
+export * from './types/webhook';
