@@ -53,6 +53,24 @@ export type MerchantCreatedEvent = EventEnvelope<'merchant.created', MerchantCre
  * 0013's column and the literal blast radius of arc INC — can never be set to true by any
  * specified mechanism.
  */
+export interface MerchantUpdatedPayload {
+  merchant_id: MerchantId;
+  display_name: string;
+  status: MerchantStatus;
+  risk_tier: string;
+  payout_schedule: string;
+  pricing_model: string;
+  reserve_bps: number;
+  reserve_hold_days: number;
+  payout_delay_days: number;
+  settlement_tolerance_minor: MinorUnits;
+  capture_at_settlement: boolean;
+  platform_fee_bps: number;
+  platform_fee_fixed_minor: MinorUnits;
+  statement_descriptor: string | null;
+  changed_by: string;
+  changed_at: IsoTimestamp;
+}
 export type MerchantUpdatedEvent = EventEnvelope<'merchant.updated', MerchantUpdatedPayload>;
 
 export interface MerchantStatusChangedPayload {

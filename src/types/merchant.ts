@@ -95,6 +95,8 @@ export type MerchantResponse = Merchant;
 export type MerchantListResponse = Paginated<Merchant>;
 
 export const USER_ROLES = ['owner', 'admin', 'developer', 'viewer'] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
 export interface User {
   id: UserId;
   object: 'user';
@@ -130,6 +132,20 @@ export const API_KEY_SCOPES = [
 ] as const;
 export type ApiKeyScope = (typeof API_KEY_SCOPES)[number];
 
+export interface ApiKey {
+  id: ApiKeyId;
+  object: 'api_key';
+  merchant_id: MerchantId;
+  name: string;
+  mode: ApiKeyMode;
+  /** `sk_live_` / `sk_test_`. Never `pk_` — that prefix means *publishable* everywhere else. */
+  prefix: string;
+  last_four: string;
+  scopes: ApiKeyScope[];
+  created_at: IsoTimestamp;
+  revoked_at: IsoTimestamp | null;
+}
+
 export interface CreateApiKeyRequest {
   name: string;
   mode: ApiKeyMode;
@@ -153,6 +169,8 @@ export type BankAccountStatus = (typeof BANK_ACCOUNT_STATUSES)[number];
 
 /** Which rail's coordinates a bank account carries. Drives validation and payout method. */
 export const BANK_ACCOUNT_SCHEMES = ['aba', 'iban', 'uk_sort_code'] as const;
+export type BankAccountScheme = (typeof BANK_ACCOUNT_SCHEMES)[number];
+
 export interface BankAccount {
   id: BankAccountId;
   object: 'bank_account';
