@@ -84,3 +84,14 @@ export interface ApiError {
 
 export interface Paginated<T> {
   data: T[];
+  /** Opaque cursor for the next page. `null` when exhausted. */
+  next_cursor: string | null;
+  has_more: boolean;
+}
+
+export interface ListQuery {
+  limit?: number;
+  cursor?: string;
+  created_after?: IsoTimestamp;
+  created_before?: IsoTimestamp;
+}
