@@ -18,7 +18,9 @@ const CHARGE_ID = 'ch_01HQ8Z3K9X4M2N7P6R5T1V0W91';
 const PAYMENT_INTENT_ID = 'pi_01HQ8Z3K9X4M2N7P6R5T1V0W92';
 const BATCH_ID = 'sb_01HQ8Z3K9X4M2N7P6R5T1V0W93';
 const ITEM_ID = 'ri_01HQ8Z3K9X4M2N7P6R5T1V0W94';
+const RUN_ID = 'rr_01HQ8Z3K9X4M2N7P6R5T1V0W95';
 const TRANSACTION_ID = 'txn_01HQ8Z3K9X4M2N7P6R5T1V0W96';
+const PAYOUT_ID = 'po_01HQ8Z3K9X4M2N7P6R5T1V0W97';
 const BANK_ACCOUNT_ID = 'ba_01HQ8Z3K9X4M2N7P6R5T1V0W98';
 const REFUND_ID = 're_01HQ8Z3K9X4M2N7P6R5T1V0W99';
 const DISPUTE_ID = 'dp_01HQ8Z3K9X4M2N7P6R5T1V0W9A';
@@ -36,6 +38,24 @@ export function sampleMoney(currency: CurrencyCode = 'USD', amountMinor = 1234):
  * `EVENT_SCHEMA_VERSIONS` rather than being hardcoded to 1, so a fixture never
  * disagrees with the map a consumer switches on.
  */
+export function sampleEnvelope<T extends EventType, P>(
+  type: T,
+  payload: P,
+): EventEnvelope<T, P> {
+  return {
+    id: `evt_01HQ8Z3K9X4M2N7P6R5T1V0${type.length.toString(36).toUpperCase().padStart(2, '0')}A`,
+    type,
+    version: EVENT_SCHEMA_VERSIONS[type],
+    occurred_at: OCCURRED_AT,
+    source: sourceFor(type),
+    correlation_id: 'req_01HQ8Z3K9X4M2N7P6R5T1V0W8Z',
+    causation_id: null,
+    merchant_id: MERCHANT_ID,
+    livemode: true,
+    payload,
+  };
+}
+
 function sourceFor(type: EventType): EventEnvelope<string, unknown>['source'] {
   if (type === 'invoice.issued') {
     return 'payzeno-billing-legacy';

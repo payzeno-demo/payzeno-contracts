@@ -64,3 +64,16 @@ export interface PayoutFailedPayload {
   retry_scheduled_for: IsoDate | null;
   failed_at: IsoTimestamp;
 }
+export type PayoutFailedEvent = EventEnvelope<'payout.failed', PayoutFailedPayload>;
+
+export interface PayoutReturnedPayload {
+  payout_id: PayoutId;
+  merchant_id: MerchantId;
+  amount_minor: MinorUnits;
+  currency: CurrencyCode;
+  /** ACH return code, e.g. `R01`, `R03`, `R29`. */
+  return_code: string;
+  reversal_transaction_id: LedgerTransactionId;
+  returned_at: IsoTimestamp;
+}
+export type PayoutReturnedEvent = EventEnvelope<'payout.returned', PayoutReturnedPayload>;
