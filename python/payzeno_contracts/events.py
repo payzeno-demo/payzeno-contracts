@@ -114,6 +114,36 @@ class DisputeEvidenceSubmittedPayload(BaseModel):
     evidence_field_count: int
 
 
+class DisputeOpenedPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    dispute_id: str
+    charge_id: str
+    merchant_id: str
+    amount_minor: int
+    fee_minor: int
+    currency: str
+    reason: str
+    network_reason_code: str
+    evidence_due_by: str
+    opened_at: str
+
+
+class EventEnvelope(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    id: str
+    type: str
+    version: int
+    occurred_at: str
+    source: Literal["payzeno-api"] | Literal["payzeno-ledger"] | Literal["payzeno-billing-legacy"]
+    correlation_id: str
+    causation_id: str | None
+    merchant_id: str | None
+    livemode: bool
+    payload: Any
+
+
 class InvoiceIssuedPayload(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -253,6 +283,18 @@ class PaymentAuthorizedPayload(BaseModel):
     acquirer: str
     risk_score: int
     authorized_at: str
+
+
+class PaymentCanceledPayload(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    payment_intent_id: str
+    charge_id: str | None
+    merchant_id: str
+    released_amount_minor: int
+    currency: str
+    cancellation_reason: str
+    canceled_at: str
 
 
 class PaymentCapturedPayload(BaseModel):
@@ -500,6 +542,7 @@ RefundFailedEvent = EventEnvelope
 RefundSucceededEvent = EventEnvelope
 SettlementBatchClosedEvent = EventEnvelope
 SettlementCompletedEvent = EventEnvelope
+SettlementDuplicateDetectedEvent = EventEnvelope
 SettlementFundedEvent = EventEnvelope
 SettlementItemSettledEvent = EventEnvelope
 SettlementReconciliationFailedEvent = EventEnvelope

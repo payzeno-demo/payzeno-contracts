@@ -13,6 +13,7 @@ name = "payzeno-contracts"
 version = "3.4.0"
 description = "Generated Pydantic models for the Payzeno shared contracts. Source of truth is @payzeno/contracts (TypeScript)."
 readme = "README.md"
+requires-python = ">=3.11"
 license = { text = "UNLICENSED" }
 authors = [{ name = "Payzeno Platform", email = "platform@payzeno.com" }]
 dependencies = [

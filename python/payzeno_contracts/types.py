@@ -19,6 +19,7 @@ ACCOUNT_STATUSES_VALUES = Literal["active", "frozen", "closed"]
 ACCOUNT_STATUSES: tuple[str, ...] = ("active", "frozen", "closed")
 
 
+ACCOUNT_TYPES_VALUES = Literal["processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment"]
 ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment")
 
 
@@ -26,6 +27,7 @@ ACQUIRERS_VALUES = Literal["worldflow", "nordpay"]
 ACQUIRERS: tuple[str, ...] = ("worldflow", "nordpay")
 
 
+API_KEY_MODES_VALUES = Literal["test", "live"]
 API_KEY_MODES: tuple[str, ...] = ("test", "live")
 
 
@@ -150,6 +152,7 @@ PRICING_MODELS_VALUES = Literal["blended", "interchange_plus"]
 PRICING_MODELS: tuple[str, ...] = ("blended", "interchange_plus")
 
 
+PUBLIC_EVENT_TYPES_VALUES = Literal["payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.item_settled", "settlement.completed", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned"]
 PUBLIC_EVENT_TYPES: tuple[str, ...] = ("payment.authorized", "payment.captured", "payment.failed", "payment.canceled", "refund.created", "refund.succeeded", "refund.failed", "dispute.opened", "dispute.evidence_submitted", "dispute.closed", "settlement.item_settled", "settlement.completed", "payout.scheduled", "payout.paid", "payout.failed", "payout.returned")
 
 
@@ -174,6 +177,9 @@ REFUND_REASONS: tuple[str, ...] = ("duplicate", "fraudulent", "requested_by_cust
 
 
 REFUND_STATUSES_VALUES = Literal["pending", "succeeded", "failed", "canceled"]
+REFUND_STATUSES: tuple[str, ...] = ("pending", "succeeded", "failed", "canceled")
+
+
 REPORTING_WINDOWS_VALUES = Literal["24h", "7d", "30d"]
 REPORTING_WINDOWS: tuple[str, ...] = ("24h", "7d", "30d")
 
@@ -258,6 +264,13 @@ class Balance(BaseModel):
     negative_balance_minor: int
     buckets: list[BalanceBucket]
     as_of: str
+
+
+class BalanceBucket(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    type: ACCOUNT_TYPES_VALUES
+    amount_minor: int
 
 
 class BalanceHistoryResponse(BaseModel):
@@ -1051,9 +1064,11 @@ ChargeListResponse = Paginated[Charge]
 ChargeResponse = Charge
 ChargeStatus = CHARGE_STATUSES_VALUES
 CurrencyCode = CURRENCIES_VALUES
+DeclineCode = DECLINE_CODES_VALUES
 DisputeId = str
 DisputeListResponse = Paginated[Dispute]
 DisputeReason = DISPUTE_REASONS_VALUES
+DisputeResponse = Dispute
 DisputeStatus = DISPUTE_STATUSES_VALUES
 EntryDirection = ENTRY_DIRECTIONS_VALUES
 ErrorCode = ERROR_CODES_VALUES
@@ -1068,7 +1083,9 @@ LedgerActor = LEDGER_ACTORS_VALUES
 LedgerEntryId = str
 LedgerPurpose = LEDGER_PURPOSES_VALUES
 LedgerReferenceType = LEDGER_REFERENCE_TYPES_VALUES
+LedgerTransactionId = str
 MatchMethod = MATCH_METHODS_VALUES
+MerchantId = str
 MerchantListResponse = Paginated[Merchant]
 MerchantResponse = Merchant
 MerchantStatus = MERCHANT_STATUSES_VALUES
@@ -1099,6 +1116,7 @@ RefundListResponse = Paginated[Refund]
 RefundReason = REFUND_REASONS_VALUES
 RefundResponse = Refund
 RefundStatus = REFUND_STATUSES_VALUES
+ReportingWindow = REPORTING_WINDOWS_VALUES
 RiskTier = RISK_TIERS_VALUES
 ScaExemption = SCA_EXEMPTIONS_VALUES
 SettlementBatchId = str
