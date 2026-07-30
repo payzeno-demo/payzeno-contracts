@@ -131,3 +131,9 @@ describe('the PayzenoEvent union', () => {
       expect(duplicate.payload.detected_by).toBe('retry_scheduler');
       expect(duplicate.payload.idempotency_key).toMatch(/^settle:sb_/);
       expect(duplicate.payload.existing_transaction_id).toMatch(/^txn_/);
+    }
+  });
+
+  it('chunks settlement.completed', () => {
+    const completed = events.find((e) => isEventOfType(e, 'settlement.completed'));
+    if (completed !== undefined && isEventOfType(completed, 'settlement.completed')) {
