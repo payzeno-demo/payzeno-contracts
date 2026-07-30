@@ -29,6 +29,8 @@ export const DISPUTE_REASONS = [
   'credit_not_processed',
   'general',
 ] as const;
+export type DisputeReason = (typeof DISPUTE_REASONS)[number];
+
 export interface DisputeEvidence {
   product_description?: string;
   customer_name?: string;

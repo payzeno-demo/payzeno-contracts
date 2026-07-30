@@ -29,3 +29,5 @@ export * from './types/dispute';
 export * from './types/ledger';
 export * from './types/payout';
 export * from './types/webhook';
+export * from './types/invoice';
+export * from './types/auth';

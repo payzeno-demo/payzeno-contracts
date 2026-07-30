@@ -84,3 +84,8 @@ export interface ApiError {
 
 export interface Paginated<T> {
   data: T[];
+  /** Opaque cursor for the next page. `null` when exhausted. */
+  next_cursor: string | null;
+  has_more: boolean;
+}
+
