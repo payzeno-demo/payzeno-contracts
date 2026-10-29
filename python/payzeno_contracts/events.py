@@ -283,6 +283,7 @@ class PaymentAuthorizedPayload(BaseModel):
     acquirer: str
     risk_score: int
     authorized_at: str
+    review_id: str | None = None
 
 
 class PaymentCanceledPayload(BaseModel):
@@ -307,6 +308,7 @@ class PaymentCapturedPayload(BaseModel):
     authorized_amount_minor: int
     currency: str
     captured_at: str
+    subscription_id: str | None = None
 
 
 class PaymentFailedPayload(BaseModel):
@@ -321,6 +323,7 @@ class PaymentFailedPayload(BaseModel):
     failure_message: str
     retryable: bool
     failed_at: str
+    subscription_id: str | None = None
 
 
 class PayoutFailedPayload(BaseModel):

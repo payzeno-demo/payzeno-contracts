@@ -34,6 +34,7 @@ public enum ErrorCode {
     AMOUNT_TOO_LARGE("amount_too_large"),
     REFUND_AMOUNT_EXCEEDED("refund_amount_exceeded"),
     MERCHANT_RESTRICTED("merchant_restricted"),
+    MERCHANT_NOT_ACTIVATED("merchant_not_activated"),
     LEDGER_IMBALANCE("ledger_imbalance"),
     ACCOUNT_FROZEN("account_frozen"),
     SETTLEMENT_LOCKED("settlement_locked"),

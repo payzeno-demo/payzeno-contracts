@@ -32,6 +32,16 @@ export type ReconciliationRunId = string;
 export type ReconciliationItemId = string;
 export type PayoutId = string;
 export type InvoiceId = string;
+export type CheckoutSessionId = string;
+export type CustomerId = string;
+export type PaymentMethodId = string;
+export type PriceId = string;
+export type SubscriptionId = string;
+export type ReviewId = string;
+export type KycDocumentId = string;
+export type FxQuoteId = string;
+export type EmailMessageId = string;
+export type StaffUserId = string;
 
 export const CURRENCIES = ['USD', 'EUR', 'GBP', 'ILS', 'JPY'] as const;
 export type CurrencyCode = (typeof CURRENCIES)[number];

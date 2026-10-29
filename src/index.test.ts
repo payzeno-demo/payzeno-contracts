@@ -127,7 +127,9 @@ describe('layering', () => {
     }
   });
 
-  it('has 14 type modules — the count the blueprint freezes', () => {
-    expect(files).toHaveLength(14);
+  // 14 from the blueprint, plus checkout (hosted checkout) and RFC platform-v2's customer,
+  // billing, risk, fx and onboarding.
+  it('has 20 type modules — the blueprint\'s 14 plus checkout and platform-v2', () => {
+    expect(files).toHaveLength(20);
   });
 });

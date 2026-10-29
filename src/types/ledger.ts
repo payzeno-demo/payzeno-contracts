@@ -33,6 +33,12 @@ export const ACCOUNT_TYPES = [
   'chargeback_liability',
   'cash',
   'rounding_adjustment',
+  /**
+   * RFC platform-v2 §7, ledger migration 0035. A converted payout crosses currencies through
+   * fx_clearing (debit-normal, one per currency); the spread over mid lands in fx_revenue.
+   */
+  'fx_clearing',
+  'fx_revenue',
 ] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
 

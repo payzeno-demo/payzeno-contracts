@@ -14,6 +14,10 @@
  *     from this emitter to a Python float.
  *   - Optional vs nullable are spelled differently: `x: T | None = None` for
  *     optional, `x: T | None` for nullable-but-required.
+ *   - A field whose name is a Python keyword or builtin is renamed with a trailing
+ *     underscore and keeps its wire name as an alias — `object_: ... = Field(alias='object')`
+ *     — and its model gets `populate_by_name=True`. Without the alias the model accepts
+ *     and emits `object_`, so every `{"object": ...}` body fails `extra='forbid'`.
  */
 
 import { UnsupportedTypeError } from '../errors';
@@ -67,6 +71,28 @@ function referencesModel(type: IrType, models: Set<string>): boolean {
   }
 }
 
+/**
+ * Moves each model after its base class, keeping the alphabetical order otherwise. The base
+ * in `class ChargeListQuery(ListQuery)` is evaluated at import time, so the sort above alone
+ * put `ChargeListQuery` ahead of `ListQuery` and the module raised NameError on import.
+ */
+function basesFirst(declarations: IrModule['declarations']): IrModule['declarations'] {
+  const byName = new Map(declarations.map((decl) => [decl.name, decl]));
+  const placed = new Set<string>();
+  const out: IrModule['declarations'] = [];
+  const place = (decl: IrModule['declarations'][number]): void => {
+    if (placed.has(decl.name)) return;
+    placed.add(decl.name);
+    if (decl.kind === 'model' && decl.base !== null) {
+      const base = byName.get(decl.base);
+      if (base !== undefined) place(base);
+    }
+    out.push(decl);
+  };
+  declarations.forEach(place);
+  return out;
+}
+
 export class PythonEmitter extends ContractEmitter {
   readonly target: Target = 'python';
   readonly fileExtension = '.py';
@@ -85,10 +111,12 @@ export class PythonEmitter extends ContractEmitter {
     // Paginated[Charge]` sorted alphabetically ahead of `Paginated` is a
     // NameError on import, in the ledger, at boot.
     const order: Record<string, number> = { enum: 0, 'const-map': 0, model: 1, alias: 2 };
-    const declarations = [...m.declarations].sort((a, b) => {
-      const rank = (order[a.kind] ?? 3) - (order[b.kind] ?? 3);
-      return rank !== 0 ? rank : a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
-    });
+    const declarations = basesFirst(
+      [...m.declarations].sort((a, b) => {
+        const rank = (order[a.kind] ?? 3) - (order[b.kind] ?? 3);
+        return rank !== 0 ? rank : a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+      }),
+    );
 
     for (const decl of declarations) {
       if (decl.kind === 'enum') {
@@ -113,7 +141,7 @@ export class PythonEmitter extends ContractEmitter {
       '',
       'from typing import Any, Generic, Literal, TypeVar',
       '',
-      'from pydantic import BaseModel, ConfigDict',
+      'from pydantic import BaseModel, ConfigDict, Field',
       '',
       'T = TypeVar("T")',
       '',
@@ -185,7 +213,12 @@ export class PythonEmitter extends ContractEmitter {
     if (model.doc !== null && model.doc.trim() !== '' && this.options.includeDocs !== false) {
       lines.push(`    """${model.doc.replace(/"""/g, "'''")}"""`);
     }
-    lines.push("    model_config = ConfigDict(extra='forbid')");
+    const aliased = model.fields.some((field) => this.quoteIdentifier(field.name) !== field.name);
+    lines.push(
+      aliased
+        ? "    model_config = ConfigDict(extra='forbid', populate_by_name=True)"
+        : "    model_config = ConfigDict(extra='forbid')",
+    );
     lines.push('');
 
     if (model.fields.length === 0) {
@@ -209,7 +242,13 @@ export class PythonEmitter extends ContractEmitter {
     const name = this.quoteIdentifier(field.name);
     const rendered = this.renderType(field.type);
     const annotation = field.nullable || field.optional ? `${rendered} | None` : rendered;
-    const assignment = field.optional ? ' = None' : '';
+    let assignment = field.optional ? ' = None' : '';
+    if (name !== field.name) {
+      // Renamed to dodge a keyword; the wire name stays the original.
+      assignment = field.optional
+        ? ` = Field(default=None, alias='${field.name}')`
+        : ` = Field(alias='${field.name}')`;
+    }
     return `${doc}    ${name}: ${annotation}${assignment}`;
   }
 

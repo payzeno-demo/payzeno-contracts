@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, Literal, TypeVar
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
@@ -19,8 +19,8 @@ ACCOUNT_STATUSES_VALUES = Literal["active", "frozen", "closed"]
 ACCOUNT_STATUSES: tuple[str, ...] = ("active", "frozen", "closed")
 
 
-ACCOUNT_TYPES_VALUES = Literal["processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment"]
-ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment")
+ACCOUNT_TYPES_VALUES = Literal["processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment", "fx_clearing", "fx_revenue"]
+ACCOUNT_TYPES: tuple[str, ...] = ("processor_clearing", "merchant_receivable", "authorization_hold", "merchant_payable", "platform_fee_revenue", "interchange_expense", "scheme_fee_expense", "acquirer_fee_expense", "reserve", "chargeback_liability", "cash", "rounding_adjustment", "fx_clearing", "fx_revenue")
 
 
 ACQUIRERS_VALUES = Literal["worldflow", "nordpay"]
@@ -96,8 +96,8 @@ ENTRY_DIRECTIONS_VALUES = Literal["debit", "credit"]
 ENTRY_DIRECTIONS: tuple[str, ...] = ("debit", "credit")
 
 
-ERROR_CODES_VALUES = Literal["invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error"]
-ERROR_CODES: tuple[str, ...] = ("invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error")
+ERROR_CODES_VALUES = Literal["invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "merchant_not_activated", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error"]
+ERROR_CODES: tuple[str, ...] = ("invalid_request", "refund_window_closed", "retryable_settlement", "orphaned_item", "retry_exhausted", "settlement_variance_exceeded", "validation_failed", "authentication_required", "invalid_api_key", "permission_denied", "not_found", "idempotency_key_reuse", "idempotency_in_progress", "invalid_state", "conflict", "rate_limited", "card_declined", "insufficient_funds", "expired_card", "processor_unavailable", "currency_mismatch", "amount_too_small", "amount_too_large", "refund_amount_exceeded", "merchant_restricted", "merchant_not_activated", "ledger_imbalance", "account_frozen", "settlement_locked", "duplicate_settlement", "batch_not_reconcilable", "payout_blocked", "dispute_window_closed", "duplicate_dispute", "legacy_upstream_unavailable", "internal_error")
 
 
 IDEMPOTENCY_STATES_VALUES = Literal["in_progress", "completed", "failed"]
@@ -217,10 +217,10 @@ WEBHOOK_EVENT_STATUSES: tuple[str, ...] = ("pending", "delivering", "delivered",
 
 
 class Account(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["account"]
+    object_: Literal["account"] = Field(alias='object')
     merchant_id: str | None
     type: ACCOUNT_TYPES_VALUES
     currency: CURRENCIES_VALUES
@@ -237,10 +237,10 @@ class ApiError(BaseModel):
 
 
 class ApiKey(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["api_key"]
+    object_: Literal["api_key"] = Field(alias='object')
     merchant_id: str
     name: str
     mode: API_KEY_MODES_VALUES
@@ -252,9 +252,9 @@ class ApiKey(BaseModel):
 
 
 class Balance(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["balance"]
+    object_: Literal["balance"] = Field(alias='object')
     merchant_id: str
     currency: CURRENCIES_VALUES
     available_minor: int
@@ -283,10 +283,10 @@ class BalanceHistoryResponse(BaseModel):
 
 
 class BankAccount(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["bank_account"]
+    object_: Literal["bank_account"] = Field(alias='object')
     merchant_id: str
     country: str
     currency: CURRENCIES_VALUES
@@ -334,10 +334,10 @@ class CardSummary(BaseModel):
 
 
 class Charge(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["charge"]
+    object_: Literal["charge"] = Field(alias='object')
     merchant_id: str
     payment_intent_id: str
     amount_minor: int
@@ -372,6 +372,15 @@ class ChargeLedgerResponse(BaseModel):
 
     charge_id: str
     transactions: list[LedgerTransaction]
+
+
+class ListQuery(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    limit: int | None = None
+    cursor: str | None = None
+    created_after: str | None = None
+    created_before: str | None = None
 
 
 class ChargeListQuery(ListQuery):
@@ -473,9 +482,9 @@ class CurrenciesResponse(BaseModel):
 
 
 class DashboardSummary(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["dashboard_summary"]
+    object_: Literal["dashboard_summary"] = Field(alias='object')
     merchant_id: str
     currency: CURRENCIES_VALUES
     window: REPORTING_WINDOWS_VALUES
@@ -490,10 +499,10 @@ class DashboardSummary(BaseModel):
 
 
 class Dispute(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["dispute"]
+    object_: Literal["dispute"] = Field(alias='object')
     merchant_id: str
     charge_id: str
     amount_minor: int
@@ -532,10 +541,10 @@ class FieldError(BaseModel):
 
 
 class FundingEvent(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["funding_event"]
+    object_: Literal["funding_event"] = Field(alias='object')
     acquirer: ACQUIRERS_VALUES
     currency: CURRENCIES_VALUES
     amount_minor: int
@@ -555,10 +564,10 @@ class HealthResponse(BaseModel):
 
 
 class Invoice(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["invoice"]
+    object_: Literal["invoice"] = Field(alias='object')
     merchant_id: str
     subscription_id: str | None
     number: str
@@ -586,10 +595,10 @@ class InvoiceLine(BaseModel):
 
 
 class LedgerAdjustmentRequest(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["ledger_adjustment_request"]
+    object_: Literal["ledger_adjustment_request"] = Field(alias='object')
     merchant_id: str | None
     currency: CURRENCIES_VALUES
     lines: list[PostTransactionLine]
@@ -603,10 +612,10 @@ class LedgerAdjustmentRequest(BaseModel):
 
 
 class LedgerEntry(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["ledger_entry"]
+    object_: Literal["ledger_entry"] = Field(alias='object')
     transaction_id: str
     account_id: str
     direction: ENTRY_DIRECTIONS_VALUES
@@ -617,10 +626,10 @@ class LedgerEntry(BaseModel):
 
 
 class LedgerTransaction(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["ledger_transaction"]
+    object_: Literal["ledger_transaction"] = Field(alias='object')
     idempotency_key: str
     request_fingerprint: str
     purpose: LEDGER_PURPOSES_VALUES
@@ -635,15 +644,6 @@ class LedgerTransaction(BaseModel):
     posted_at: str
 
 
-class ListQuery(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-
-    limit: int | None = None
-    cursor: str | None = None
-    created_after: str | None = None
-    created_before: str | None = None
-
-
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -652,18 +652,18 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["login"]
+    object_: Literal["login"] = Field(alias='object')
     user: User
     merchant: Merchant
 
 
 class Merchant(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["merchant"]
+    object_: Literal["merchant"] = Field(alias='object')
     legal_name: str
     display_name: str
     country: str
@@ -687,10 +687,10 @@ class Merchant(BaseModel):
 
 
 class MerchantSettlementBatch(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["merchant_settlement_batch"]
+    object_: Literal["merchant_settlement_batch"] = Field(alias='object')
     merchant_id: str
     currency: CURRENCIES_VALUES
     processing_date: str
@@ -725,10 +725,10 @@ class Paginated(BaseModel, Generic[T]):
 
 
 class PaymentIntent(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["payment_intent"]
+    object_: Literal["payment_intent"] = Field(alias='object')
     merchant_id: str
     amount_minor: int
     currency: CURRENCIES_VALUES
@@ -756,10 +756,10 @@ class PaymentIntentListQuery(ListQuery):
 
 
 class Payout(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["payout"]
+    object_: Literal["payout"] = Field(alias='object')
     merchant_id: str
     bank_account_id: str
     amount_minor: int
@@ -778,6 +778,9 @@ class Payout(BaseModel):
     failed_at: str | None
     returned_at: str | None
     created_at: str
+    source_amount_minor: int | None = None
+    source_currency: CURRENCIES_VALUES | None = None
+    fx_rate: str | None = None
 
 
 class PostTransactionLine(BaseModel):
@@ -809,9 +812,9 @@ class ReadinessResponse(BaseModel):
 
 
 class ReconciliationBacklog(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["reconciliation_backlog"]
+    object_: Literal["reconciliation_backlog"] = Field(alias='object')
     retryable: int
     failed: int
     orphaned: int
@@ -821,10 +824,10 @@ class ReconciliationBacklog(BaseModel):
 
 
 class ReconciliationItem(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["reconciliation_item"]
+    object_: Literal["reconciliation_item"] = Field(alias='object')
     batch_id: str
     charge_id: str | None
     merchant_id: str | None
@@ -852,10 +855,10 @@ class ReconciliationItem(BaseModel):
 
 
 class ReconciliationRun(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["reconciliation_run"]
+    object_: Literal["reconciliation_run"] = Field(alias='object')
     batch_id: str
     trigger: RECONCILIATION_TRIGGERS_VALUES
     status: RECONCILIATION_RUN_STATUSES_VALUES
@@ -868,10 +871,10 @@ class ReconciliationRun(BaseModel):
 
 
 class Refund(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["refund"]
+    object_: Literal["refund"] = Field(alias='object')
     merchant_id: str
     charge_id: str
     amount_minor: int
@@ -893,19 +896,19 @@ class RetryReconciliationItemRequest(BaseModel):
 
 
 class SessionResponse(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["session"]
+    object_: Literal["session"] = Field(alias='object')
     user: User
     merchant: Merchant
     permissions: list[str]
 
 
 class SettlementBatch(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["settlement_batch"]
+    object_: Literal["settlement_batch"] = Field(alias='object')
     currency: CURRENCIES_VALUES
     processing_date: str
     acquirer: ACQUIRERS_VALUES
@@ -954,9 +957,9 @@ class TimeseriesPoint(BaseModel):
 
 
 class TrialBalanceResult(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["trial_balance"]
+    object_: Literal["trial_balance"] = Field(alias='object')
     currency: CURRENCIES_VALUES
     balanced: bool
     delta_minor: int
@@ -983,10 +986,10 @@ class UpdateMerchantRequest(BaseModel):
 
 
 class User(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["user"]
+    object_: Literal["user"] = Field(alias='object')
     merchant_id: str
     email: str
     full_name: str
@@ -996,9 +999,9 @@ class User(BaseModel):
 
 
 class VolumeTimeseries(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
-    object_: Literal["volume_timeseries"]
+    object_: Literal["volume_timeseries"] = Field(alias='object')
     merchant_id: str
     currency: CURRENCIES_VALUES
     interval: TIMESERIES_INTERVALS_VALUES
@@ -1006,10 +1009,10 @@ class VolumeTimeseries(BaseModel):
 
 
 class WebhookEndpoint(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["webhook_endpoint"]
+    object_: Literal["webhook_endpoint"] = Field(alias='object')
     merchant_id: str
     url: str
     enabled_events: list[PUBLIC_EVENT_TYPES_VALUES]
@@ -1022,10 +1025,10 @@ class WebhookEndpoint(BaseModel):
 
 
 class WebhookEvent(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', populate_by_name=True)
 
     id: str
-    object_: Literal["webhook_event"]
+    object_: Literal["webhook_event"] = Field(alias='object')
     merchant_id: str
     endpoint_id: str
     type: PUBLIC_EVENT_TYPES_VALUES
