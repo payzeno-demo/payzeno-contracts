@@ -50,4 +50,9 @@ export type AuthPrincipal =
       kind: 'client_secret';
       merchant_id: MerchantId;
       payment_intent_id: PaymentIntentId;
+      /**
+       * The intent's own mode. The secret has no `sk_live_`/`sk_test_` prefix to read it from,
+       * and a test-mode intent confirmed as live is a 404 — the scope never matches its row.
+       */
+      livemode: boolean;
     };

@@ -21,6 +21,8 @@ import type {
   BasisPoints,
   PaymentIntentId,
   RefundId,
+  ReviewId,
+  SubscriptionId,
 } from '../index';
 import type { EventEnvelope } from './envelope';
 
@@ -50,6 +52,11 @@ export interface PaymentAuthorizedPayload {
   acquirer: Acquirer;
   risk_score: number;
   authorized_at: IsoTimestamp;
+  /**
+   * RFC platform-v2 §8, additive: set when Payzeno's risk rules held the payment for review —
+   * the authorisation stays uncaptured until a risk analyst decides. Null or absent otherwise.
+   */
+  review_id?: ReviewId | null;
 }
 export type PaymentAuthorizedEvent = EventEnvelope<'payment.authorized', PaymentAuthorizedPayload>;
 
@@ -61,6 +68,8 @@ export interface PaymentCapturedPayload {
   authorized_amount_minor: MinorUnits;
   currency: CurrencyCode;
   captured_at: IsoTimestamp;
+  /** RFC platform-v2 §6, additive: the subscription this payment was for (first or renewal). */
+  subscription_id?: SubscriptionId | null;
 }
 export type PaymentCapturedEvent = EventEnvelope<'payment.captured', PaymentCapturedPayload>;
 
@@ -74,6 +83,8 @@ export interface PaymentFailedPayload {
   failure_message: string;
   retryable: boolean;
   failed_at: IsoTimestamp;
+  /** RFC platform-v2 §6, additive: set when a subscription payment (first or renewal) failed. */
+  subscription_id?: SubscriptionId | null;
 }
 export type PaymentFailedEvent = EventEnvelope<'payment.failed', PaymentFailedPayload>;
 

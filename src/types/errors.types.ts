@@ -35,6 +35,8 @@ export const ERROR_CODES = [
   'amount_too_large',
   'refund_amount_exceeded',
   'merchant_restricted',
+  /** RFC platform-v2 §3: a live payment for a merchant that is not `active` yet. 403. */
+  'merchant_not_activated',
   'ledger_imbalance',
   'account_frozen',
   'settlement_locked',

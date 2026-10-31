@@ -67,6 +67,10 @@ export interface Payout {
   failed_at: IsoTimestamp | null;
   returned_at: IsoTimestamp | null;
   created_at: IsoTimestamp;
+  /** Set when the payout converted: the balance it came out of. `amount_minor`/`currency` are what lands in the bank. */
+  source_amount_minor: MinorUnits | null;
+  source_currency: CurrencyCode | null;
+  fx_rate: string | null;
 }
 
 export interface CreatePayoutRequest {
@@ -74,8 +78,8 @@ export interface CreatePayoutRequest {
   currency: CurrencyCode;
   /**
    * Optional; defaults to the merchant's `is_default` account **for this currency**. The
-   * account's `currency` must equal `currency` — Payzeno does not convert (domain-model §0.1).
-   * Mismatch is `BankAccountUnusableError`.
+   * When the account's currency differs from `currency`, the ledger converts at payout time
+   * (RFC platform-v2 §7) and the payout records `source_*` and `fx_rate`.
    */
   bank_account_id?: BankAccountId;
   method?: PayoutMethod;

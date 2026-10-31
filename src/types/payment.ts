@@ -11,13 +11,18 @@ import type { ListQuery, Paginated } from './errors.types';
 import type {
   ChargeId,
   CurrencyCode,
+  CustomerId,
   IsoTimestamp,
   MerchantId,
   Metadata,
   MinorUnits,
   PaymentIntentId,
+  PaymentMethodId,
+  ReviewId,
   SettlementBatchId,
+  SubscriptionId,
 } from './scalars';
+import type { Presentment } from './fx';
 import type { Acquirer } from './settlement';
 
 export const CARD_BRANDS = ['visa', 'mastercard', 'amex', 'discover'] as const;
@@ -104,6 +109,18 @@ export interface PaymentIntent {
   updated_at: IsoTimestamp;
   canceled_at: IsoTimestamp | null;
   cancellation_reason: CancellationReason | null;
+  /** RFC platform-v2 §5. Null when the payment was not tied to a customer. */
+  customer_id: CustomerId | null;
+  /** The saved card used, when one was. */
+  payment_method_id: PaymentMethodId | null;
+  /** Where the receipt goes once the payment is captured. */
+  receipt_email: string | null;
+  /** §7: set when the shopper paid in a currency other than the price's. */
+  presentment: Presentment | null;
+  /** §8: the open or closed risk review, when platform rules held the payment. */
+  review_id: ReviewId | null;
+  /** §6: set for subscription payments (first and renewals). */
+  subscription_id: SubscriptionId | null;
 }
 
 export interface CreatePaymentIntentRequest {

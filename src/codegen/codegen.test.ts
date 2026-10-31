@@ -164,7 +164,7 @@ describe('PythonEmitter', () => {
   });
 
   it('forbids extra fields — a producer/consumer skew must fail loudly', () => {
-    expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid')");
+    expect(emitted.contents).toContain("model_config = ConfigDict(extra='forbid'");
   });
 
   it('imports future annotations so declaration order does not matter', () => {
@@ -188,6 +188,12 @@ describe('PythonEmitter', () => {
 
   it('escapes the `object` field name, which is a Python builtin', () => {
     expect(emitted.contents).toContain('object_: Literal["charge"]');
+  });
+
+  it('keeps the wire name of an escaped field as its alias', () => {
+    expect(emitted.contents).toContain(`object_: Literal["charge"] = Field(alias='object')`);
+    expect(emitted.contents).toContain("ConfigDict(extra='forbid', populate_by_name=True)");
+    expect(emitted.contents).toContain('from pydantic import BaseModel, ConfigDict, Field');
   });
 
   it('stamps the DO-NOT-EDIT banner with CONTRACTS_VERSION', () => {

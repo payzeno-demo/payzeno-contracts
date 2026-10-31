@@ -10,7 +10,7 @@ const PREFIXES = Object.keys(ID_PREFIXES) as IdPrefix[];
 
 describe('ID_PREFIXES', () => {
   it('covers the domain-model table plus the two vault prefixes', () => {
-    expect(PREFIXES).toHaveLength(20);
+    expect(PREFIXES).toHaveLength(29);
     expect(PREFIXES).toContain('mch');
     expect(PREFIXES).toContain('sub');
     expect(PREFIXES).toContain('pmt');
